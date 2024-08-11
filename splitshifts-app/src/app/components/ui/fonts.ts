@@ -1,5 +1,4 @@
-import { Inter } from 'next/font/google';
-import { Space_Grotesk } from 'next/font/google';
+import { Inter, Space_Grotesk } from 'next/font/google';
 
 export const inter = Inter({
   subsets: ['latin'],
