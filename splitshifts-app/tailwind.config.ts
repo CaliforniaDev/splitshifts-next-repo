@@ -50,8 +50,12 @@ const config: Config = {
         'surface-container-highest': '#E0E3E8',
       },
       fontFamily: {
-        inter: ['Inter', 'sans-serif'],
-        'space-grotesk': ['Space Grotesk', 'sans-serif'],
+        inter: ['var(--font-inter)', 'Inter', 'sans-serif'],
+        'space-grotesk': [
+          'var(--font-space-grotesk)',
+          'Space Grotesk',
+          'sans-serif',
+        ],
       },
       fontSize: {
         'display-lg': ['57px', '64px'],
