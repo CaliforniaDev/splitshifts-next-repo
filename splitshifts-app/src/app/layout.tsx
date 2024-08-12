@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
-import { inter, spaceGrotesk } from '@/app/components/ui/fonts';
+import { inter, spaceGrotesk } from '@/app/typeface/fonts';
 
 import TopNav from '@/app/components/ui/navigation/TopNav';
 import './globals.css';
+import './typeface/typography.css';
 
 export const metadata: Metadata = {
   title: 'SplitShifts',
