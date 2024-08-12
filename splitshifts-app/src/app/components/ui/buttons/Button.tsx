@@ -1,3 +1,22 @@
+/**
+ * Button component
+ *
+ * This component renders a button with different styles based on the `variant` prop.
+ *
+ * Props:
+ * - `variant` (string): The style variant of the button. Can be 'outlined' or 'text'.
+ * - `disabled` (boolean): If true, the button will be disabled.
+ * - `onClick` (function): The function to call when the button is clicked.
+ * - `children` (ReactNode): The content to display inside the button.
+ *
+ * Example usage:
+ * ```jsx
+ * <Button variant="outlined" onClick={() => console.log('Button clicked!')}>
+ *   Click Me
+ * </Button>
+ * ```
+ */
+
 type ButtonVariant = 'elevated' | 'filled' | 'tonal' | 'outlined' | 'text';
 
 type ButtonProps = {
