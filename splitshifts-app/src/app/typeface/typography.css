@@ -1,3 +1,46 @@
+/* 
+  ==============================================================================
+  Tailwind CSS Type Scale Definitions
+  ==============================================================================
+
+  This file defines a custom type scale using Tailwind CSS for consistent 
+  typography throughout the SplitShifts web application. The type scale is 
+  categorized into Display, Headline, Title, Label, and Body fonts, each with 
+  variations in size, weight, and letter spacing.
+
+  Type Scale Overview:
+  --------------------
+  - Display Fonts: Used for large, prominent text elements. The "Space Grotesk" 
+    font is applied with weights of 500, and sizes vary from large to small.
+  
+  - Headline Fonts: Suitable for headlines and section titles. Also using "Space 
+    Grotesk," but with a lighter weight of 400 to differentiate from Display fonts.
+  
+  - Title Fonts: Applied to smaller, significant text elements like titles and 
+    subtitles. The "Inter" font is used here with a weight of 500, with a more 
+    prominent variant available.
+  
+  - Label Fonts: Utilized for form labels and UI elements that require clarity. 
+    "Inter" is used with weights of 500 and a prominent variant at 600 for emphasis.
+  
+  - Body Fonts: Intended for body text across the application. The "Inter" font 
+    at a weight of 400 is used to maintain readability.
+
+  Tailwind's @layer Feature:
+  ---------------------------
+  - @layer base: This is where the type scale classes are defined, applying the 
+    corresponding font family, weight, size, and letter spacing. This structure 
+    ensures that typography remains consistent across all components in the 
+    application.
+
+  Example Usage:
+  --------------
+  - Classes such as .typescale-display-large, .typescale-headline-medium, 
+    .typescale-title-small, etc., can be applied directly to HTML elements 
+    to ensure they adhere to the defined type scale.
+*/
+
+
 @tailwind base;
 
 @layer base {
