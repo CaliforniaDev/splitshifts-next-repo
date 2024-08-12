@@ -1,0 +1,119 @@
+@tailwind base;
+
+@layer base {
+  /* Display Fonts */
+  .typescale-display-large,
+  .typescale-display-medium,
+  .typescale-display-small {
+    @apply font-space-grotesk;
+    font-weight: 500;
+  }
+  .typescale-display-large {
+    @apply text-display-lg;
+    letter-spacing: -0.25px;
+  }
+  .typescale-display-medium {
+    @apply text-display-md;
+    letter-spacing: 0px;
+  }
+  .typescale-display-small {
+    @apply text-display-sm;
+    letter-spacing: 0px;
+  }
+  .typescale-headline-large,
+  .typescale-headline-medium,
+  .typescale-headline-small {
+    @apply font-space-grotesk;
+    font-weight: 400;
+  }
+
+  /* Headline Fonts */
+  .typescale-headline-large {
+    @apply text-headline-lg;
+    letter-spacing: 0px;
+  }
+  .typescale-headline-medium {
+    @apply text-headline-md;
+    letter-spacing: 0px;
+  }
+  .typescale-headline-small {
+    @apply text-headline-sm;
+    letter-spacing: 0px;
+  }
+
+  /* Title Fonts  */
+  .typescale-title-large,
+  .typescale-title-medium,
+  .typescale-title-small {
+    @apply font-inter;
+    font-weight: 500;
+  }
+  .typescale-title-large {
+    @apply text-title-lg;
+    letter-spacing: 0px;
+  }
+  .typescale-title-medium {
+    @apply text-title-md;
+    letter-spacing: 0.15px;
+  }
+  .typescale-title-small {
+    @apply text-title-sm;
+    letter-spacing: 0.1px;
+  }
+  .typescale-title-small-prominent {
+    @apply text-title-sm;
+    letter-spacing: 0.1px;
+    font-weight: 600;
+  }
+  /* Label Fonts */
+
+  .typescale-label-large,
+  .typescale-label-medium,
+  .typescale-label-small {
+    @apply font-inter;
+    font-weight: 500;
+  }
+  .typescale-label-large {
+    @apply text-label-lg;
+    letter-spacing: 0.1px;
+  }
+  .typescale-label-large-prominent {
+    @apply text-label-lg;
+    letter-spacing: 0.1px;
+    font-weight: 600;
+  }
+  .typescale-label-medium {
+    @apply text-label-md;
+    letter-spacing: 0.5px;
+  }
+  .typescale-label-medium-prominent {
+    @apply text-label-md;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+  .typescale-label-small {
+    @apply text-label-sm;
+    letter-spacing: 0.5px;
+  }
+
+  /* Body Fonts */
+
+  .typescale-body-large,
+  .typescale-body-medium,
+  .typescale-body-small {
+    @apply font-inter;
+    font-weight: 400;
+  }
+  .typescale-body-large {
+    @apply text-body-lg;
+    letter-spacing: 0px;
+  }
+  .typescale-body-medium {
+    @apply text-body-md;
+    letter-spacing: 0.25px;
+  }
+  .typescale-body-small {
+    @apply text-body-sm;
+    letter-spacing: 0.4px;
+  }
+}
