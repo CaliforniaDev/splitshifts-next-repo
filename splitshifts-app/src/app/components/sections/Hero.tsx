@@ -1,8 +1,11 @@
+import Image from 'next/image';
+import dashboardMockup from '@/../public/assets/mockups/dashboard-light.webp';
+
 import Button from '@/app/components/ui/buttons/Button';
 
 export default function Hero() {
   return (
-    <section className='flex  flex-col gap-6 text-center text-on-surface'>
+    <section className='flex flex-col gap-6 text-center text-on-surface'>
       <header className='flex flex-col gap-5'>
         <h1 className='typescale-display-large'>
           Simplify Shift Management,{' '}
@@ -16,6 +19,13 @@ export default function Hero() {
         <Button size='large' variant='elevated'>
           Get Started
         </Button>
+      </div>
+      <div className='relative mt-6 flex rounded-xl shadow-elevation-1'>
+        <Image
+          src={dashboardMockup}
+          alt='SplitShifts Hero'
+          placeholder='blur'
+        />
       </div>
     </section>
   );
