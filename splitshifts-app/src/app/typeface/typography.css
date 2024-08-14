@@ -95,6 +95,11 @@
     @apply text-title-lg;
     letter-spacing: 0px;
   }
+  .typescale-title-large-prominent {
+    @apply text-title-lg;
+    letter-spacing: 0px;
+    font-weight: 600;
+  }
   .typescale-title-medium {
     @apply text-title-md;
     letter-spacing: 0.15px;
