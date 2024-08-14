@@ -10,11 +10,11 @@
 
   Type Scale Overview:
   --------------------
-  - Display Fonts: Used for large, prominent text elements. The "Space Grotesk" 
-    font is applied with weights of 500, and sizes vary from large to small.
+  - Display Fonts: Used for large, prominent text elements. The "Inter" 
+    font is applied with weights of 800, and sizes vary from large to small.
   
-  - Headline Fonts: Suitable for headlines and section titles. Also using "Space 
-    Grotesk," but with a lighter weight of 400 to differentiate from Display fonts.
+  - Headline Fonts: Suitable for headlines and section titles. Uses the "Space 
+    Grotesk," but with a lighter weight of 450 to differentiate from Display fonts.
   
   - Title Fonts: Applied to smaller, significant text elements like titles and 
     subtitles. The "Inter" font is used here with a weight of 500, with a more 
@@ -48,12 +48,12 @@
   .typescale-display-large,
   .typescale-display-medium,
   .typescale-display-small {
-    @apply font-space-grotesk;
-    font-weight: 500;
+    @apply font-inter;
+    font-weight: 800;
   }
   .typescale-display-large {
     @apply text-display-lg;
-    letter-spacing: -0.25px;
+    letter-spacing: 0.25px;
   }
   .typescale-display-medium {
     @apply text-display-md;
@@ -67,7 +67,7 @@
   .typescale-headline-medium,
   .typescale-headline-small {
     @apply font-space-grotesk;
-    font-weight: 400;
+    font-weight: 450;
   }
 
   /* Headline Fonts */
