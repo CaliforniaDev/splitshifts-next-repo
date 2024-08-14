@@ -13,7 +13,6 @@ export const spaceGrotesk = Space_Grotesk({
 });
 
 export const josefinSans = Josefin_Sans({
-  weight: '700',
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-josefin-sans',
