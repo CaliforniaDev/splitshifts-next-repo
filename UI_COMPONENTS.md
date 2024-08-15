@@ -7,6 +7,7 @@ This document provides detailed descriptions, usage examples, and styling inform
   - [Props](#props)
   - [Example Usage](#example-usage)
   - [Styling](#styling)
+- [Typography and Styling Guide](#typography-and-styling-guide)
 - [Additional Components](#additional-components)
 
 ---
@@ -87,3 +88,47 @@ import Button from '@/app/components/Button';
 <Button variant="filled" disabled onClick={() => console.log('This should not log')}>
   Disabled Button
 </Button>
+```
+
+## Typography and Styling Guide
+
+This section outlines the custom type scale defined using Tailwind CSS for consistent typography across the SplitShifts web application. The type scale is carefully categorized into Display, Headline, Title, Label, and Body fonts, each offering variations in size, weight, and letter spacing to maintain a cohesive design.
+
+### Type Scale Overview
+
+- **Display Fonts:** 
+  - Used for large, prominent text elements.
+  - Font: **Inter**, Weight: **800**, with varying sizes (Large, Medium, Small).
+
+- **Headline Fonts:**
+  - Suitable for headlines and section titles.
+  - Font: **Space Grotesk**, Weight: **450** for differentiation from Display fonts.
+
+- **Title Fonts:**
+  - Applied to smaller, significant text elements like titles and subtitles.
+  - Font: **Inter**, Weight: **500** with a more prominent variant available.
+
+- **Label Fonts:**
+  - Utilized for form labels and UI elements requiring clarity.
+  - Font: **Inter**, Weights: **500** and **600** (prominent variant).
+
+- **Body Fonts:**
+  - Intended for body text across the application.
+  - Font: **Inter**, Weight: **400** for readability.
+
+### Tailwind's @layer Feature
+
+- **@layer base:** 
+  - This layer is where the type scale classes are defined, applying the corresponding font family, weight, size, and letter spacing. It ensures typography remains consistent across all components in the application.
+
+### Usage
+
+- **Typography**: Use the classes defined in `typography.css` to apply consistent typography styles.
+- **Tailwind Configuration**: Customize the theme in `tailwind.config.ts` to match the design requirements.
+- **Fonts**: Define and use custom fonts in `fonts.ts`.
+- **Layout**: Apply the defined styles in `layout.tsx`.
+
+### Example Usage
+
+- Apply classes such as `.typescale-display-large`, `.typescale-headline-medium`, `.typescale-title-small`, etc., directly to HTML elements to ensure they adhere to the defined type scale.
+
