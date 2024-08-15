@@ -10,7 +10,6 @@ SplitShifts is a web application designed to streamline the scheduling process f
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Running the Development Server](#running-the-development-server)
-- [Typography](#typography)
 - [License](#license)
 - [Contact](#contact)
 
@@ -76,8 +75,6 @@ Before you begin, ensure you have met the following requirements:
 
 2. Open your browser and visit 'http://locolhost:3000' to see the app in action.
 
-## Typography
-
 ### Overview
 
 This project uses a consistent type scale across various components and pages. The type scale is defined in multiple files, including `typography.css`, `tailwind.config.ts`, `fonts.ts`, and `layout.tsx`.
@@ -92,13 +89,6 @@ This project uses a consistent type scale across various components and pages. T
 ### How They Link Together
 
 The type scale defined in `typography.css` is referenced in the Tailwind configuration to ensure consistent typography across the application. Tailwind's `@layer` feature is used to apply these styles globally. The `fonts.ts` file defines the font families and weights, which are then used in `tailwind.config.ts`. The `layout.tsx` file applies these styles to the application layout.
-
-### Usage
-
-- **Typography**: Use the classes defined in `typography.css` to apply consistent typography styles.
-- **Tailwind Configuration**: Customize the theme in `tailwind.config.ts` to match the design requirements.
-- **Fonts**: Define and use custom fonts in `fonts.ts`.
-- **Layout**: Apply the defined styles in `layout.tsx`.
 
 Refer to the comments in each file for more detailed information.
 
