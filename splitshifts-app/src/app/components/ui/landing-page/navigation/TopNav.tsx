@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import logo from '@/../public/assets/splitshifts-logo.svg';
 import { josefinSans } from '@/app/typeface/fonts';
-import Button from '@/app/components/ui/buttons/Button';
+
+import ButtonGroup from './ButtonGroup';
 
 export default function TopNav() {
   const Logo = () => {
@@ -24,6 +25,10 @@ export default function TopNav() {
     );
   };
 
+  const handleClick = () => {
+    console.log('Button clicked!');
+  }
+
   return (
     <nav className='flex h-20 items-center justify-between gap-4 px-[72px] py-[18px]'>
       <Logo />
@@ -43,10 +48,7 @@ export default function TopNav() {
           </li>
         </ul>
       </div>
-      <div data-section='call-to-action' className='flex w-1/3 gap-4'>
-        <Button variant='text'> Log In</Button>
-        <Button variant='filled'>Start for free</Button>
-      </div>
+      <ButtonGroup />
     </nav>
   );
 }

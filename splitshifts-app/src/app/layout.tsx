@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { inter, spaceGrotesk } from '@/app/typeface/fonts';
 
-import TopNav from '@/app/components/ui/navigation/TopNav';
+import TopNav from '@/app/components/ui/landing-page/navigation/TopNav';
 import './globals.css';
 import './typeface/typography.css';
 
