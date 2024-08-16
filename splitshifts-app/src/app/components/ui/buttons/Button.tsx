@@ -1,3 +1,4 @@
+'use client'
 /**
  * Button component
  *
@@ -52,9 +53,11 @@ export default function Button({
     large: 'typescale-title-large-prominent font px-8 py-2 ',
   };
 
+  const disabledStyle = disabled ? 'opacity-[0.12] cursor-not-allowed' : '';
+
   return (
     <button
-      className={` ${baseStyle} ${styles[variant]} ${sizeStyles[size]} ${className}`}
+      className={` ${baseStyle} ${styles[variant]} ${sizeStyles[size]} ${disabledStyle} ${className}`}
       disabled={disabled}
       onClick={onClick}
     >
