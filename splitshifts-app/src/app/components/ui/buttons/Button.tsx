@@ -21,14 +21,15 @@
 type ButtonVariant = 'elevated' | 'filled' | 'tonal' | 'outlined' | 'text';
 type ButtonSize = 'default' | 'large';
 
-type ButtonProps = {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   children: React.ReactNode;
   disabled?: boolean;
   className?: string;
-  onClick?: () => void;
 };
+
+
 
 export default function Button({
   variant = 'filled',
@@ -36,7 +37,7 @@ export default function Button({
   children = 'Button',
   className = '',
   disabled = false,
-  onClick,
+  ...rest
 }: ButtonProps) {
   const baseStyle = 'whitespace-nowrap rounded-[10px] focus:outline-none;';
 
@@ -59,9 +60,17 @@ export default function Button({
     <button
       className={` ${baseStyle} ${styles[variant]} ${sizeStyles[size]} ${disabledStyle} ${className}`}
       disabled={disabled}
-      onClick={onClick}
+      {...rest}
     >
       {children}
     </button>
   );
 }
+
+// type ButtonProps = {
+//   variant?: ButtonVariant;
+//   size?: ButtonSize;
+//   children: React.ReactNode;
+//   disabled?: boolean;
+//   className?: string;
+// } & React.ButtonHTMLAttributes<HTMLButtonElement>;
