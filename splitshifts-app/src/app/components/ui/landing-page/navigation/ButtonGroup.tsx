@@ -8,13 +8,26 @@ export default function ButtonGroup() {
   };
   const handleSignUp = () => {
     console.log('Sign Up!');
-  }
+  };
   return (
-    <div className='flex w-1/3 gap-4'>
-      <Button onClick={handleLogIn} variant='text'>
+    <div
+      className='flex w-1/3 gap-4'
+      aria-label='Primary call-to-action buttons'
+    >
+      <Button
+        onClick={handleLogIn}
+        variant='text'
+        aria-label='Log in to your account'
+      >
         Log In
       </Button>
-      <Button onClick={handleSignUp} variant='filled'>Start for free</Button>
+      <Button
+        onClick={handleSignUp}
+        variant='filled'
+        aria-label='Sign up for a free account'
+      >
+        Start for free
+      </Button>
     </div>
   );
 }
