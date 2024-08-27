@@ -1,3 +1,17 @@
+/**
+ * ButtonGroup component
+ *
+ * This component renders a group of buttons for primary call-to-action actions.
+ * It includes a "Log In" button and a "Start for free" button.
+ *
+ * The "Log In" button triggers the handleLogIn function, which logs a message to the console.
+ * The "Start for free" button triggers the handleSignUp function, which logs a message to the console.
+ *
+ * This component is marked with 'use client' to indicate that it should be rendered on the client side.
+ * This allows the rest of the code to remain on the server, optimizing performance and security.
+ *
+ */
+
 'use client';
 
 import Button from '@/app/components/ui/buttons/Button';
