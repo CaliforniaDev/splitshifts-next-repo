@@ -75,6 +75,13 @@ const config: Config = {
         'title-md': ['16px', '24px'],
         'title-sm': ['14px', '20px'],
       },
+      opacity: {
+        'hover': '0.08',
+        'focus': '0.10',
+        'press': '0.10',
+        'disabled': '0.12',
+        'drag': '0.16'
+      },
       boxShadow: {
         'elevation-1':
           '0px 4px 4px 0px rgba(0, 0, 0, 0.25), 0px 1px 2px 0px rgba(0, 0, 0, 0.30);',
