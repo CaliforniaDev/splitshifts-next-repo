@@ -76,11 +76,14 @@ const config: Config = {
         'title-sm': ['14px', '20px'],
       },
       opacity: {
-        'hover': '0.08',
-        'focus': '0.10',
-        'press': '0.10',
-        'disabled': '0.12',
-        'drag': '0.16'
+        8: '0.08',
+        12: '0.12',
+        16: '0.16',
+        'state-hover': '0.08',
+        'state-focus': '0.10',
+        'state-press': '0.10',
+        'state-disabled': '0.12',
+        'state-drag': '0.16',
       },
       boxShadow: {
         'elevation-1':
