@@ -37,8 +37,11 @@ export default function Button({
   disabled = false,
   ...rest
 }: ButtonProps) {
-  const baseStyle = 'relative overflow-hidden whitespace-nowrap rounded-[10px] focus:outline-none';
+  // Base Button Styles Used for All Variants
+  const baseStyle =
+    'relative overflow-hidden whitespace-nowrap rounded-[10px] before:absolute before:inset-0 before:transition-all before:duration-200 focus:outline-none';
 
+  // Variant Styles
   const styles = {
     elevated: 'shadow-elevation-1 bg-surface-container-low text-primary',
     filled: 'bg-primary text-on-primary',
@@ -47,29 +50,31 @@ export default function Button({
     text: 'text-primary',
   };
 
-  const stateOverlay = {
-    elevated: 'opacity-0 hover:bg-primary hover:opacity-hover',
-    filled: 'opacity-0 hover:bg-on-primary hover:opacity-hover',
-    tonal: 'opacity-0 hover:bg-on-secondary-container hover:opacity-hover',
-    outlined: 'opacity-0 hover:bg-primary hover:opacity-hover ',
-    text: 'opacity-0 hover:bg-primary hover:opacity-hover',
+  // State Overlay Layer Styles Used for Hover and Focus States
+  const stateLayer = {
+    elevated: 'before:bg-primary before:opacity-0 hover:before:opacity-8',
+    filled: 'before:bg-on-primary before:opacity-0 hover:before:opacity-8',
+    tonal: 'before:bg-on-secondary-container before:opacity-0  hover:before:hover:opacity-8', // prettier-ignore
+    outlined: 'before:bg-primary before:opacity-0 hover:before:opacity-8',
+    text: 'before:bg-primary before:opacity-0 hover:before:opacity-8',
   };
 
+  // Button Size Styles
   const sizeStyles = {
     default: 'typescale-label-large px-6 py-2.5',
     large: 'typescale-title-large-prominent font px-8 py-2 ',
   };
 
+  // Disabled Button Styles
   const disabledStyle = disabled ? 'opacity-disabled cursor-not-allowed' : '';
 
   return (
     <button
-      className={` ${baseStyle} ${styles[variant]} ${sizeStyles[size]} ${disabledStyle} ${className}`}
+      className={`${className} ${baseStyle} ${styles[variant]} ${stateLayer[variant]} ${sizeStyles[size]} ${disabledStyle}`}
       disabled={disabled}
       {...rest}
     >
-      <span className='pointer-events-none relative z-10'>{children}</span>
-      <span className={`absolute inset-0 transition-all duration-200 ease-in ${stateOverlay[variant]}`}></span>
+      <span className='pointer-events-none relative'>{children}</span>
     </button>
   );
 }
