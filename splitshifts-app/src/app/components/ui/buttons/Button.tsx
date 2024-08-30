@@ -48,11 +48,11 @@ export default function Button({
   };
 
   const stateOverlay = {
-    elevated: 'opacity-0 hover:bg-primary hover:opacity-[0.08]',
-    filled: 'opacity-0 hover:bg-on-primary hover:opacity-[0.08]',
-    tonal: 'opacity-0 hover:bg-on-secondary-container hover:opacity-[0.08] ',
-    outlined: 'opacity-0 hover:bg-primary hover:opacity-[0.08] ',
-    text: 'opacity-0 hover:bg-primary hover:opacity-[0.08] ',
+    elevated: 'opacity-0 hover:bg-primary hover:opacity-hover',
+    filled: 'opacity-0 hover:bg-on-primary hover:opacity-hover',
+    tonal: 'opacity-0 hover:bg-on-secondary-container hover:opacity-hover',
+    outlined: 'opacity-0 hover:bg-primary hover:opacity-hover ',
+    text: 'opacity-0 hover:bg-primary hover:opacity-hover',
   };
 
   const sizeStyles = {
@@ -60,7 +60,7 @@ export default function Button({
     large: 'typescale-title-large-prominent font px-8 py-2 ',
   };
 
-  const disabledStyle = disabled ? 'opacity-[0.12] cursor-not-allowed' : '';
+  const disabledStyle = disabled ? 'opacity-disabled cursor-not-allowed' : '';
 
   return (
     <button
