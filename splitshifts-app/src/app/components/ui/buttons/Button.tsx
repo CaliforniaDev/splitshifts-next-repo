@@ -1,4 +1,4 @@
-'use client'
+'use client';
 /**
  * Button component
  *
@@ -27,9 +27,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   disabled?: boolean;
   className?: string;
-};
-
-
+}
 
 export default function Button({
   variant = 'filled',
@@ -39,7 +37,7 @@ export default function Button({
   disabled = false,
   ...rest
 }: ButtonProps) {
-  const baseStyle = 'whitespace-nowrap rounded-[10px] focus:outline-none;';
+  const baseStyle = 'relative overflow-hidden whitespace-nowrap rounded-[10px] focus:outline-none';
 
   const styles = {
     elevated: 'shadow-elevation-1 bg-surface-container-low text-primary',
@@ -47,6 +45,14 @@ export default function Button({
     tonal: 'bg-secondary-container text-on-secondary-container',
     outlined: 'border border-outline text-primary',
     text: 'text-primary',
+  };
+
+  const stateOverlay = {
+    elevated: 'opacity-0 hover:bg-primary hover:opacity-[0.08]',
+    filled: 'opacity-0 hover:bg-on-primary hover:opacity-[0.08]',
+    tonal: 'opacity-0 hover:bg-on-secondary-container hover:opacity-[0.08] ',
+    outlined: 'opacity-0 hover:primary hover:opacity-[0.08] ',
+    text: 'opacity-0 hover:bg-primary hover:opacity-[0.08] ',
   };
 
   const sizeStyles = {
@@ -62,7 +68,8 @@ export default function Button({
       disabled={disabled}
       {...rest}
     >
-      {children}
+      <span className='pointer-events-none relative z-10'>{children}</span>
+      <span className={`absolute inset-0 transition-all duration-200 ease-in ${stateOverlay[variant]}`}></span>
     </button>
   );
 }
