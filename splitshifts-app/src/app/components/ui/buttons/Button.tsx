@@ -51,7 +51,7 @@ export default function Button({
     elevated: 'opacity-0 hover:bg-primary hover:opacity-[0.08]',
     filled: 'opacity-0 hover:bg-on-primary hover:opacity-[0.08]',
     tonal: 'opacity-0 hover:bg-on-secondary-container hover:opacity-[0.08] ',
-    outlined: 'opacity-0 hover:primary hover:opacity-[0.08] ',
+    outlined: 'opacity-0 hover:bg-primary hover:opacity-[0.08] ',
     text: 'opacity-0 hover:bg-primary hover:opacity-[0.08] ',
   };
 
