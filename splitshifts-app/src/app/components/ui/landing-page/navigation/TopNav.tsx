@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import Image from 'next/image';
 import logo from '@/../public/assets/splitshifts-logo.svg';
 import { josefinSans } from '@/app/typeface/fonts';
@@ -25,20 +26,16 @@ export default function TopNav() {
     );
   };
 
-  const handleClick = () => {
-    console.log('Button clicked!');
-  }
-
   return (
     <nav className='flex h-20 items-center justify-between gap-4 px-[72px] py-[18px]'>
       <Logo />
       <div className='flex w-full justify-center'>
         <ul className='typescale-label-large z-10 flex min-w-max max-w-max gap-14 rounded-full border border-outline-variant px-6 py-2.5'>
           <li className='typescale-label-large-prominent text-primary'>
-            <a href='/'>Home</a>
+            <Link href='/'>Home</Link>
           </li>
           <li>
-            <a href='/pricing'>Pricing</a>
+            <Link href='/pricing'>Pricing</Link>
           </li>
           <li>
             <a href='/learn-more'>Learn More</a>
