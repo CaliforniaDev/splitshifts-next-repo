@@ -98,11 +98,16 @@
   .typescale-title-large-prominent {
     @apply text-title-lg;
     letter-spacing: 0px;
-    font-weight: 600;
+    font-weight: 700;
   }
   .typescale-title-medium {
     @apply text-title-md;
     letter-spacing: 0.15px;
+  }
+  .typescale-title-medium-prominent {
+    @apply text-title-md;
+    letter-spacing: 0.15px;
+    font-weight: 700;
   }
   .typescale-title-small {
     @apply text-title-sm;
@@ -111,7 +116,7 @@
   .typescale-title-small-prominent {
     @apply text-title-sm;
     letter-spacing: 0.1px;
-    font-weight: 600;
+    font-weight: 700;
   }
   /* Label Fonts */
 
@@ -128,7 +133,7 @@
   .typescale-label-large-prominent {
     @apply text-label-lg;
     letter-spacing: 0.1px;
-    font-weight: 600;
+    font-weight: 700;
   }
   .typescale-label-medium {
     @apply text-label-md;
@@ -137,7 +142,7 @@
   .typescale-label-medium-prominent {
     @apply text-label-md;
     letter-spacing: 0.5px;
-    font-weight: 600;
+    font-weight: 700;
   }
   .typescale-label-small {
     @apply text-label-sm;
