@@ -2,7 +2,7 @@
 
 /**
  * NavItems.tsx
- * 
+ *
  * This file contains components for rendering navigation items.
  * It includes the NavList component for rendering a list of navigation links
  * and the NavLink component for rendering individual navigation links.
@@ -40,9 +40,9 @@ export function NavList({ children }: NavListProps) {
 
 /**
  * NavLink component
- * 
+ *
  * This component renders a single navigation link.
- * 
+ *
  * @param {React.ReactNode} children - The content to be displayed within the link.
  * @param {string} href - The URL that the link points to.
  * @param {string} [ariaLabel] - Optional ARIA label for accessibility.
@@ -58,9 +58,11 @@ export function NavLink({ children, href, ariaLabel }: NavLinkProps) {
   return (
     <li
       className={clsx(
-        'nav-item transition-all duration-200 hover:opacity-40 active:text-primary active:opacity-100',
-        isActive &&
-          'typescale-label-large-prominent text-primary opacity-100 hover:opacity-100',
+        'nav-item transition-all duration-200 active:text-primary active:opacity-100',
+        {
+          'hover:opacity-40': !isActive,
+          'typescale-label-large-prominent text-primary': isActive,
+        },
       )}
     >
       <Link
