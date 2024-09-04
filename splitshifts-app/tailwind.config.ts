@@ -43,6 +43,9 @@ const config: Config = {
         'inverse-surface': '#2D3135',
         'inverse-on-surface': '#EEF1F6',
 
+        'surface-dim': '#D7DADF',
+        'surface-bright': '#F7F9FF',
+
         'surface-container-lowest': '#FFFFFF',
         'surface-container-low': '#F1F4F9',
         'surface-container': '#EBEEF3',
