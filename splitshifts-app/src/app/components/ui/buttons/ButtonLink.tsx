@@ -1,29 +1,31 @@
-'use client';
+import Link from 'next/link';
 import clsx from 'clsx';
+
 import {
   baseStyle,
   styles,
   stateLayer,
   sizeStyles,
-  disabledStyle,
   StyleVariants,
   SizeVariants,
 } from './buttonStyles';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonLinkProps {
+  href: string;
   variant?: StyleVariants;
   size?: SizeVariants;
   children: React.ReactNode;
   className?: string;
-  disabled?: boolean;
 }
 
 /**
- * The `Button` component is a reusable styled button that supports multiple variants
- * and sizes. It provides flexibility with different styles, including elevated, filled,
- * tonal, outlined, and text buttons, along with size options.
+ * The `ButtonLink` component is intended for use cases where
+ * you need a link that visually looks like a button. It provides
+ * consistent styling with the `Button` component but functions
+ * as a navigation link instead of a button.
  *
  * Props:
+ * - `href` (string, required): The URL to link to. Must be a valid URL string.
  * - `variant` (optional, StyleVariants): The style variant of the button. Available values:
  *     - `'elevated'`: Adds shadow and background.
  *     - `'filled'`: Solid color background.
@@ -31,42 +33,41 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
  *     - `'outlined'`: No background, only a border.
  *     - `'text'`: No background or border, just text.
  *   Default: `'filled'`.
- * - `size` (optional, SizeVariants): The size variant of the button. Available values:
+ * - `size` (optional, SizeVariants): The size of the button. Available values:
  *     - `'default'`: Normal size.
  *     - `'large'`: Larger size with more padding.
  *   Default: `'default'`.
  * - `children` (ReactNode): The content to display inside the button, usually text.
  * - `className` (optional, string): Additional custom classes to apply to the button.
- *   This can be used to extend or override the default styles.
- * - `disabled` (optional, boolean): If true, the button will be disabled and non-interactive.
- *   Adds appropriate styling for disabled state.
- * - `rest` (any): Additional props to pass to the underlying `<button>` element, such as event handlers
- *   like `onClick`.
+ * - `rest` (any): Additional props to pass to the `Link` component.
  *
- * @param {ButtonProps} props The props for the Button component.
- * @returns The rendered Button component with the provided styling and content.
+ * @param {ButtonLinkProps} props The props for the ButtonLink component.
+ * @returns The rendered ButtonLink component.
+ *
  */
 
-export default function Button({
+export default function ButtonLink({
+  href,
   variant = 'filled',
   size = 'default',
-  children = 'Button',
+  children = 'Link',
   className = '',
-  disabled = false,
   ...rest
-}: ButtonProps) {
+}: ButtonLinkProps) {
+  /**
+   * The `className` variable is used to apply the appropriate styles to the button based on the props.
+   * The `clsx` function is used to concatenate the class names together.
+   */
   className = clsx(
     className,
     baseStyle,
     styles[variant],
     stateLayer[variant],
     sizeStyles[size],
-    disabled ? disabledStyle[variant] : '',
   );
-
   return (
-    <button className={className} disabled={disabled} {...rest}>
+    <Link className={className} href={href} {...rest}>
       <span className='pointer-events-none relative'>{children}</span>
-    </button>
+    </Link>
   );
 }
