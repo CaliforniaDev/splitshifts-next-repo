@@ -82,6 +82,7 @@ const config: Config = {
         8: '0.08',
         12: '0.12',
         16: '0.16',
+        38: '0.38',
         'state-hover': '0.08',
         'state-focus': '0.10',
         'state-press': '0.10',
