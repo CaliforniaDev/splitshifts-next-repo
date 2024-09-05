@@ -4,6 +4,7 @@
  * @returns The rendered top navigation component.
  */
 import { NavList, NavLink } from './NavItems';
+import ButtonLink from '@/app/components/ui/buttons/ButtonLink';
 import Image from 'next/image';
 import logo from '@/../public/assets/splitshifts-logo.svg';
 import { josefinSans } from '@/app/typeface/fonts';
@@ -50,7 +51,25 @@ export default function TopNav() {
           </NavLink>
         </NavList>
       </div>
-      <ButtonGroup />
+      <div
+        className='flex w-1/3 gap-4'
+        aria-label='Primary call-to-action links'
+      >
+        <ButtonLink
+          href='/login'
+          variant='text'
+          aria-label='Log in to your account'
+        >
+          Log In
+        </ButtonLink>
+        <ButtonLink
+          href='/signup'
+          variant='filled'
+          aria-label='Sign up for a new account'
+        >
+          Start for free
+        </ButtonLink>
+      </div>
     </nav>
   );
 }
