@@ -9,13 +9,7 @@
  * - `disabled` (boolean): If true, the button will be disabled.
  * - `onClick` (function): The function to call when the button is clicked.
  * - `children` (ReactNode): The content to display inside the button.
- *
- * Example usage:
- * ```jsx
- * <Button variant="outlined" onClick={() => console.log('Button clicked!')}>
- *   Click Me
- * </Button>
- * ```
+ * - `className` (string): Additional classes to apply to the button.
  */
 
 type ButtonVariant = 'elevated' | 'filled' | 'tonal' | 'outlined' | 'text';
