@@ -11,11 +11,12 @@
 - Implemented basic folder structure for components, pages, and styles.
 - Integrated ESLint and Prettier for code linting and formatting.
 - **Button Component**: Implemented a reusable `Button` component with support for different variants (`elevated`, `filled`, `tonal`, `outlined`, `text`) and sizes (`default`, `large`). The component also supports disabling and custom styling through the `className` prop.
-- **TopNav Component**: Styled the `TopNav` component and added buttons for "Log In" and "Start for free". The component is functional but not yet fully reusable.
+- **ButtonLink Component**: Added a `ButtonLink` component that renders a styled link resembling a button. It supports the same variants (`elevated`, `filled`, `tonal`, `outlined`, `text`) and sizes (`default`, `large`) as the `Button` component for consistent styling in navigation.
+- **TopNav Component**: Styled the `TopNav` component and replaced the buttons with `ButtonLink` components for navigation ("Log In" and "Start for free"). The component is functional but not yet fully reusable.
 - **Hero Section**: Added a Hero section with a headline, subheadline, and a call-to-action button.
 
 ### Changed
-- N/A
+- Extracted shared Tailwind CSS styles for `Button` and `ButtonLink` components into a separate file (`buttonStyles.ts`) to ensure consistency and reusability across both components.
 
 ### Fixed
 - N/A

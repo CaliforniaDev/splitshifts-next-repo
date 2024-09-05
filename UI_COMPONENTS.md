@@ -6,7 +6,9 @@ This document provides detailed descriptions, usage examples, and styling inform
 - [Button Component](#button-component)
   - [Props](#props)
   - [Example Usage](#example-usage)
-  - [Styling](#styling)
+- [ButtonLink Component](#buttonlink-component)
+  - [Props](#props)
+  - [Example Usage](#example-usage)
 - [Typography and Styling Guide](#typography-and-styling-guide)
 - [Additional Components](#additional-components)
 
@@ -88,6 +90,67 @@ import Button from '@/app/components/Button';
 <Button variant="filled" disabled onClick={() => console.log('This should not log')}>
   Disabled Button
 </Button>
+```
+
+## ButtonLink Component
+
+The `ButtonLink` component is similar to the `Button` component but is used for navigation. It renders a styled `<a>` tag using Next.js's `Link` component, offering the same styling and flexibility as the `Button`.
+
+### Props
+
+- **`href`** (required, `string`): Defines the URL to which the link should navigate. It must be a valid URL string.
+  
+- **`variant`** (optional, `string`): Defines the style variant of the button. It can be one of the following:
+  - `'elevated'`: Renders a link with an elevated shadow and background color from `surface-container-low`.
+  - `'filled'`: Renders a link with a solid primary background color and on-primary text color.
+  - `'tonal'`: Renders a link with a secondary container background color and on-secondary container text color.
+  - `'outlined'`: Renders a link with a border and primary text color.
+  - `'text'`: Renders a link with only primary text color, without any background or border.
+
+  **Default:** `'filled'`
+
+- **`size`** (optional, `string`): Defines the size of the button link. It can be one of the following:
+  - `'default'`: Renders a link with standard padding and typographic scale.
+  - `'large'`: Renders a link with larger padding and a prominent typographic scale.
+
+  **Default:** `'default'`
+
+- **`children`** (optional, `ReactNode`): The content to display inside the link. This can be text, icons, or any other JSX elements.
+
+  **Default:** `'Button'`
+
+- **`className`** (optional, `string`): Allows additional custom classes to be added to the link for further styling customization.
+
+  **Default:** `''`
+
+- **`rest`** (optional, `object`): Additional props that are passed to the underlying `Link` component from Next.js.
+
+### Example Usage
+
+Here are some examples of how to use the `ButtonLink` component in your application:
+
+```jsx
+import ButtonLink from '@/app/components/ui/buttons/ButtonLink';
+
+// Text Link
+<ButtonLink href="/login" variant="text">
+  Log In
+</ButtonLink>
+
+// Filled Link
+<ButtonLink href="/signup" variant="filled">
+  Start for free
+</ButtonLink>
+
+// Tonal Link
+<ButtonLink href="/learn-more" variant="tonal">
+  Learn More
+</ButtonLink>
+
+// Large Filled Link
+<ButtonLink href="/signup" size="large" variant="filled">
+  Start for free
+</ButtonLink>
 ```
 
 ## Typography and Styling Guide
