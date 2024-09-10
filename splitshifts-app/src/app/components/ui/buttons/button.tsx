@@ -8,7 +8,7 @@ import {
   disabledStyle,
   StyleVariants,
   SizeVariants,
-} from './buttonStyles';
+} from './styles';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: StyleVariants;
