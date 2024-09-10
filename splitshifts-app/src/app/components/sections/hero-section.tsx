@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import dashboardMockup from '@/../public/assets/mockups/dashboard-light.webp';
 
-import Button from '@/app/components/ui/buttons/Button';
+import Button from '@/app/components/ui/buttons/button';
 
 export default function Hero() {
   return (

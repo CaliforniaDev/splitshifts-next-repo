@@ -8,9 +8,9 @@ import {
   sizeStyles,
   StyleVariants,
   SizeVariants,
-} from './buttonStyles';
+} from './styles';
 
-interface ButtonLinkProps {
+interface LinkButtonProps {
   href: string;
   variant?: StyleVariants;
   size?: SizeVariants;
@@ -19,7 +19,7 @@ interface ButtonLinkProps {
 }
 
 /**
- * The `ButtonLink` component is intended for use cases where
+ * The `LinkButton` component is intended for use cases where
  * you need a link that visually looks like a button. It provides
  * consistent styling with the `Button` component but functions
  * as a navigation link instead of a button.
@@ -41,19 +41,19 @@ interface ButtonLinkProps {
  * - `className` (optional, string): Additional custom classes to apply to the button.
  * - `rest` (any): Additional props to pass to the `Link` component.
  *
- * @param {ButtonLinkProps} props The props for the ButtonLink component.
- * @returns The rendered ButtonLink component.
+ * @param {LinkButtonProps} props The props for the LinkButton component.
+ * @returns The rendered LinkButton component.
  *
  */
 
-export default function ButtonLink({
+export default function LinkButton({
   href,
   variant = 'filled',
   size = 'default',
   children = 'Link',
   className = '',
   ...rest
-}: ButtonLinkProps) {
+}: LinkButtonProps) {
   /**
    * The `className` variable is used to apply the appropriate styles to the button based on the props.
    * The `clsx` function is used to concatenate the class names together.

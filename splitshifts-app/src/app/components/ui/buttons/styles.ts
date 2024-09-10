@@ -1,4 +1,4 @@
-// These styles are shared between the `Button` and `ButtonLink` components
+// These styles are shared between the `button` and `link-button` components
 // to ensure consistent styling. Each component can use `variant` and `size`
 // props to apply appropriate styles.
 

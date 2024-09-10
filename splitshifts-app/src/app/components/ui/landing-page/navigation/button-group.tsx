@@ -14,7 +14,7 @@
 
 'use client';
 
-import Button from '@/app/components/ui/buttons/Button';
+import Button from '@/app/components/ui/buttons/real-button';
 
 export default function ButtonGroup() {
   const handleLogIn = () => {

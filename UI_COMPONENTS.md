@@ -6,7 +6,7 @@ This document provides detailed descriptions, usage examples, and styling inform
 - [Button Component](#button-component)
   - [Props](#props)
   - [Example Usage](#example-usage)
-- [ButtonLink Component](#buttonlink-component)
+- [LinkButton Component](#linkbutton-component)
   - [Props](#props)
   - [Example Usage](#example-usage)
 - [Typography and Styling Guide](#typography-and-styling-guide)
@@ -54,7 +54,7 @@ The `Button` component is a reusable UI element that allows you to render button
 Here are some examples of how to use the `Button` component in your application:
 
 ```jsx
-import Button from '@/app/components/Button';
+import Button from '@/app/components/ui/buttons/button';
 
 // Elevated Button
 <Button variant="elevated" onClick={() => console.log('Elevated Button clicked!')}>
@@ -92,9 +92,9 @@ import Button from '@/app/components/Button';
 </Button>
 ```
 
-## ButtonLink Component
+## LinkButton Component
 
-The `ButtonLink` component is similar to the `Button` component but is used for navigation. It renders a styled `<a>` tag using Next.js's `Link` component, offering the same styling and flexibility as the `Button`.
+The `LinkButton` component is similar to the `Button` component but is used for navigation. It renders a styled `<a>` tag using Next.js's `Link` component, offering the same styling and flexibility as the `Button`.
 
 ### Props
 
@@ -127,30 +127,30 @@ The `ButtonLink` component is similar to the `Button` component but is used for 
 
 ### Example Usage
 
-Here are some examples of how to use the `ButtonLink` component in your application:
+Here are some examples of how to use the `LinkButton` component in your application:
 
 ```jsx
-import ButtonLink from '@/app/components/ui/buttons/ButtonLink';
+import LinkButton from '@/app/components/ui/buttons/LinkButton';
 
 // Text Link
-<ButtonLink href="/login" variant="text">
+<LinkButton href="/login" variant="text">
   Log In
-</ButtonLink>
+</LinkButton>
 
 // Filled Link
-<ButtonLink href="/signup" variant="filled">
+<LinkButton href="/signup" variant="filled">
   Start for free
-</ButtonLink>
+</LinkButton>
 
 // Tonal Link
-<ButtonLink href="/learn-more" variant="tonal">
+<LinkButton href="/learn-more" variant="tonal">
   Learn More
-</ButtonLink>
+</LinkButton>
 
 // Large Filled Link
-<ButtonLink href="/signup" size="large" variant="filled">
+<LinkButton href="/signup" size="large" variant="filled">
   Start for free
-</ButtonLink>
+</LinkButton>
 ```
 
 ## Typography and Styling Guide
