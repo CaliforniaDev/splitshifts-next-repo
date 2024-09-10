@@ -37,3 +37,6 @@ next-env.d.ts
 
 # Ignore experimental folder
 /experimental/
+
+# Ignore settings.json
+.vscode/settings.json
