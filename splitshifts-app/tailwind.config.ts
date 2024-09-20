@@ -106,6 +106,9 @@ const config: Config = {
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
+      transitionProperty: {
+        'textfield': 'border, background-color, color, padding',
+      },
     },
   },
   plugins: [],
