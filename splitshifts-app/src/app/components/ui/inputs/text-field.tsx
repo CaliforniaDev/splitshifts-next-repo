@@ -42,16 +42,13 @@ export default function TextField({
           {...props}
           className={clsx(
             'relative h-14 w-full rounded-t-[4px] bg-surface-container-highest px-4 pb-2 pt-6 text-on-surface caret-primary transition-textfield duration-200 ease-in focus:outline-none',
+            className,
             {
-              className,
               'border-b-2 border-b-primary': isFocused,
               'border-b-[1px] border-b-on-surface': !isFocused,
             },
           )}
         />
-        {/**
-         * TODO: Add label styling
-         */}
         <label
           htmlFor={id}
           className={clsx(
