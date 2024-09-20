@@ -1,8 +1,24 @@
+'use client';
+import { useState } from 'react';
 import Button from '@/app/components/ui/buttons/button';
+import TextField from '@/app/components/ui/inputs/text-field';
 export default function SignUpPage() {
+  const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    inquiryType: '',
+    message: '',
+  });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
   return (
-    <form action=''>
-      <div>
+    <form action='' className="relative flex border-4 p-10 ">
+      <TextField onChange={handleChange} label='First name' name='firstName' value={form.firstName} />
+      {/* <div>
         <label htmlFor='name'>Name</label>
         <input id='name' name='name' placeholder='Name' />
       </div>
@@ -14,7 +30,7 @@ export default function SignUpPage() {
         <label htmlFor='password'>Password</label>
         <input id='password' name='password' type='password' />
       </div>
-      <Button variant='filled' type='submit'>Sign Up</Button>
+      <Button variant='filled' type='submit'>Sign Up</Button> */}
     </form>
   );
 }
