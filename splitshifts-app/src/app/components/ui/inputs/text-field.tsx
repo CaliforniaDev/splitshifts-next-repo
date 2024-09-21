@@ -50,7 +50,7 @@ export default function TextField({
             describedByIds.length > 0 ? describedByIds.join(' ') : undefined
           }
           {...props}
-          className={clsx(styles.inputBase, {
+          className={clsx(styles.inputBase, className, {
             'border-b-2 border-b-primary': isFocused, // && !error,w
             'border-b-[1px] border-b-on-surface': !isFocused,
             // 'border-b-error': error,
