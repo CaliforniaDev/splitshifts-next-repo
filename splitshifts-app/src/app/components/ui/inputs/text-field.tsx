@@ -21,19 +21,25 @@ export default function TextField({
   name,
   onChange,
   className,
+  error,
+  supportingText,
   ...props
 }: TextFieldProps) {
   const [isFocused, setIsFocused] = useState(false);
   let isPopulated = value !== '';
   const id = props.id || name;
-  const errorId = `${id}-error`;
-  const supportingTextId = `${id}-supporting-text`;
-  const describedByIds = [];
-  if (errorId) describedByIds.push(errorId);
-  if (supportingTextId) describedByIds.push(supportingTextId);
 
   const handleFocus = () => setIsFocused(true);
   const handleBlur = () => setIsFocused(false);
+
+  // Accessibility IDs
+  const errorId = `${id}-error`;
+  const supportingTextId = `${id}-supporting-text`;
+
+  // Collect IDs for aria-describedby
+  const describedByIds = [];
+  if (errorId) describedByIds.push(errorId);
+  if (supportingTextId) describedByIds.push(supportingTextId);
 
   return (
     <div className='relative'>
@@ -45,30 +51,39 @@ export default function TextField({
           onChange={onChange}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          // aria-invalid={!!error}
-          aria-describedby={
-            describedByIds.length > 0 ? describedByIds.join(' ') : undefined
-          }
+          aria-invalid={!!error}
+          aria-describedby={describedByIds.length > 0 ? describedByIds.join(' ') : undefined} // prettier-ignore
+          disabled={props.disabled}
           {...props}
           className={clsx(styles.inputBase, className, {
-            'border-b-2 border-b-primary': isFocused, // && !error,w
-            'border-b-[1px] border-b-on-surface': !isFocused,
-            // 'border-b-error': error,
+            'border-b-[1px]': !isFocused,
+            'border-b-2': isFocused,
+            'border-b-on-surface': !isFocused && !error,
+            'border-b-primary caret-primary': isFocused && !error,
+            'border-b-error caret-error': error,
           })}
         />
         <label
           htmlFor={id}
           className={clsx(styles.labelBase, {
-            'text-primary': isFocused, // && !error,
-            'text-on-surface-variant': !isFocused,
             'typescale-body-large pt-4': !isFocused && !isPopulated,
             'typescale-body-small pt-[8px]': isFocused || isPopulated,
-            // 'text-on-error-container': error,
+            'text-on-surface-variant': !isFocused && !error,
+            'text-primary': isFocused && !error,
+            'text-error': error,
           })}
         >
           {label}
         </label>
       </span>
+      {supportingText && !error && (
+        <p className='typescale-body-small px-4 pb-0 pt-1'>{supportingText}</p>
+      )}
+      {error && (
+        <p className='typescale-body-small px-4 pb-0 pt-1 text-error'>
+          {error}
+        </p>
+      )}
     </div>
   );
 }
