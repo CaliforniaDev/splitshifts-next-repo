@@ -9,6 +9,9 @@ This document provides detailed descriptions, usage examples, and styling inform
 - [LinkButton Component](#linkbutton-component)
   - [Props](#props)
   - [Example Usage](#example-usage)
+- [TextField Component](#textfield-component)
+  - [Props](#textfield-component-props)
+  - [Example Usage](#textfield-component-example-usage)
 - [Typography and Styling Guide](#typography-and-styling-guide)
 - [Additional Components](#additional-components)
 
@@ -151,6 +154,106 @@ import LinkButton from '@/app/components/ui/buttons/LinkButton';
 <LinkButton href="/signup" size="large" variant="filled">
   Start for free
 </LinkButton>
+```
+
+## TextField Component
+
+The `TextField` component is a reusable input field that supports labels, error messages, supporting text, and accessibility features. It manages focus and populated states to provide visual feedback and ensure accessibility compliance.
+
+### Props {#textfield-component-props}
+
+- **`label`** (`string`): The label for the text field.
+
+- **`value`** (`string`, optional): The current value of the text field.
+  
+  **Default:** `''`
+
+- **`name`** (`string`): The name attribute for the input element.
+
+- **`onChange`** (`function`, optional): Callback fired when the value of the text field changes.
+
+- **`className`** (`string`, optional): Additional CSS classes to apply to the input element.
+
+  **Default:** `''`
+
+- **`error`** (`boolean | string`, optional): Indicates an error state or provides an error message.
+
+  **Default:** `false`
+
+- **`supportingText`** (`string`, optional): Optional supporting text displayed below the text field.
+
+- **`required`** (`boolean`, optional): If `true`, the text field is marked as required.
+
+  **Default:** `false`
+
+- **`disabled`** (`boolean`, optional): If `true`, the text field will be disabled and non-interactive.
+
+  **Default:** `false`
+
+- **`style`** (`React.CSSProperties`, optional): Inline styles to apply to the input element.
+
+### Example Usage {#textfield-component-example-usage}
+
+Here are some examples of how to use the `TextField` component in your application:
+
+```jsx
+import TextField from '@/app/components/ui/text-field';
+
+function ExampleForm() {
+  const [username, setUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+    // Example validation
+    if (e.target.value.length < 3) {
+      setUsernameError('Username must be at least 3 characters long.');
+    } else {
+      setUsernameError('');
+    }
+  };
+
+  return (
+    <form>
+      {/* Basic TextField */}
+      <TextField
+        label="Username"
+        name="username"
+        value={username}
+        onChange={handleUsernameChange}
+        supportingText="Enter your unique username."
+        required
+      />
+
+      {/* TextField with Error */}
+      <TextField
+        label="Password"
+        name="password"
+        type="password"
+        onChange={(e) => console.log(e.target.value)}
+        error="Password must be at least 8 characters."
+        required
+      />
+
+      {/* Disabled TextField */}
+      <TextField
+        label="Disabled Field"
+        name="disabled"
+        value="Cannot edit this"
+        disabled
+      />
+
+      {/* Email TextField */}
+      <TextField
+        label="Email"
+        name="email"
+        type="email"
+        onChange={(e) => console.log(e.target.value)}
+        supportingText="We'll never share your email."
+      />
+    </form>
+  );
+}
 ```
 
 ## Typography and Styling Guide
