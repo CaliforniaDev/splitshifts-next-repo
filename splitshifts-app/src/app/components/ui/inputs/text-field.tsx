@@ -28,7 +28,7 @@ export default function TextField({
   const [isFocused, setIsFocused] = useState(false);
   let isPopulated = value !== '';
 
-  // Generate a unique ID for the input element if one is not provided
+  // Generate a unique ID for the if one is not provided
   const generatedId = useId();
   const id = props.id || `${name}-${generatedId}`;
 
