@@ -53,6 +53,7 @@ export default function TextField({
           onFocus={handleFocus}
           onBlur={handleBlur}
           aria-invalid={!!error}
+          aria-required={props.required ? true : undefined}
           aria-describedby={describedByIds.length > 0 ? describedByIds.join(' ') : undefined} // prettier-ignore
           disabled={props.disabled}
           {...props}
