@@ -27,17 +27,20 @@ export default function TextField({
 }: TextFieldProps) {
   const [isFocused, setIsFocused] = useState(false);
   let isPopulated = value !== '';
+
+  // Generate a unique ID for the input element if one is not provided
   const generatedId = useId();
   const id = props.id || `${name}-${generatedId}`;
 
+  // Handlers to manage focus state
   const handleFocus = () => setIsFocused(true);
   const handleBlur = () => setIsFocused(false);
 
-  // Accessibility IDs
+  // Accessibility IDs for error and supporting text
   const errorId = `${id}-error`;
   const supportingTextId = `${id}-supporting-text`;
 
-  // Collect IDs for aria-describedby
+  // Collect IDs for aria-describedby to associate input with descriptions
   const describedByIds = [];
   if (errorId) describedByIds.push(errorId);
   if (supportingTextId) describedByIds.push(supportingTextId);
