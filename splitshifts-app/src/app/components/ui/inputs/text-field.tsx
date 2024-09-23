@@ -86,11 +86,19 @@ export default function TextField({
         </label>
       </span>
       {supportingText && !error && (
-        <p className='typescale-body-small px-4 pb-0 pt-1'>{supportingText}</p>
+        <p
+          id={supportingTextId}
+          className='typescale-body-small px-4 pb-0 pt-1'
+        >
+          {supportingText}
+        </p>
       )}
       {error && (
-        <p className='typescale-body-small px-4 pb-0 pt-1 text-error'>
-          {error}
+        <p
+          id={errorId}
+          className='typescale-body-small px-4 pb-0 pt-1 text-error'
+        >
+          {typeof error === 'string' ? error : 'There is an error'}
         </p>
       )}
     </div>
