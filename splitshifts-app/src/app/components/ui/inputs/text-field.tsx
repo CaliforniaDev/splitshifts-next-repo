@@ -83,6 +83,7 @@ export default function TextField({
         />
         <label htmlFor={id} className={labelClasses}>
           {label}
+          {props.required && <span aria-hidden='true'>*</span>}
         </label>
       </span>
       {supportingText && !error && (
