@@ -16,9 +16,28 @@ export default function SignUpPage() {
     setForm(prev => ({ ...prev, [name]: value }));
   };
   return (
-    <form action='' className="relative flex border-4 p-10 ">
-      <TextField onChange={handleChange} label='First name' name='firstName' value={form.firstName} />
-      {/* <div>
+    <form action='' className='relative flex gap-4 border-4 p-10'>
+      <TextField
+        onChange={handleChange}
+        label='First name'
+        name='firstName'
+        value={form.firstName}
+        supportingText='*Required'
+      />
+      <TextField
+        error="*Last name is required"
+        onChange={handleChange}
+        label='Last name'
+        name='lastName'
+        value={form.lastName}
+        supportingText='*Required'
+      />
+   
+    </form>
+  );
+}
+   {
+     /* <div>
         <label htmlFor='name'>Name</label>
         <input id='name' name='name' placeholder='Name' />
       </div>
@@ -30,7 +49,5 @@ export default function SignUpPage() {
         <label htmlFor='password'>Password</label>
         <input id='password' name='password' type='password' />
       </div>
-      <Button variant='filled' type='submit'>Sign Up</Button> */}
-    </form>
-  );
-}
+      <Button variant='filled' type='submit'>Sign Up</Button> */
+   }
