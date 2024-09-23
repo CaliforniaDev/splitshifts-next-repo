@@ -50,7 +50,7 @@ export default function TextField({
     'border-b-primary caret-primary': isFocused && !error,
     'border-b-error caret-error': error,
   });
-  
+
   const labelClasses = clsx(styles.labelBase, {
     'typescale-body-large pt-4': !isFocused && !isPopulated,
     'typescale-body-small pt-[8px]': isFocused || isPopulated,
@@ -71,7 +71,9 @@ export default function TextField({
           onBlur={handleBlur}
           aria-invalid={!!error}
           aria-required={props.required ? true : undefined}
-          aria-describedby={describedByIds.length > 0 ? describedByIds.join(' ') : undefined} // prettier-ignore
+          aria-describedby={
+            describedByIds.length > 0 ? describedByIds.join(' ') : undefined
+          }
           disabled={props.disabled}
           className={inputClasses}
           {...props}
