@@ -42,6 +42,23 @@ export default function TextField({
   if (errorId) describedByIds.push(errorId);
   if (supportingTextId) describedByIds.push(supportingTextId);
 
+  // Classes for input and label elements
+  const inputClasses = clsx(styles.inputBase, className, {
+    'border-b-[1px]': !isFocused,
+    'border-b-2': isFocused,
+    'border-b-on-surface': !isFocused && !error,
+    'border-b-primary caret-primary': isFocused && !error,
+    'border-b-error caret-error': error,
+  });
+  
+  const labelClasses = clsx(styles.labelBase, {
+    'typescale-body-large pt-4': !isFocused && !isPopulated,
+    'typescale-body-small pt-[8px]': isFocused || isPopulated,
+    'text-on-surface-variant': !isFocused && !error,
+    'text-primary': isFocused && !error,
+    'text-error': error,
+  });
+
   return (
     <div className='relative'>
       <span className={clsx(styles.hoverStateLayer, 'relative block w-full')}>
@@ -56,25 +73,10 @@ export default function TextField({
           aria-required={props.required ? true : undefined}
           aria-describedby={describedByIds.length > 0 ? describedByIds.join(' ') : undefined} // prettier-ignore
           disabled={props.disabled}
+          className={inputClasses}
           {...props}
-          className={clsx(styles.inputBase, className, {
-            'border-b-[1px]': !isFocused,
-            'border-b-2': isFocused,
-            'border-b-on-surface': !isFocused && !error,
-            'border-b-primary caret-primary': isFocused && !error,
-            'border-b-error caret-error': error,
-          })}
         />
-        <label
-          htmlFor={id}
-          className={clsx(styles.labelBase, {
-            'typescale-body-large pt-4': !isFocused && !isPopulated,
-            'typescale-body-small pt-[8px]': isFocused || isPopulated,
-            'text-on-surface-variant': !isFocused && !error,
-            'text-primary': isFocused && !error,
-            'text-error': error,
-          })}
-        >
+        <label htmlFor={id} className={labelClasses}>
           {label}
         </label>
       </span>
