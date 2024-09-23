@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import clsx from 'clsx';
 import styles from './text-field.module.css';
 
@@ -27,7 +27,8 @@ export default function TextField({
 }: TextFieldProps) {
   const [isFocused, setIsFocused] = useState(false);
   let isPopulated = value !== '';
-  const id = props.id || name;
+  const generatedId = useId();
+  const id = props.id || `${name}-${generatedId}`;
 
   const handleFocus = () => setIsFocused(true);
   const handleBlur = () => setIsFocused(false);
