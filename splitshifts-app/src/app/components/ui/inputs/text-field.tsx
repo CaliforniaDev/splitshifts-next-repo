@@ -15,6 +15,46 @@ interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   style?: React.CSSProperties;
 }
 
+/**
+ * The `TextField` component is a reusable input field that supports labels, error messages,
+ * supporting text, and accessibility features. It manages focus and populated states to
+ * provide visual feedback and ensure accessibility compliance.
+ *
+ * **Features:**
+ * - Controlled and uncontrolled usage
+ * - Accessible labels and error descriptions
+ * - Dynamic styling based on focus and error states
+ * - Support for disabling the input
+ *
+ * **Usage:**
+ * ```jsx
+ * <TextField
+ *   label="Username"
+ *   name="username"
+ *   value={username}
+ *   onChange={(e) => setUsername(e.target.value)}
+ *   error={usernameError}
+ *   supportingText="Enter your unique username."
+ *   required
+ * />
+ * ```
+ *
+ * **Props:**
+ * - `label` (string): The label for the text field.
+ * - `value` (optional, string): The current value of the text field.
+ * - `name` (string): The name attribute for the input element.
+ * - `onChange` (optional, function): Callback fired when the value changes.
+ * - `className` (optional, string): Additional CSS classes for the input.
+ * - `disabled` (optional, boolean): Disables the input if `true`.
+ * - `error` (optional, boolean|string): Indicates an error state or provides an error message.
+ * - `supportingText` (optional, string): Additional text displayed below the input.
+ * - `required` (optional, boolean): Marks the input as required.
+ * - `style` (optional, React.CSSProperties): Inline styles for the input.
+ *
+ * @param {TextFieldProps} props The props for the TextField component.
+ * @returns The rendered TextField component with label, input, and optional messages.
+ */
+
 export default function TextField({
   label,
   value = '',
