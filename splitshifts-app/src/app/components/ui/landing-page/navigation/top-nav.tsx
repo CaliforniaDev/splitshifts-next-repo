@@ -8,7 +8,6 @@ import logo from '@/../public/assets/splitshifts-logo.svg';
 
 import { NavList, NavLink } from './nav-items';
 import LinkButton from '@/app/components/ui/buttons/link-button';
-import ButtonGroup from './button-group';
 
 import { josefinSans } from '@/app/typeface/fonts';
 
@@ -53,7 +52,7 @@ export default function TopNav() {
           </NavLink>
         </NavList>
       </div>
-      <div
+      <form
         className='flex w-1/3 gap-4'
         aria-label='Primary call-to-action links'
       >
@@ -71,7 +70,7 @@ export default function TopNav() {
         >
           Start for free
         </LinkButton>
-      </div>
+      </form>
     </nav>
   );
 }
