@@ -1,9 +1,8 @@
 import Image from 'next/image';
-import {handleSignIn} from '@/lib/actions'
+
 import dashboardMockup from '@/../public/assets/mockups/dashboard-light.webp';
 
 import Button from '@/app/components/ui/buttons/button';
-import { signIn } from '@/lib/auth';
 
 export default function Hero() {
   return (
@@ -17,7 +16,7 @@ export default function Hero() {
           Welcome to SplitShifts - Your Ultimate Scheduling Solution
         </h2>
       </header>
-      <form action={handleSignIn}>
+      <form>
         <Button type="submit" size='large' variant='elevated'>
           Get Started
         </Button>
