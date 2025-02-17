@@ -11,7 +11,7 @@ import { NavList, NavLink } from './nav-items';
 import LinkButton from '@/app/components/ui/buttons/link-button';
 
 import { josefinSans } from '@/app/typeface/fonts';
-import logo from '@/../public/assets/splitshifts-logo.svg';
+import logo from '@/public/assets/splitshifts-logo.svg';
 
 
 const Logo = () => {
