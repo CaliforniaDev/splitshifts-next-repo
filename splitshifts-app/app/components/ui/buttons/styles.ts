@@ -18,14 +18,16 @@ export const styles = {
   text: 'text-primary',
 };
 
+// State Layer (hover effects)
 export const stateLayer = {
   elevated: 'before:bg-primary before:opacity-0 hover:before:opacity-8',
   filled: 'before:bg-on-primary before:opacity-0 hover:before:opacity-8',
-  tonal: 'before:bg-on-secondary-container before:opacity-0  hover:before:hover:opacity-8', // prettier-ignore
+  tonal: 'before:bg-on-secondary-container before:opacity-0  hover:before:opacity-8', // prettier-ignore
   outlined: 'before:bg-primary before:opacity-0 hover:before:opacity-8',
   text: 'before:bg-primary before:opacity-0 hover:before:opacity-8',
 };
 
+// Size Variants
 export const sizeStyles = {
   default: 'typescale-label-large px-6 py-2.5',
   large: 'typescale-title-large-prominent font px-8 py-2 ',
@@ -33,7 +35,8 @@ export const sizeStyles = {
 
 // Disabled Button Styles
 export const disabledStyle = {
-  elevated: 'text-on-surface/38 bg-on-surface/12 shadow-none pointer-events-none',
+  elevated:
+    'text-on-surface/38 bg-on-surface/12 shadow-none pointer-events-none',
   filled: 'text-on-surface/38 bg-on-surface/12 pointer-events-none',
   tonal: 'text-on-surface/38 bg-on-surface/12 pointer-events-none',
   outlined: 'text-on-surface/38 pointer-events-none',
