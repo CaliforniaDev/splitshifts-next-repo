@@ -27,7 +27,7 @@ interface ButtonProps<T extends ElementType = 'button'> {
  * sizes, and dynamic HTML elements via the `as` prop.
  *
  * ## Props:
- * - **`as` (optional, `ElementType`)**: Defines the HTML element for the button.  
+ * - **`as` (optional, `ElementType`)**: Defines the HTML element for the button.
  *   Defaults to `<button>`, but can be `'a'`, `'div'`, etc.
  * - **`variant` (optional, `StyleVariants`)**: Determines the button style. Options:
  *     - `'elevated'`: Adds shadow and background.
@@ -47,7 +47,6 @@ interface ButtonProps<T extends ElementType = 'button'> {
  * @param {ButtonProps<T>} props - The props for the Button component.
  * @returns {JSX.Element} The rendered Button component.
  */
-
 
 export default function Button<T extends ElementType = 'button'>({
   as,
