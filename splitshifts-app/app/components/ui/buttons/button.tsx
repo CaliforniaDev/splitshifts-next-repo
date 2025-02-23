@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { ElementType, ReactNode } from 'react';
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -13,43 +14,28 @@ import {
   SizeVariants,
 } from './styles';
 
+// Define the types for the component props
 interface ButtonProps<T extends ElementType = 'button'> {
-  as?: T;
-  variant?: StyleVariants;
-  size?: SizeVariants;
-  children: ReactNode;
-  className?: string;
-  disabled?: boolean;
+  as?: T | 'next-link'; // Allows "next-link" but not "a"
+  href?: string; // Required when using a link
+  variant?: StyleVariants; // Controls button style
+  size?: SizeVariants; // Controls button size
+  children: ReactNode; // Button content
+  className?: string; // Custom styles
+  disabled?: boolean; // Disables button interaction
 }
 
 /**
- * The `Button` component is a reusable styled button that supports multiple variants,
- * sizes, and dynamic HTML elements via the `as` prop.
- *
- * ## Props:
- * - **`as` (optional, `ElementType`)**: Defines the HTML element for the button.
- *   Defaults to `<button>`, but can be `'a'`, `'div'`, etc.
- * - **`variant` (optional, `StyleVariants`)**: Determines the button style. Options:
- *     - `'elevated'`: Adds shadow and background.
- *     - `'filled'`: Solid color background (default).
- *     - `'tonal'`: Background with a more subtle tone.
- *     - `'outlined'`: No background, only a border.
- *     - `'text'`: No background or border, just text.
- * - **`size` (optional, `SizeVariants`)**: Adjusts button size. Options:
- *     - `'default'`: Normal size (default).
- *     - `'large'`: Larger padding and height.
- * - **`children` (ReactNode)**: The button’s content.
- * - **`className` (optional, `string`)**: Additional classes for styling.
- * - **`disabled` (optional, `boolean`)**: If true, disables the button.
- * - **`...rest`**: Additional props, including valid attributes for `T` (e.g., `href` if `as="a"`).
- *
- * @template T - The HTML element type, inferred from `as`. Defaults to `"button"`.
- * @param {ButtonProps<T>} props - The props for the Button component.
- * @returns {JSX.Element} The rendered Button component.
+ * Utility function to check if a given `href` is an external link.
+ * External links start with "http://" or "https://".
  */
+const isExternalLink = (href?: string): boolean => {
+  return !!href && (href.startsWith('http://') || href.startsWith('https://'));
+};
 
 export default function Button<T extends ElementType = 'button'>({
   as,
+  href,
   variant = 'filled',
   size = 'default',
   children,
@@ -58,7 +44,8 @@ export default function Button<T extends ElementType = 'button'>({
   ...rest
 }: ButtonProps<T> &
   Omit<React.ComponentPropsWithoutRef<T>, keyof ButtonProps<T>>) {
-  const Component = as || 'button'; // Defaults to <button> if `as` is not provided.
+  const isNextLink = as === 'next-link'; // Checks if we are using Next.js <Link>
+  const isExternal = isExternalLink(href); // Determines if the link is external
 
   const mergedClass = twMerge(
     clsx(
@@ -71,8 +58,39 @@ export default function Button<T extends ElementType = 'button'>({
     ),
   );
 
+  // Throw an error if someone tries to use `as="a"`
+  if (as === 'a') {
+    throw new Error('❌ <a> tags are not allowed. Use "next-link" instead.');
+  }
+
+  // Warn if href is provided but `as="next-link"` is missing
+  if (href && !isNextLink) {
+    console.warn(
+      `⚠️ Warning: href="${href}" provided but as="next-link" is missing.`,
+    );
+  }
+
+  // If `as="next-link"`, render a Next.js <Link>
+  if (isNextLink) {
+    return (
+      <Link
+        href={href!}
+        target={isExternal ? '_blank' : undefined} // Open external links in a new tab
+        rel={isExternal ? 'noopener noreferrer' : undefined} // Security best practice for external links
+        className={mergedClass}
+        {...rest}
+      >
+        {children}
+      </Link>
+    );
+  }
+
+  // Default to a button or other valid HTML element
+  const Component = as || 'button';
+
   return (
     <Component className={mergedClass} disabled={disabled} {...rest}>
+      {/* Wraps content to prevent pointer events on child elements */}
       <span className='pointer-events-none relative'>{children}</span>
     </Component>
   );
