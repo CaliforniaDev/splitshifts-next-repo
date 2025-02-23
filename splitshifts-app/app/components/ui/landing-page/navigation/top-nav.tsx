@@ -1,38 +1,12 @@
 /**
- * Renders the top navigation component.
+ * Renders the top navigation bar.
  *
- * @returns The rendered top navigation component.
+ * Includes the site logo, navigation links, and primary action buttons.
  */
-import Image from 'next/image';
 
-
-
+import Logo from '@/app/components/ui/logo';
+import Button from '@/app/components/ui/buttons/button';
 import { NavList, NavLink } from './nav-items';
-import LinkButton from '@/app/components/ui/buttons/link-button';
-
-import { josefinSans } from '@/app/typeface/fonts';
-import logo from '@/public/assets/splitshifts-logo.svg';
-
-
-const Logo = () => {
-  return (
-    <div aria-label='Logo ' className='flex w-1/3 items-center gap-2'>
-      <Image
-        src={logo}
-        alt='SplitShifts Logo'
-        width={48}
-        height={48}
-        quality={100}
-        priority
-      />
-      <span
-        className={`${josefinSans.className} pt-1.5 text-2xl font-bold text-inverse-surface`}
-      >
-        SplitShifts
-      </span>
-    </div>
-  );
-};
 
 export default function TopNav() {
   return (
@@ -58,20 +32,22 @@ export default function TopNav() {
         className='flex w-1/3 gap-4'
         aria-label='Primary call-to-action links'
       >
-        <LinkButton
+        <Button
+          as='next-link'
           href='/login'
           variant='text'
           aria-label='Log in to your account'
         >
           Log In
-        </LinkButton>
-        <LinkButton
+        </Button>
+        <Button
+          as='next-link'
           href='/signup'
           variant='filled'
           aria-label='Sign up for a new account'
         >
           Start for free
-        </LinkButton>
+        </Button>
       </form>
     </nav>
   );
