@@ -1,13 +1,11 @@
 'use client';
 
 /**
- * NavItems.tsx
+ * Navigation components for the site.
  *
- * This file contains components for rendering navigation items.
- * It includes the NavList component for rendering a list of navigation links
- * and the NavLink component for rendering individual navigation links.
+ * - `NavList` renders a list of navigation links.
+ * - `NavLink` renders an individual navigation link with active styling.
  */
-
 import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -23,12 +21,7 @@ interface NavLinkProps {
 }
 
 /**
- * NavList component.
- *
- * A wrapper component for rendering a list of navigation links.
- *
- * @param {React.ReactNode} children - The navigation items to be displayed within the list.
- * @returns {JSX.Element} The rendered list of navigation items.
+ * NavList component for wrapping navigation links in an unordered list.
  */
 export function NavList({ children }: NavListProps) {
   return (
@@ -39,21 +32,13 @@ export function NavList({ children }: NavListProps) {
 }
 
 /**
- * NavLink component
+ * NavLink component for rendering individual navigation links.
  *
- * This component renders a single navigation link.
- *
- * @param {React.ReactNode} children - The content to be displayed within the link.
- * @param {string} href - The URL that the link points to.
- * @param {string} [ariaLabel] - Optional ARIA label for accessibility.
- * @returns {JSX.Element} The rendered navigation link.
+ * Detects if the current URL matches `href` to highlight active links.
  */
 export function NavLink({ children, href, ariaLabel }: NavLinkProps) {
-  // Get the current pathname
-  const pathname = usePathname();
-
-  // Determine if the current link is active by comparing the pathname to the href
-  const isActive: boolean = pathname === href;
+  const pathname = usePathname(); // Get current URL path
+  const isActive = pathname === href; // Determine if the link is active
 
   return (
     <li
