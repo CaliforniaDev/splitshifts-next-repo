@@ -4,8 +4,9 @@
  * Includes the site logo, navigation links, and primary action buttons.
  */
 
+import NavActions from './nav-actions';
+
 import Logo from '@/app/components/ui/logo';
-import Button from '@/app/components/ui/buttons/button';
 import { NavList, NavLink } from './nav-items';
 
 export default function TopNav() {
@@ -28,27 +29,7 @@ export default function TopNav() {
           </NavLink>
         </NavList>
       </div>
-      <form
-        className='flex w-1/3 gap-4'
-        aria-label='Primary call-to-action links'
-      >
-        <Button
-          as='next-link'
-          href='/login'
-          variant='text'
-          aria-label='Log in to your account'
-        >
-          Log In
-        </Button>
-        <Button
-          as='next-link'
-          href='/signup'
-          variant='filled'
-          aria-label='Sign up for a new account'
-        >
-          Start for free
-        </Button>
-      </form>
+      <NavActions />
     </nav>
   );
 }
