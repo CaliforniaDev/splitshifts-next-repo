@@ -2,14 +2,13 @@
 import Link from 'next/link';
 import { ElementType, ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { buttonVariants, ButtonVariantType, ButtonSizeType } from './styles';
-
+import type { VariantProps } from 'class-variance-authority';
+import { buttonVariants } from './variants';
 // Define the types for the component props
-interface ButtonProps<T extends ElementType = 'button'> {
+interface ButtonProps<T extends ElementType = 'button'>
+  extends VariantProps<typeof buttonVariants> {
   as?: T | 'next-link'; // Allows "next-link" but not "a"
   href?: string; // Required when using a link
-  variant?: ButtonVariantType; // Controls button style
-  size?: ButtonSizeType; // Controls button size
   children: ReactNode; // Button content
   className?: string; // Custom styles
   disabled?: boolean; // Disables button interaction
@@ -42,8 +41,8 @@ export default function Button<T extends ElementType = 'button'>({
       variant,
       size,
       disabled,
-      className
-    })
+      className,
+    }),
   );
 
   // Throw an error if someone tries to use `as="a"`
