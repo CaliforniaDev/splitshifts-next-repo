@@ -1,6 +1,4 @@
 import { cva } from 'class-variance-authority';
-export type ButtonVariantType = 'elevated' | 'filled' | 'tonal' | 'outlined' | 'text'; // prettier-ignore
-export type ButtonSizeType = 'default' | 'large';
 
 export const buttonVariants = cva(
   'relative overflow-hidden whitespace-nowrap rounded-[10px] before:absolute before:inset-0 before:transition-all before:duration-200 focus:outline-none',
