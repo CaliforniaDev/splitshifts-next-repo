@@ -1,25 +1,15 @@
 'use client';
 import Link from 'next/link';
 import { ElementType, ReactNode } from 'react';
-import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
-
-import {
-  baseStyle,
-  styles,
-  stateLayer,
-  sizeStyles,
-  disabledStyle,
-  StyleVariants,
-  SizeVariants,
-} from './styles';
+import { buttonVariants, ButtonVariantType, ButtonSizeType } from './styles';
 
 // Define the types for the component props
 interface ButtonProps<T extends ElementType = 'button'> {
   as?: T | 'next-link'; // Allows "next-link" but not "a"
   href?: string; // Required when using a link
-  variant?: StyleVariants; // Controls button style
-  size?: SizeVariants; // Controls button size
+  variant?: ButtonVariantType; // Controls button style
+  size?: ButtonSizeType; // Controls button size
   children: ReactNode; // Button content
   className?: string; // Custom styles
   disabled?: boolean; // Disables button interaction
@@ -48,14 +38,12 @@ export default function Button<T extends ElementType = 'button'>({
   const isExternal = isExternalLink(href); // Determines if the link is external
 
   const mergedClass = twMerge(
-    clsx(
-      baseStyle,
-      styles[variant],
-      stateLayer[variant],
-      sizeStyles[size],
-      disabled && disabledStyle[variant],
-      className,
-    ),
+    buttonVariants({
+      variant,
+      size,
+      disabled,
+      className
+    })
   );
 
   // Throw an error if someone tries to use `as="a"`
@@ -90,7 +78,6 @@ export default function Button<T extends ElementType = 'button'>({
 
   return (
     <Component className={mergedClass} disabled={disabled} {...rest}>
-      {/* Wraps content to prevent pointer events on child elements */}
       <span className='pointer-events-none relative'>{children}</span>
     </Component>
   );
