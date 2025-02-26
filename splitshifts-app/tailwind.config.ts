@@ -90,6 +90,7 @@ const config: Config = {
         'state-drag': '0.16',
       },
       boxShadow: {
+        'elevation-0': 'none',
         'elevation-1':
           '0px 4px 4px 0px rgba(0, 0, 0, 0.25), 0px 1px 2px 0px rgba(0, 0, 0, 0.30);',
         'elevation-2':
