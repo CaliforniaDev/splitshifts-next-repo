@@ -29,8 +29,7 @@ const inputVariants = cva(
     },
   },
 );
-
-// Floating label styles
+// Label styles
 const labelVariants = cva(
   'pointer-events-none absolute left-4 right-4 text-left transition-all duration-300 ease-in-out',
   {
@@ -50,6 +49,18 @@ const labelVariants = cva(
         className: 'typescale-body-large pt-4',
       },
     ],
+  },
+);
+// Hover State Overlay
+const hoverOverlay = cva(
+  'hover-overlay pointer-events-none absolute inset-0 rounded-t-[4px] opacity-0 transition-all duration-300 ease-in-out',
+  {
+    variants: {
+      focused: {
+        true: null,
+        false: 'group-hover:bg-on-surface group-hover:opacity-8',
+      },
+    },
   },
 );
 
@@ -114,7 +125,11 @@ export default function Input({
           aria-invalid={!!error}
           aria-describedby={error ? `${inputId}-error` : undefined}
           className={cn(
-            inputVariants({ focused: isFocused, error: !!error, disabled: !!disabled }),
+            inputVariants({
+              focused: isFocused,
+              error: !!error,
+              disabled: !!disabled,
+            }),
             className,
           )}
           onFocus={() => handleFocus(true)}
@@ -125,17 +140,15 @@ export default function Input({
           {...props}
         />
         <div
-          className='hover-overlay pointer-events-none absolute inset-0 rounded-t-[4px] opacity-0 transition-all duration-300 ease-in-out group-hover:bg-on-surface group-hover:opacity-8'
           aria-hidden='true'
+          className={hoverOverlay({ focused: isFocused })}
         ></div>
         <label
           htmlFor={inputId}
-          className={cn(
-            labelVariants({
-              floating: !!isFocused || hasValue,
-              error: !!error,
-            }),
-          )}
+          className={labelVariants({
+            floating: !!isFocused || hasValue,
+            error: !!error,
+          })}
         >
           {label}
         </label>
