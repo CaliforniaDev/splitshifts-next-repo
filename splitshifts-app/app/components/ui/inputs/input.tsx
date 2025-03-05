@@ -1,6 +1,6 @@
 'use client'; //
 
-import { useId, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/app/lib/utils';
 
@@ -92,31 +92,32 @@ export default function Input({
   ...props
 }: InputProps) {
   const [isFocused, setIsFocused] = useState(false);
-  const [uncontrolledValue, setUncontrolledValue] = useState(
-    defaultValue || '',
-  );
+  const uncontrolledValueRef = useRef<HTMLInputElement>(null);
 
   const isControlled = value !== undefined;
-  const inputValue = isControlled ? value : uncontrolledValue;
-  const hasValue = !!inputValue?.length;
+  const inputValue = isControlled ? value : uncontrolledValueRef.current?.value;
+  const hasValue = Boolean(inputValue?.length);
   const generatedId = useId();
   const inputId = id || generatedId;
 
   // Accessibility IDs
   const errorId = `${inputId}-error`;
   const supportingTextId = `${inputId}-supporting-text`;
-  const describedByIds: string[] = [];
-  if (error) describedByIds.push(errorId);
-  if (supportingText && !error) describedByIds.push(supportingTextId);
+  const describedBy = error
+    ? errorId
+    : supportingText
+      ? supportingTextId
+      : undefined;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Updates local state only for uncontrolled input
-    if (!isControlled) setUncontrolledValue(e.target.value);
+    if (!isControlled && uncontrolledValueRef.current) {
+      uncontrolledValueRef.current.value = e.target.value;
+    }
     onChange?.(e);
   };
 
-  const handleFocus = (focus: boolean) => setIsFocused(focus);
-
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
   return (
     <div className='group relative'>
       <span className='relative block w-full'>
@@ -124,7 +125,7 @@ export default function Input({
           id={inputId}
           disabled={disabled}
           aria-invalid={!!error}
-          aria-describedby={error ? `${inputId}-error` : undefined}
+          aria-describedby={describedBy}
           className={cn(
             inputVariants({
               focused: isFocused,
@@ -133,10 +134,11 @@ export default function Input({
             }),
             className,
           )}
-          onFocus={() => handleFocus(true)}
-          onBlur={() => handleFocus(false)}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           value={isControlled ? value : undefined}
           defaultValue={defaultValue}
+          ref={uncontrolledValueRef}
           onChange={handleChange}
           {...props}
         />
