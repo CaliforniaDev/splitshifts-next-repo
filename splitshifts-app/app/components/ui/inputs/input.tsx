@@ -4,6 +4,7 @@ import { useId, useState } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/app/lib/utils';
 
+// Input field styles
 const inputVariants = cva(
   'relative h-14 w-full rounded-t-[4px] bg-surface-container-highest px-4 pb-2 pt-6 text-on-surface transition-textfield duration-200 ease-in focus:outline-none',
   {
@@ -29,6 +30,7 @@ const inputVariants = cva(
   },
 );
 
+// Floating label styles
 const labelVariants = cva(
   'pointer-events-none absolute left-4 right-4 text-left transition-all duration-300 ease-in-out',
   {
