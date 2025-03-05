@@ -114,7 +114,7 @@ export default function Input({
           aria-invalid={!!error}
           aria-describedby={error ? `${inputId}-error` : undefined}
           className={cn(
-            inputVariants({ focused: isFocused, error: !!error, disabled }),
+            inputVariants({ focused: isFocused, error: !!error, disabled: !!disabled }),
             className,
           )}
           onFocus={() => handleFocus(true)}
