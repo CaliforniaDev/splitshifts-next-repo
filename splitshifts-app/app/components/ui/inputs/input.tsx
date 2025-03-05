@@ -88,6 +88,7 @@ export default function Input({
   disabled,
   onChange,
   className,
+  onBlur,
   ...props
 }: InputProps) {
   const [isFocused, setIsFocused] = useState(false);
