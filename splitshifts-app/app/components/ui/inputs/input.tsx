@@ -35,8 +35,12 @@ const labelVariants = cva(
   {
     variants: {
       floating: {
-        true: 'typescale-body-small pt-[8px] text-primary',
+        true: 'typescale-body-small pt-[8px]',
         false: 'typescale-body-large pt-4',
+      },
+      focused: {
+        true: 'text-primary',
+        false: null,
       },
       error: {
         true: 'text-error',
@@ -45,10 +49,25 @@ const labelVariants = cva(
     },
     compoundVariants: [
       {
+        error: false,
+        focused: false,
+        className: 'text-on-surface-variant',
+      },
+      {
+        error: true,
+        focused: false,
+        className: 'text-error',
+      },
+      {
         floating: false,
         className: 'typescale-body-large pt-4',
       },
     ],
+    defaultVariants: {
+      focused: false,
+      error: false,
+      floating: false,
+    },
   },
 );
 // Hover State Overlay
@@ -151,6 +170,7 @@ export default function Input({
           className={labelVariants({
             floating: !!isFocused || hasValue,
             error: !!error,
+            focused: !!isFocused,
           })}
         >
           {label}
