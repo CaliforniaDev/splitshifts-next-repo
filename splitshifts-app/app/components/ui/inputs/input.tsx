@@ -14,7 +14,7 @@ const inputVariants = cva(
         false: 'border-b-[1px] border-b-on-surface',
       },
       error: {
-        true: 'border-b-error caret-error',
+        true: 'border-b-error caret-error group-hover:border-b-on-error-container',
         false: null,
       },
       disabled: {
@@ -22,6 +22,13 @@ const inputVariants = cva(
         false: 'cursor-default',
       },
     },
+    compoundVariants: [
+      {
+        error: true,
+        focused: true,
+        className: 'border-b-error caret-error group-hover:border-b-error',
+      },
+    ],
     defaultVariants: {
       focused: false,
       error: false,
@@ -39,8 +46,8 @@ const labelVariants = cva(
         false: 'typescale-body-large pt-4',
       },
       focused: {
-        true: 'text-primary',
-        false: null,
+        true: 'typescale-body-small pt-[8px]',
+        false: 'null',
       },
       error: {
         true: 'text-error',
@@ -51,20 +58,27 @@ const labelVariants = cva(
       {
         error: false,
         focused: false,
-        className: 'text-on-surface-variant',
-      },
-      {
-        error: true,
-        focused: false,
-        className: 'text-error',
-      },
-      {
         floating: false,
-        className: 'typescale-body-large pt-4',
+        className: 'text-on-surface-variant group-hover:text-on-surface',
+      },
+      {
+        error: false,
+        focused: false,
+        floating: true,
+        className: 'text-on-surface-variant group-hover:text-on-surface',
+      },
+      {
+        error: false,
+        focused: true,
+        className: 'text-primary',
+      },
+      {
+        focused: false,
+        error: true,
+        className: 'group-hover:text-on-error-container',
       },
     ],
     defaultVariants: {
-      focused: false,
       error: false,
       floating: false,
     },
