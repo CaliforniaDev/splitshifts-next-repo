@@ -1,53 +1,172 @@
 'use client';
-import { useState } from 'react';
+
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/app/components/ui/card';
+import Input from '@/app/components/ui/inputs/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+} from '@/app/components/ui/form';
+
 import Button from '@/app/components/ui/buttons/button';
-import TextField from '@/app/components/ui/inputs/text-field';
+
+const formSchema = z.object({
+  firstName: z.string().nonempty('First name is required'),
+  lastName: z.string().nonempty('Last name is required'),
+  email: z.string().email('Invalid email address'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(
+      /[!@#$%^&*(),.?":{}|<>]/,
+      'Password must contain at least one special character',
+    ),
+  passwordConfirm: z.string(),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
 export default function SignUpPage() {
-  const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: '',
-    inquiryType: '',
-    message: '',
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      passwordConfirm: '',
+    },
   });
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-  };
+  const submitHandler = async (data: FormData) => {};
   return (
-    <form action='' className='relative flex gap-4 border-4 p-10'>
-      <TextField
-        onChange={handleChange}
-        label='First name'
-        name='firstName'
-        value={form.firstName}
-        supportingText='*Required'
-      />
-      <TextField
-        error="*Last name is required"
-        onChange={handleChange}
-        label='Last name'
-        name='lastName'
-        value={form.lastName}
-        supportingText='*Required'
-      />
-   
-    </form>
+    <main className='flex min-h-screen justify-center'>
+      <Card className='w-[720px] shadow-elevation-0'>
+        <CardHeader>
+          <CardTitle>Welcome | Sign Up Today</CardTitle>
+          <CardDescription className='typescale-body-large'>
+            Already have an account? Log In
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              className='space-y-8'
+              onSubmit={form.handleSubmit(submitHandler)}
+            >
+              <div className='flex space-x-4'>
+                <FormField
+                  name='firstName'
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <FormItem className='w-1/2'>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          label='First Name *'
+                          type='text'
+                          onBlur={field.onBlur}
+                          error={!!fieldState.error}
+                          errorMessage='First name is required'
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name='lastName'
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <FormItem className='w-1/2'>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          label='Last Name *'
+                          type='text'
+                          onBlur={field.onBlur}
+                          error={!!fieldState.error}
+                          errorMessage='Last name is required'
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <FormField
+                name='email'
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <FormItem className='w-full'>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        label='Email *'
+                        error={!!fieldState.error}
+                        onBlur={field.onBlur}
+                        errorMessage='Invalid email address'
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <div className='flex space-x-4'>
+                <FormField
+                  name='password'
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <FormItem className='w-1/2'>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          label='Password *'
+                          type='password'
+                          onBlur={field.onBlur}
+                          error={!!fieldState.error}
+                          errorMessage='Password must be at least 8 characters and contain at least one special character'
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name='passwordConfirm'
+                  control={form.control}
+                  render={({ field, fieldState }) => {
+                    return (
+                      <FormItem className='w-1/2'>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            label='Confirm Password *'
+                            type='password'
+                            onBlur={field.onBlur}
+                            error={!!fieldState.error}
+                            errorMessage='Passwords do not match'
+                          />
+                        </FormControl>
+                      </FormItem>
+                    );
+                  }}
+                />
+              </div>
+              <Button className='w-full' type='submit' variant='filled'>
+                Get Started
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </main>
   );
 }
-   {
-     /* <div>
-        <label htmlFor='name'>Name</label>
-        <input id='name' name='name' placeholder='Name' />
-      </div>
-      <div>
-        <label htmlFor='email'>Email</label>
-        <input id='email' name='email' type='email' placeholder='Email' />
-      </div>
-      <div>
-        <label htmlFor='password'>Password</label>
-        <input id='password' name='password' type='password' />
-      </div>
-      <Button variant='filled' type='submit'>Sign Up</Button> */
-   }
