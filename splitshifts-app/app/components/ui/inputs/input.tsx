@@ -10,23 +10,24 @@ const inputVariants = cva(
   {
     variants: {
       focused: {
-        true: 'border-b-2 border-b-primary caret-primary',
-        false: 'border-b-[1px] border-b-on-surface',
+        true: 'border-b-2 border-primary caret-primary',
+        false:
+          'border-b-[1px] border-on-surface-variant group-hover:border-on-surface',
       },
       error: {
-        true: 'border-b-error caret-error group-hover:border-b-on-error-container',
+        true: 'border-error caret-error group-hover:border-on-error-container',
         false: null,
       },
       disabled: {
-        true: 'opacity-50 cursor-not-allowed',
-        false: 'cursor-default',
+        true: 'bg-on-surface opacity-[0.04] cursor-not-allowed',
+        false: ' bg-surface-container-highest cursor-default',
       },
     },
     compoundVariants: [
       {
         error: true,
         focused: true,
-        className: 'border-b-error caret-error group-hover:border-b-error',
+        className: 'border-b-error caret-error group-hover:border-error',
       },
     ],
     defaultVariants: {
@@ -51,6 +52,10 @@ const labelVariants = cva(
       },
       error: {
         true: 'text-error',
+        false: null,
+      },
+      disabled: {
+        true: 'opacity-[0.38]',
         false: null,
       },
     },
@@ -81,6 +86,8 @@ const labelVariants = cva(
     defaultVariants: {
       error: false,
       floating: false,
+      disabled: false,
+      focused: false,
     },
   },
 );
@@ -175,16 +182,19 @@ export default function Input({
           onChange={handleChange}
           {...props}
         />
-        <div
-          aria-hidden='true'
-          className={hoverOverlay({ focused: isFocused })}
-        ></div>
+        {!disabled && (
+          <div
+            aria-hidden='true'
+            className={hoverOverlay({ focused: !!isFocused })}
+          ></div>
+        )}
         <label
           htmlFor={inputId}
           className={labelVariants({
             floating: !!isFocused || hasValue,
             error: !!error,
             focused: !!isFocused,
+            disabled: !!disabled,
           })}
         >
           {label}
@@ -200,11 +210,11 @@ export default function Input({
         >
           {errorMessage ?? 'There is an error'}
         </p>
-      ) : supportingText ? (
+      ) : supportingText && !disabled ? (
         <p
           id={supportingTextId}
           aria-live='polite'
-          className='typescale-body-small px-4 pb-0 pt-1'
+          className='typescale-body-small px-4 pb-0 pt-1 text-on-surface-variant'
         >
           {supportingText}
         </p>
