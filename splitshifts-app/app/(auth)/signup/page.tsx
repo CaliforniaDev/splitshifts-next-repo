@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { passwordMatchSchema } from '@/validation/passwordMatchSchema';
 
 import {
   Card,
@@ -21,19 +22,13 @@ import {
 
 import Button from '@/app/components/ui/buttons/button';
 
-const formSchema = z.object({
-  firstName: z.string().nonempty('First name is required'),
-  lastName: z.string().nonempty('Last name is required'),
-  email: z.string().email('Invalid email address'),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(
-      /[!@#$%^&*(),.?":{}|<>]/,
-      'Password must contain at least one special character',
-    ),
-  passwordConfirm: z.string(),
-});
+const formSchema = z
+  .object({
+    firstName: z.string().nonempty('First name is required'),
+    lastName: z.string().nonempty('Last name is required'),
+    email: z.string().email('Invalid email address'),
+  })
+  .and(passwordMatchSchema);
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -77,7 +72,7 @@ export default function SignUpPage() {
                           type='text'
                           onBlur={field.onBlur}
                           error={!!fieldState.error}
-                          errorMessage='First name is required'
+                          errorMessage={fieldState.error?.message}
                         />
                       </FormControl>
                     </FormItem>
@@ -95,7 +90,7 @@ export default function SignUpPage() {
                           type='text'
                           onBlur={field.onBlur}
                           error={!!fieldState.error}
-                          errorMessage='Last name is required'
+                          errorMessage={fieldState.error?.message}
                         />
                       </FormControl>
                     </FormItem>
@@ -113,7 +108,7 @@ export default function SignUpPage() {
                         label='Email *'
                         error={!!fieldState.error}
                         onBlur={field.onBlur}
-                        errorMessage='Invalid email address'
+                        errorMessage={fieldState.error?.message}
                       />
                     </FormControl>
                   </FormItem>
@@ -133,7 +128,8 @@ export default function SignUpPage() {
                           type='password'
                           onBlur={field.onBlur}
                           error={!!fieldState.error}
-                          errorMessage='Password must be at least 8 characters and contain at least one special character'
+                          errorMessage={fieldState.error?.message}
+                          supportingText='Your password must be at least 8 characters and contain at least one special character, such as !@#$%^&*().'
                         />
                       </FormControl>
                     </FormItem>
@@ -152,7 +148,7 @@ export default function SignUpPage() {
                             type='password'
                             onBlur={field.onBlur}
                             error={!!fieldState.error}
-                            errorMessage='Passwords do not match'
+                            errorMessage={fieldState.error?.message}
                           />
                         </FormControl>
                       </FormItem>
