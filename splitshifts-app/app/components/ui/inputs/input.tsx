@@ -192,7 +192,7 @@ export default function Input({
           htmlFor={inputId}
           className={labelVariants({
             floating: !!isFocused || hasValue,
-            error: !!error,
+            error: !!error && !disabled,
             focused: !!isFocused,
             disabled: !!disabled,
           })}
@@ -202,7 +202,7 @@ export default function Input({
       </span>
 
       {/* Supporting Text OR Error Message (Show Only One) */}
-      {error ? (
+      {error && !disabled ? (
         <p
           id={errorId}
           aria-live='assertive'
