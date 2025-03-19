@@ -44,7 +44,10 @@ export default function SignUpPage() {
       passwordConfirm: '',
     },
   });
-  
+
+  const isSubmitting = form.formState.isSubmitting;
+  const isSubmitSuccessful = form.formState.isSubmitSuccessful;
+
   const submitHandler = async (data: FormData) => {
     try {
       const response = await registerUser({
@@ -75,7 +78,7 @@ export default function SignUpPage() {
 
   return (
     <main className='flex min-h-screen justify-center'>
-      {form.formState.isSubmitSuccessful ? (
+      {isSubmitSuccessful ? (
         <Card className='w-[720px] border-red-50 shadow-elevation-0'>
           <CardHeader>
             <CardTitle>Registration Successful!</CardTitle>
@@ -100,10 +103,7 @@ export default function SignUpPage() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(submitHandler)}>
-                <fieldset
-                  disabled={form.formState.isSubmitting}
-                  className='space-y-8'
-                >
+                <fieldset disabled={isSubmitting} className='space-y-8'>
                   <div className='flex space-x-4'>
                     <FormField
                       name='firstName'
@@ -202,14 +202,12 @@ export default function SignUpPage() {
                     />
                   </div>
                   <Button
-                    disabled={form.formState.isSubmitting}
+                    disabled={isSubmitting}
                     className='w-full'
                     type='submit'
                     variant='filled'
                   >
-                    {form.formState.isSubmitting
-                      ? 'Submitting...'
-                      : 'Get Started'}
+                    {isSubmitting ? 'Submitting...' : 'Get Started'}
                   </Button>
                 </fieldset>
               </form>
