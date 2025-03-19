@@ -3,7 +3,9 @@
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { nameSchema } from '@/validation/nameSchema';
 import { passwordMatchSchema } from '@/validation/passwordMatchSchema';
+import { registerUser } from './actions';
 
 import {
   Card,
@@ -21,11 +23,10 @@ import {
 } from '@/app/components/ui/form';
 
 import Button from '@/app/components/ui/buttons/button';
-
 const formSchema = z
   .object({
-    firstName: z.string().nonempty('First name is required'),
-    lastName: z.string().nonempty('Last name is required'),
+    firstName: nameSchema,
+    lastName: nameSchema,
     email: z.string().email('Invalid email address'),
   })
   .and(passwordMatchSchema);
@@ -43,7 +44,36 @@ export default function SignUpPage() {
       passwordConfirm: '',
     },
   });
-  const submitHandler = async (data: FormData) => {};
+
+  const submitHandler = async (data: FormData) => {
+    try {
+      const response = await registerUser({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        passwordConfirm: data.passwordConfirm,
+      });
+
+      // Handle field validation errors from API response
+      if (response?.error && response?.fieldErrors) {
+        Object.entries(response.fieldErrors).forEach(([field, message]) => {
+          form.setError(field as keyof FormData, { message });
+        });
+        console.error(response);
+        return; // Stop execution if there are field errors
+      }
+      console.log(response); // Logs successful registration
+    } catch (error) {
+      console.error('An unexpected error occurred', error);
+
+      form.setError('root', {
+        type: 'general',
+        message: 'An error occurred. Please try again later.',
+      });
+    }
+  };
+
   return (
     <main className='flex min-h-screen justify-center'>
       <Card className='w-[720px] shadow-elevation-0'>
