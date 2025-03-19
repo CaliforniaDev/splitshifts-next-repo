@@ -43,6 +43,7 @@ export default function Button<T extends ElementType = 'button'>({
       disabled,
       className,
     }),
+    'flex items-center justify-center',
   );
 
   // Throw an error if someone tries to use `as="a"`
