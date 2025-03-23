@@ -17,7 +17,7 @@ export default function NavActions() {
         variant='filled'
         aria-label='Sign up for a new account'
       >
-        Start for free
+        Sign Up Now
       </Button>
     </div>
   );
