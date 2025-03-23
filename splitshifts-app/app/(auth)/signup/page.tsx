@@ -30,10 +30,10 @@ const formSchema = z
   })
   .and(passwordMatchSchema);
 
-type FormData = z.infer<typeof formSchema>;
+type SignUpFormData = z.infer<typeof formSchema>;
 
 export default function SignUpPage() {
-  const form = useForm<FormData>({
+  const form = useForm<SignUpFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       firstName: '',
@@ -47,7 +47,7 @@ export default function SignUpPage() {
   const isSubmitting = form.formState.isSubmitting;
   const isSubmitSuccessful = form.formState.isSubmitSuccessful;
 
-  const submitHandler = async (data: FormData) => {
+  const submitHandler = async (data: SignUpFormData) => {
     try {
       const response = await registerUser({
         firstName: data.firstName,
@@ -60,7 +60,7 @@ export default function SignUpPage() {
       // Handle field validation errors from API response
       if (response?.error && response?.fieldErrors) {
         Object.entries(response.fieldErrors).forEach(([field, message]) => {
-          form.setError(field as keyof FormData, { message });
+          form.setError(field as keyof SignUpFormData, { message });
         });
         console.error(response);
       }
