@@ -3,8 +3,7 @@
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { nameSchema } from '@/validation/nameSchema';
-import { passwordMatchSchema } from '@/validation/passwordMatchSchema';
+import {nameSchema, passwordMatchSchema} from '@/validation/authSchema';
 import { registerUser } from './actions';
 
 import {

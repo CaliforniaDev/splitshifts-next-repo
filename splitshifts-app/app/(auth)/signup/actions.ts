@@ -4,8 +4,7 @@ import db from '@/db/drizzle';
 import { hash } from 'bcryptjs';
 
 import { users } from '@/db/usersSchema';
-import { nameSchema } from '@/validation/nameSchema';
-import { passwordMatchSchema } from '@/validation/passwordMatchSchema';
+import { nameSchema, passwordMatchSchema } from '@/validation/authSchema';
 
 interface CustomError extends Error {
   code?: string;
