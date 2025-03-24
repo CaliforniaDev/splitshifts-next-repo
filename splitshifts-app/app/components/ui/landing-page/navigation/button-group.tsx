@@ -2,7 +2,7 @@
  * ButtonGroup component
  *
  * This component renders a group of buttons for primary call-to-action actions.
- * It includes a "Log In" button and a "Start for free" button.
+ * It includes a "Log In" button and a "Sign Up" button.
  *
  * The "Log In" button triggers the handleLogIn function, which logs a message to the console.
  * The "Start for free" button triggers the handleSignUp function, which logs a message to the console.
@@ -40,7 +40,7 @@ export default function ButtonGroup() {
         variant='filled'
         aria-label='Sign up for a free account'
       >
-        Start for free
+        Sign Up
       </Button>
     </div>
   );
