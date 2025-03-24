@@ -1,5 +1,6 @@
 'use client';
 
+import { UseFormReturn } from 'react-hook-form';
 import { useSignUpForm } from '../hooks/use-signup-form';
 import { registerUser } from '../actions/register-user';
 
@@ -21,7 +22,6 @@ import {
 } from '@/app/components/ui/form';
 
 import { SignUpFormData } from '../types/signup-form-data';
-import { UseFormReturn } from 'react-hook-form';
 
 export default function SignUpForm() {
   const form = useSignUpForm();
