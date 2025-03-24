@@ -90,6 +90,7 @@ interface Props {
   isSubmitting: boolean;
   onSubmit: (data: SignUpFormData) => Promise<void>;
 }
+
 function SignUpFormCard({ form, isSubmitting, onSubmit }: Props) {
   return (
     <Card className='w-[720px] shadow-elevation-0'>
