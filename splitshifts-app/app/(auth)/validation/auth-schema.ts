@@ -94,7 +94,7 @@ export const signUpFormSchema = z
   .and(passwordMatchSchema);
 
 // Log In Form Schema
-export const logInFormSchema = z.object({
+export const loginFormSchema = z.object({
   email: z.string().email(),
   password: passwordSchema,
 });
