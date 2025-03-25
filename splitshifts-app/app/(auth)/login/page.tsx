@@ -1,52 +1,106 @@
-'use client'
+'use client';
+import { useLoginForm } from './hooks/use-login-form';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card'
-import { Form } from '@/app/components/ui/form'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import {nameSchema, passwordSchema } from '@/validation/authSchema';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/app/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+} from '@/app/components/ui/form';
 
-const formSchema = z.object({
-  email: z.string().email(),
-  password: passwordSchema
-})
-
-type LoginFormData = z.infer<typeof formSchema>
+import { LoginFormData } from './types/login-form-data';
+import Input from '@/app/components/ui/inputs/input';
+import Button from '@/app/components/ui/buttons/button';
+import Link from 'next/link';
 
 export default function LogIn() {
-  const form = useForm<LoginFormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    }
-  })
+  const form = useLoginForm();
+  const isSubmitting = form.formState.isSubmitting;
+  const isSubmitSuccessful = form.formState.isSubmitSuccessful;
+
   const handleSubmit = async (data: LoginFormData) => {
-    console.log('submitting', data)
-  }
+    console.log('submitting', data);
+  };
 
   return (
     <main className='flex min-h-screen justify-center'>
       <Card className='w-[720px] shadow-elevation-0'>
         <CardHeader>
-          <CardTitle>
-            Login to your account
-          </CardTitle>
+          <CardTitle>Login to your account</CardTitle>
           <CardDescription className='typescale-body-large'>
             Enter your email and password to log in.
           </CardDescription>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)}>
-
-              </form>
-            </Form>
-
-          </CardContent>
         </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              className='flex flex-col'
+              onSubmit={form.handleSubmit(handleSubmit)}
+            >
+              <fieldset disabled={isSubmitting} className='space-y-8'>
+                <FormField
+                  name='email'
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          label='Email *'
+                          type='text'
+                          onBlur={field.onBlur}
+                          error={!!fieldState.error}
+                          errorMessage={fieldState.error?.message}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name='password'
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          label='Password *'
+                          type='password'
+                          onBlur={field.onBlur}
+                          error={!!fieldState.error}
+                          errorMessage={fieldState.error?.message}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  disabled={isSubmitting}
+                  className='w-full'
+                  type='submit'
+                  variant='filled'
+                >
+                  {isSubmitting ? 'logging in' : 'Login'}
+                </Button>
+              </fieldset>
+            </form>
+          </Form>
+        </CardContent>
+        <CardFooter>
+          <div className='typescale-body-large'>
+            Don't have an account?{' '}
+            <Link href='/signup' >Click here</Link>
+          </div>
+        </CardFooter>
       </Card>
-
     </main>
-  )
+  );
 }
