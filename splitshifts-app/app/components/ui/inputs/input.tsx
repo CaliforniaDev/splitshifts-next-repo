@@ -20,7 +20,7 @@ const inputVariants = cva(
       },
       disabled: {
         true: 'bg-on-surface opacity-[0.04] cursor-not-allowed',
-        false: ' bg-surface-container-highest cursor-default',
+        false: ' bg-surface-container-highest cursor-text',
       },
     },
     compoundVariants: [
