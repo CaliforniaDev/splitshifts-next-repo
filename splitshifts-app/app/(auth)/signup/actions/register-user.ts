@@ -4,7 +4,7 @@ import db from '@/db/drizzle';
 import { hash } from 'bcryptjs';
 import { users } from '@/db/usersSchema';
 import { signUpFormSchema } from '../../validation/auth-schema';
-import {
+import type {
   RegisterUserTypes,
   RegisterUserResponse,
 } from '../types/signup-form-data';

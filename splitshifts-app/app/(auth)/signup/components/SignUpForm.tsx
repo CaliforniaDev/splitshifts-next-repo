@@ -21,7 +21,7 @@ import {
   FormItem,
 } from '@/app/components/ui/form';
 
-import { SignUpFormData } from '../types/signup-form-data';
+import type { SignUpFormData } from '../types/signup-form-data';
 
 export default function SignUpForm() {
   const form = useSignUpForm();
