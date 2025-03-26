@@ -97,4 +97,5 @@ export const signUpFormSchema = z
 export const loginFormSchema = z.object({
   email: z.string().email(),
   password: passwordSchema,
+  token: z.string().optional(),
 });
