@@ -19,7 +19,9 @@ import {
 import { LoginFormData } from './types/login-form-data';
 import Input from '@/app/components/ui/inputs/input';
 import Button from '@/app/components/ui/buttons/button';
+import LogoutButton from '@/app/components/ui/auth/logout-button';
 import Link from 'next/link';
+import { loginWithCredentials } from './action/login-with-credentials';
 
 export default function LogIn() {
   const form = useLoginForm();
@@ -27,7 +29,10 @@ export default function LogIn() {
   const isSubmitSuccessful = form.formState.isSubmitSuccessful;
 
   const handleSubmit = async (data: LoginFormData) => {
-    console.log('submitting', data);
+    await loginWithCredentials({
+      email: data.email,
+      password: data.password,
+    });
   };
 
   return (
@@ -82,22 +87,26 @@ export default function LogIn() {
                     </FormItem>
                   )}
                 />
-                <Button
-                  disabled={isSubmitting}
-                  className='w-full'
-                  type='submit'
-                  variant='filled'
-                >
-                  {isSubmitting ? 'logging in' : 'Login'}
-                </Button>
+                <div className='flex flex-col gap-4'>
+                  <Button
+                    disabled={isSubmitting}
+                    className='w-full'
+                    type='submit'
+                    variant='filled'
+                  >
+                    {isSubmitting ? 'logging in' : 'Login'}
+                  </Button>
+                  <LogoutButton className='w-full' variant='outlined'>
+                    Logout
+                  </LogoutButton>
+                </div>
               </fieldset>
             </form>
           </Form>
         </CardContent>
         <CardFooter>
           <div className='typescale-body-large'>
-            Don't have an account?{' '}
-            <Link href='/signup' >Click here</Link>
+            Don't have an account? <Link href='/signup'>Click here</Link>
           </div>
         </CardFooter>
       </Card>
