@@ -1,6 +1,18 @@
 'use client';
+
+// ---Core Framework---------------------------------------------------
+import Link from 'next/link';
+
+// ---Hooks------------------------------------------------------------
 import { useLoginForm } from './hooks/use-login-form';
 
+// ---Types-------------------------------------------------------------
+import type { LoginFormData } from './types/login-form-data';
+
+// ---Actions-----------------------------------------------------------
+import { loginWithCredentials } from './action/login-with-credentials';
+
+// ---UI Components-----------------------------------------------------
 import {
   Card,
   CardContent,
@@ -15,13 +27,11 @@ import {
   FormField,
   FormItem,
 } from '@/app/components/ui/form';
-
-import { LoginFormData } from './types/login-form-data';
 import Input from '@/app/components/ui/inputs/input';
 import Button from '@/app/components/ui/buttons/button';
 import LogoutButton from '@/app/components/ui/auth/logout-button';
-import Link from 'next/link';
-import { loginWithCredentials } from './action/login-with-credentials';
+
+
 
 export default function LogIn() {
   const form = useLoginForm();
