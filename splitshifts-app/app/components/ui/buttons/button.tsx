@@ -5,7 +5,7 @@ import { twMerge } from 'tailwind-merge';
 import type { VariantProps } from 'class-variance-authority';
 import { buttonVariants } from './variants';
 // Define the types for the component props
-interface ButtonProps<T extends ElementType = 'button'>
+export interface ButtonProps<T extends ElementType = 'button'>
   extends VariantProps<typeof buttonVariants> {
   as?: T | 'next-link'; // Allows "next-link" but not "a"
   href?: string; // Required when using a link
