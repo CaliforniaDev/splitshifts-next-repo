@@ -1,5 +1,5 @@
 'use client';
-
+import Link from 'next/link';
 import { UseFormReturn } from 'react-hook-form';
 import { useSignUpForm } from '../hooks/use-signup-form';
 import { registerUser } from '../actions/register-user';
@@ -11,6 +11,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/app/components/ui/card';
@@ -213,6 +214,14 @@ function SignUpFormCard({ form, isSubmitting, onSubmit }: Props) {
           </form>
         </Form>
       </CardContent>
+      <CardFooter className='typescale-body-medium flex flex-col items-end gap-2'>
+        <div>
+          Already have an account?{' '}
+          <Link href='/login' className='underline'>
+            Login
+          </Link>
+        </div>
+      </CardFooter>
     </Card>
   );
 }
