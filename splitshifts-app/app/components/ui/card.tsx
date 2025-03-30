@@ -1,5 +1,5 @@
-import React from 'react';
 import { cn } from '@/app/lib/utils';
+import React from 'react';
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   ref?: React.Ref<HTMLDivElement>;
@@ -8,10 +8,7 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 const Card: React.FC<CardProps> = ({ className, ref, ...props }) => (
   <div
     ref={ref}
-    className={cn(
-      'bg-card text-card-foreground rounded-xl border shadow',
-      className,
-    )}
+    className={cn('bg-surface rounded-xl border border-outline-variant', className)}
     {...props}
   />
 );
@@ -20,7 +17,10 @@ const CardHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
   ...props
 }) => (
-  <div className={cn('flex flex-col space-y-1.5 p-6', className)} {...props} />
+  <div
+    className={cn('flex flex-col space-y-1.5 p-6 text-on-surface', className)}
+    {...props}
+  />
 );
 
 const CardTitle: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
@@ -29,7 +29,7 @@ const CardTitle: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
 }) => (
   <div
     className={cn(
-      'typescale-headline-large font-semibold leading-none tracking-tight',
+      'typescale-headline-large leading-none tracking-tight',
       className,
     )}
     {...props}
@@ -39,9 +39,7 @@ const CardTitle: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
 const CardDescription: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
   ...props
-}) => (
-  <div className={cn('text-muted-foreground text-sm', className)} {...props} />
-);
+}) => <div className={cn('text-on-surface-variant', className)} {...props} />;
 
 const CardContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
@@ -52,7 +50,13 @@ const CardFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
   ...props
 }) => (
-  <div className={cn('flex items-center p-6 pt-0', className)} {...props} />
+  <div
+    className={cn(
+      'flex  items-center p-6 pt-0 text-on-surface-variant',
+      className,
+    )}
+    {...props}
+  />
 );
 
 export {
