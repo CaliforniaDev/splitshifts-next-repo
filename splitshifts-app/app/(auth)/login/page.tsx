@@ -1,7 +1,7 @@
 'use client';
-
 // ---Core Framework---------------------------------------------------
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 // ---Hooks------------------------------------------------------------
 import { useLoginForm } from './hooks/use-login-form';
@@ -13,6 +13,7 @@ import type { LoginFormData } from './types/login-form-data';
 import { loginWithCredentials } from './action/login-with-credentials';
 
 // ---UI Components-----------------------------------------------------
+import Button from '@/app/components/ui/buttons/button';
 import {
   Card,
   CardContent,
@@ -26,23 +27,27 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormMessage,
 } from '@/app/components/ui/form';
 import Input from '@/app/components/ui/inputs/input';
-import Button from '@/app/components/ui/buttons/button';
-import LogoutButton from '@/app/components/ui/auth/logout-button';
-
-
 
 export default function LogIn() {
   const form = useLoginForm();
+  const router = useRouter();
   const isSubmitting = form.formState.isSubmitting;
-  const isSubmitSuccessful = form.formState.isSubmitSuccessful;
 
   const handleSubmit = async (data: LoginFormData) => {
-    await loginWithCredentials({
+    const response = await loginWithCredentials({
       email: data.email,
       password: data.password,
     });
+    if (response?.error) {
+      form.setError('root', {
+        message: response.message,
+      });
+    } else {
+      router.push('/dashboard');
+    }
   };
 
   return (
@@ -91,12 +96,17 @@ export default function LogIn() {
                           type='password'
                           onBlur={field.onBlur}
                           error={!!fieldState.error}
-                          errorMessage={fieldState.error?.message}
+                          errorMessage={fieldState.error && 'Invalid Password'}
                         />
                       </FormControl>
                     </FormItem>
                   )}
                 />
+                {!!form.formState.errors.root?.message && (
+                  <FormMessage>
+                    {form.formState.errors.root.message}
+                  </FormMessage>
+                )}
                 <div className='flex flex-col gap-4'>
                   <Button
                     disabled={isSubmitting}
@@ -106,17 +116,17 @@ export default function LogIn() {
                   >
                     {isSubmitting ? 'logging in' : 'Login'}
                   </Button>
-                  <LogoutButton className='w-full' variant='outlined'>
-                    Logout
-                  </LogoutButton>
                 </div>
               </fieldset>
             </form>
           </Form>
         </CardContent>
         <CardFooter>
-          <div className='typescale-body-large'>
-            Don't have an account? <Link href='/signup'>Click here</Link>
+          <div className='typescale-body-medium'>
+            Don't have an account?{' '}
+            <Link href='/signup' className='text-primary'>
+              Click here
+            </Link>
           </div>
         </CardFooter>
       </Card>
