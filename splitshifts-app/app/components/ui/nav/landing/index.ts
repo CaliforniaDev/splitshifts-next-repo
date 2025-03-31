@@ -1,0 +1,1 @@
+export { default as LandingNav } from './top-nav';

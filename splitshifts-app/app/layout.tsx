@@ -1,11 +1,12 @@
-import { inter, spaceGrotesk } from '@/app/typeface/fonts';
-import type { Metadata } from 'next';
-
-import TopNav from '@/app/components/ui/nav/landing/top-nav';
-import { auth } from '@/auth';
-import LogoutButton from './components/ui/auth/logout-button';
 import './globals.css';
 import './typeface/typography.css';
+import type { Metadata } from 'next';
+import { inter, spaceGrotesk } from '@/app/typeface/fonts';
+
+
+import { auth } from '@/auth';
+import LogoutButton from './components/ui/auth/logout-button';
+import { LandingNav } from '@/app/components/ui/nav/landing';
 
 export const metadata: Metadata = {
   title: 'SplitShifts',
@@ -35,7 +36,7 @@ export default async function RootLayout({
             'No Current user logged in'
           )}
         </div>
-        <TopNav />
+        <LandingNav />
         {children}
       </body>
     </html>
