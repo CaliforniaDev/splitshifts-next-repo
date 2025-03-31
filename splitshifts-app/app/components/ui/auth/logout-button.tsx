@@ -2,7 +2,7 @@
 
 import Button from '@/app/components/ui/buttons/button';
 import type { ButtonProps } from '@/app/components/ui/buttons/button';
-import { logOut } from '@/app/(auth)/actions/logout';
+import { logOut } from '@/app/(public)/(auth)/actions/logout';
 
 interface LogoutButtonProps
   extends Pick<ButtonProps, 'className' | 'variant' | 'size' | 'disabled'> {

@@ -5,7 +5,7 @@ import { signIn } from '@/auth';
 
 import db from '@/db/drizzle';
 import { users } from '@/db/usersSchema';
-import { loginFormSchema } from '@/app/(auth)/validation/auth-schema';
+import { loginFormSchema } from '@/app/(public)/(auth)/validation/auth-schema';
 import { LoginUserData, LoginResponse } from '../types/login-form-data';
 
 export const loginWithCredentials = async (
