@@ -2,7 +2,6 @@
 
 'use client';
 
-import Link from 'next/link';
 import { Home, Settings, LogOut, Key } from 'lucide-react';
 import { logOut } from '@/app/(public)/(auth)/actions/logout';
 
