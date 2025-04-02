@@ -2,8 +2,10 @@
 
 export default function Dashboard() {
   return (
-    <div>
-      <h1>Hello Dashboard</h1>
-    </div>
+    <section className='flex flex-1 rounded-xl bg-surface-container-low p-4'>
+      <div className=''>
+        <h1 className='typescale-title-large'>Hello Dashboard</h1>
+      </div>
+    </section>
   );
 }
