@@ -1,3 +1,5 @@
+// File: app/components/ui/nav/dashboard/nav-drawer.tsx
+
 'use client';
 
 import Link from 'next/link';
@@ -28,7 +30,7 @@ export default function NavDrawer() {
               href='/dashboard'
               label='Dashboard'
               icon={<Home className='h-5 w-5' />}
-              className='bg-secondary-container text-on-secondary-container'
+              className='bg-secondary-container text-on-secondary-container' // temporary styling
             />
             <ListItemLink
               href='/change-password'
