@@ -74,7 +74,7 @@ export default function LoginForm() {
                       <Input
                         {...field}
                         label='Email *'
-                        type='text'
+                        type='email'
                         onBlur={field.onBlur}
                         error={!!fieldState.error}
                         errorMessage={fieldState.error?.message}

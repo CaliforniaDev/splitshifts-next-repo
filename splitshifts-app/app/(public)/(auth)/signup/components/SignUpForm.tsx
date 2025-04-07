@@ -152,6 +152,7 @@ function SignUpFormCard({ form, isSubmitting, onSubmit }: Props) {
                       <Input
                         {...field}
                         label='Email *'
+                        type='email'
                         error={!!fieldState.error}
                         onBlur={field.onBlur}
                         errorMessage={fieldState.error?.message}
