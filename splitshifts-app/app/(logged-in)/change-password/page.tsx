@@ -1,9 +1,9 @@
-// File: app/(logged-in)/change-password/page.tsx
+import ChangePasswordForm from "./components/ChangePasswordForm";
 
-export default async function ChangePassword() {
+export default function ChangePasswordPage() {
   return (
-    <div>
-      <h1>Change Password</h1>
-    </div>
+    <main className='flex min-h-screen justify-center'>
+      <ChangePasswordForm />
+    </main>
   );
-}
+}``
