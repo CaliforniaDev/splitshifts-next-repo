@@ -42,6 +42,7 @@ const config: Config = {
         scrim: '#000000',
         'inverse-surface': '#2D3135',
         'inverse-on-surface': '#EEF1F6',
+        'inverse-primary': '#A0CAFD',
 
         'surface-dim': '#D7DADF',
         'surface-bright': '#F7F9FF',
@@ -108,7 +109,7 @@ const config: Config = {
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       transitionProperty: {
-        'textfield': 'border, background-color, color, padding',
+        textfield: 'border, background-color, color, padding',
       },
     },
   },
