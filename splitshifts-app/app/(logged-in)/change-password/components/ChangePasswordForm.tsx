@@ -21,8 +21,10 @@ import { ChangePasswordData } from '../types/change-password-data';
 import { useChangePasswordForm } from '../hooks/use-change-password-form';
 import Button from '@/app/components/ui/buttons/button';
 import Input from '@/app/components/ui/inputs/input';
+import { useToast } from '@/app/components/ui/toast';
 
 export default function ChangePasswordForm() {
+  const { toast } = useToast();
   const form = useChangePasswordForm();
   const isSubmitting = form.formState.isSubmitting;
   const handleSubmit = async (data: ChangePasswordData) => {
@@ -36,15 +38,12 @@ export default function ChangePasswordForm() {
       form.setError('root', {
         message: response.message,
       });
+    } else {
+      toast({
+        description: 'Your password has been successfully updated.',
+      });
+      form.reset();
     }
-    // else {
-    //   toast({
-    //     title: 'Password changed.',
-    //     description: 'Your password has been successfully updated.',
-    //     className: 'bg-green-500 text-white',
-    //   });
-    //   form.reset();
-    // }
   };
   return (
     <Card className='w-[750px] shadow-elevation-0'>
