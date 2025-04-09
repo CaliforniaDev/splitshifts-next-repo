@@ -120,7 +120,7 @@ export default function LoginForm() {
       </CardContent>
       <CardFooter className='typescale-body-medium flex flex-col items-end gap-2'>
         <div>
-          Don't have an account?{' '}
+          Don&#39;t have an account?{' '}
           <Link href='/signup' className='underline'>
             Register
           </Link>
