@@ -99,3 +99,7 @@ export const loginFormSchema = z.object({
   password: passwordSchema,
   token: z.string().optional(),
 });
+
+export const resetPasswordSchema = z.object({
+  email: z.string().email(),
+});
