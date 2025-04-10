@@ -100,6 +100,6 @@ export const loginFormSchema = z.object({
   token: z.string().optional(),
 });
 
-export const resetPasswordSchema = z.object({
+export const passwordResetSchema = z.object({
   email: z.string().email(),
 });
