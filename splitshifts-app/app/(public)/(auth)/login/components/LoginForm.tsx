@@ -3,6 +3,7 @@
 // ---Core Framework---------------------------------------------------
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useWatch } from 'react-hook-form';
 
 // ---Hooks------------------------------------------------------------
 import { useLoginForm } from '../hooks/use-login-form';
@@ -37,6 +38,12 @@ export default function LoginForm() {
   const router = useRouter();
   const isSubmitting = form.formState.isSubmitting;
 
+  // watch the email field to create a dynamic link for password reset
+  const watchedEmail = useWatch({ control: form.control, name: 'email' });
+  const resetPasswordHref = watchedEmail
+    ? `/password-reset?email=${encodeURIComponent(watchedEmail)}`
+    : '/password-reset';
+
   const handleSubmit = async (data: LoginFormData) => {
     const response = await loginWithCredentials({
       email: data.email,
@@ -50,6 +57,8 @@ export default function LoginForm() {
       router.push('/dashboard');
     }
   };
+
+  // const email = form.getValues('email');
   return (
     <Card className='w-[720px] shadow-elevation-0'>
       <CardHeader>
@@ -127,7 +136,7 @@ export default function LoginForm() {
         </div>
         <div>
           Forgot password?{' '}
-          <Link href='/password-reset' className='underline'>
+          <Link href={resetPasswordHref} className='underline'>
             Reset Password
           </Link>
         </div>
