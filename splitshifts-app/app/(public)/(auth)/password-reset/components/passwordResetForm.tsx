@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+
 import { usePasswordResetForm } from '../hooks/useResetForm';
+import { resetPassword } from '../actions/send-password-reset-link';
 import { PasswordResetFormData } from '../types/password-reset-form-data';
 
 import {
@@ -25,7 +27,9 @@ import Button from '@/app/components/ui/buttons/button';
 export default function PasswordResetPageForm() {
   const form = usePasswordResetForm();
   const isSubmitting = form.formState.isSubmitting;
-  const handleSubmit = async (data: PasswordResetFormData) => {};
+  const handleSubmit = async (data: PasswordResetFormData) => {
+    await resetPassword(data.email);
+  };
   return (
     <Card className='w-[720px] shadow-elevation-0'>
       <CardHeader>
