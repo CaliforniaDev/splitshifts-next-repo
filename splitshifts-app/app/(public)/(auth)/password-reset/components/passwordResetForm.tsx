@@ -31,6 +31,22 @@ export default function PasswordResetPageForm() {
     await resetPassword(data.email);
   };
   return (
+    <ResetPasswordForm
+      form={form}
+      isSubmitting={isSubmitting}
+      handleSubmit={handleSubmit}
+    />
+  );
+}
+
+interface Props {
+  form: ReturnType<typeof usePasswordResetForm>;
+  handleSubmit: (data: PasswordResetFormData) => Promise<void>;
+  isSubmitting: boolean;
+}
+
+function ResetPasswordForm({ form, handleSubmit, isSubmitting }: Props) {
+  return (
     <Card className='w-[720px] shadow-elevation-0'>
       <CardHeader>
         <CardTitle>Password Reset</CardTitle>
