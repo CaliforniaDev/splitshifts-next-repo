@@ -57,8 +57,6 @@ export default function LoginForm() {
       router.push('/dashboard');
     }
   };
-
-  // const email = form.getValues('email');
   return (
     <Card className='w-[720px] shadow-elevation-0'>
       <CardHeader>
