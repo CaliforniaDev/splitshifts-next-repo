@@ -1,7 +1,7 @@
 import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import { users } from './usersSchema';
 
-export const passwordResetTokensSchema = pgTable('password_reset_tokens', {
+export const passwordResetTokenSchema = pgTable('password_reset_tokens', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')
     .references(() => users.id, {
