@@ -45,7 +45,7 @@ interface Props {
   isSubmitting: boolean;
 }
 
-function ResetPasswordForm({ form, handleSubmit, isSubmitting }: Props) {
+function ResetPasswordFormCard({ form, handleSubmit, isSubmitting }: Props) {
   return (
     <Card className='w-[720px] shadow-elevation-0'>
       <CardHeader>
