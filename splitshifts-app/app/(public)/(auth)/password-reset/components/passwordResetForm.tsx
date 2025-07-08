@@ -31,7 +31,7 @@ export default function PasswordResetPageForm() {
     await resetPassword(data.email);
   };
   return (
-    <ResetPasswordForm
+    <ResetPasswordFormCard
       form={form}
       isSubmitting={isSubmitting}
       handleSubmit={handleSubmit}
