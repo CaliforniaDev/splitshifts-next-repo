@@ -57,8 +57,6 @@ export async function resetPassword(emailAddress: string) {
         tokenExpiration,
       },
     });
-        console.log("🚀 ~ resetPassword ~ passwordResetToken:", passwordResetToken)
-        console.log("🚀 ~ resetPassword ~ tokenExpiration:", tokenExpiration)
 }
 
 // 'use server';
