@@ -10,6 +10,7 @@ export interface ButtonProps<T extends ElementType = 'button'>
   as?: T | 'next-link'; // Allows "next-link" but not "a"
   href?: string; // Required when using a link
   children: ReactNode; // Button content
+  icon?: ReactNode; // Optional icon to display
   className?: string; // Custom styles
   disabled?: boolean; // Disables button interaction
 }
@@ -28,6 +29,7 @@ export default function Button<T extends ElementType = 'button'>({
   variant = 'filled',
   size = 'default',
   children,
+  icon,
   className,
   disabled = false,
   ...rest
@@ -78,7 +80,12 @@ export default function Button<T extends ElementType = 'button'>({
 
   return (
     <Component className={mergedClass} disabled={disabled} {...rest}>
-      <span className='pointer-events-none relative'>{children}</span>
+      <span className='pointer-events-none relative flex items-center justify-center gap-2'>
+        {icon && (
+          <span className='h-[18px] w-[18px] flex-shrink-0'>{icon}</span>
+        )}
+        {children}
+      </span>
     </Component>
   );
 }
