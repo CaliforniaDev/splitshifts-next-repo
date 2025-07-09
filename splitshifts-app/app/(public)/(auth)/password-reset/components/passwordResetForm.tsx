@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePasswordResetForm } from '../hooks/useResetForm';
 import { resetPassword } from '../actions/send-password-reset-link';
 import { PasswordResetFormData } from '../types/password-reset-form-data';
+import { Loader } from 'lucide-react';
 
 import {
   Card,
@@ -23,14 +24,19 @@ import {
 } from '@/app/components/ui/form';
 import Input from '@/app/components/ui/inputs/input';
 import Button from '@/app/components/ui/buttons/button';
+import { maskEmail } from '@/app/lib/utils';
 
 export default function PasswordResetPageForm() {
   const form = usePasswordResetForm();
-  const isSubmitting = form.formState.isSubmitting;
+  const { formState } = form;
+  const { isSubmitting, isSubmitSuccessful } = formState;
+
   const handleSubmit = async (data: PasswordResetFormData) => {
     await resetPassword(data.email);
   };
-  return (
+  return isSubmitSuccessful ? (
+    <ResetPasswordSuccessCard form={form} />
+  ) : (
     <ResetPasswordFormCard
       form={form}
       isSubmitting={isSubmitting}
@@ -43,6 +49,25 @@ interface Props {
   form: ReturnType<typeof usePasswordResetForm>;
   handleSubmit: (data: PasswordResetFormData) => Promise<void>;
   isSubmitting: boolean;
+}
+
+function ResetPasswordSuccessCard({ form }: Pick<Props, 'form'>) {
+  const email = form.getValues('email');
+  const maskedEmail = maskEmail(email);
+  return (
+    <Card className='w-[720px] shadow-elevation-0'>
+      <CardHeader>
+        <CardTitle>Password Reset Link Sent</CardTitle>
+        <CardDescription>
+          Check your email for the password reset link.
+        </CardDescription>
+      </CardHeader>
+      <CardContent role='status' aria-live='polite'>
+        If you have an account with us, you will receive a password reset link
+        via email at <span className='font-semibold text-on-surface-variant'>{maskedEmail}</span>.
+      </CardContent>
+    </Card>
+  );
 }
 
 function ResetPasswordFormCard({ form, handleSubmit, isSubmitting }: Props) {
@@ -89,8 +114,16 @@ function ResetPasswordFormCard({ form, handleSubmit, isSubmitting }: Props) {
                   className='w-full'
                   type='submit'
                   variant='filled'
+                  icon={
+                    isSubmitting ? (
+                      <Loader
+                        className='h-4 w-4 animate-spin'
+                        aria-hidden='true'
+                      />
+                    ) : null
+                  }
                 >
-                  {isSubmitting ? 'Submitting' : 'Submit'}
+                  {isSubmitting ? 'Sending Reset Link...' : 'Send Reset Link'}
                 </Button>
               </div>
             </fieldset>
