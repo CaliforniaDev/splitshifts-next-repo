@@ -19,6 +19,7 @@ SplitShifts is a web application designed to streamline the scheduling process f
 - [Environment Variables](#environment-variables)
 - [Database](#database)
 - [Styling](#styling)
+- [Email Integration](#email-integration)
 
 ## Features
 
@@ -149,6 +150,53 @@ The project integrates with Neon using `@neondatabase/serverless` and `drizzle-o
 ## Styling
 
 The project uses `tailwindcss` for styling, along with plugins like `tailwindcss-animate` and `tw-animate-css` for animations.
+
+## Email Integration
+
+The project uses `nodemailer` in combination with Resend for sending transactional emails. This setup allows for flexible email delivery and template management.
+
+### Configuration
+
+1. Install `nodemailer` and Resend:
+   ```bash
+   npm install nodemailer @resend/client
+   ```
+
+2. Set up environment variables in your `.env` file:
+   ```env
+   RESEND_API_KEY=your-resend-api-key
+   EMAIL_FROM=your-email@example.com
+   ```
+
+3. Example usage:
+   ```javascript
+   import nodemailer from 'nodemailer';
+   import { Resend } from '@resend/client';
+
+   const resend = new Resend(process.env.RESEND_API_KEY);
+
+   const transporter = nodemailer.createTransport({
+     service: 'Resend',
+     auth: {
+       api_key: process.env.RESEND_API_KEY,
+     },
+   });
+
+   const mailOptions = {
+     from: process.env.EMAIL_FROM,
+     to: 'recipient@example.com',
+     subject: 'Test Email',
+     text: 'This is a test email sent using Resend and Nodemailer.',
+   };
+
+   transporter.sendMail(mailOptions, (error, info) => {
+     if (error) {
+       console.error('Error sending email:', error);
+     } else {
+       console.log('Email sent:', info.response);
+     }
+   });
+   ```
 
 ## License
 
