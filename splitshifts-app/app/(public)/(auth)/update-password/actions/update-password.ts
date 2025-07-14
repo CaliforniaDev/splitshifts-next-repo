@@ -81,4 +81,9 @@ export const updatePassword = async ({
       password: hashedPassword,
     })
     .where(eq(users.id, passwordResetToken.userId!));
+
+  // 🗑️ Delete the used password reset token from the database
+  await db
+    .delete(passwordResetTokenSchema)
+    .where(eq(passwordResetTokenSchema.id, passwordResetToken.id));
 };
