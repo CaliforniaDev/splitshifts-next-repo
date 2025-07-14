@@ -10,8 +10,15 @@ SplitShifts is a web application designed to streamline the scheduling process f
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Running the Development Server](#running-the-development-server)
+- [Services and Tools](#services-and-tools)
 - [License](#license)
 - [Contact](#contact)
+- [Key Dependencies](#key-dependencies)
+- [Development Tools](#development-tools)
+- [Scripts](#scripts)
+- [Environment Variables](#environment-variables)
+- [Database](#database)
+- [Styling](#styling)
 
 ## Features
 
@@ -36,12 +43,22 @@ SplitShifts is a web application designed to streamline the scheduling process f
 - Node.js
 - MongoDB
 
+## Services and Tools
+
+This application leverages the following services and tools:
+
+- **Neon Databases**: A modern cloud-based database solution for scalable and efficient data storage.
+- **Drizzle ORM**: A lightweight TypeScript ORM for interacting with the database.
+- **Resend.com**: A service for sending transactional emails and managing email templates.
+
+## Getting Started
+
+### Prerequisites
+
 Before you begin, ensure you have met the following requirements:
 
 - Node.js and npm installed
 - MongoDB installed and running
-
-## Getting Started
 
 ### Installation
 
@@ -49,17 +66,16 @@ Before you begin, ensure you have met the following requirements:
 
    ```bash
    git clone https://github.com/CaliforniaDev/splitshifts-nextjs.git
-
    ```
 
 2. Navigate to project directory:
 
    ```bash
    cd splitshifts-app
-
    ```
 
 3. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -70,10 +86,9 @@ Before you begin, ensure you have met the following requirements:
 
    ```bash
    npm run dev
-
    ```
 
-2. Open your browser and visit 'http://locolhost:3000' to see the app in action.
+2. Open your browser and visit 'http://localhost:3000' to see the app in action.
 
 ### Overview
 
@@ -91,6 +106,49 @@ This project uses a consistent type scale across various components and pages. T
 The type scale defined in `typography.css` is referenced in the Tailwind configuration to ensure consistent typography across the application. Tailwind's `@layer` feature is used to apply these styles globally. The `fonts.ts` file defines the font families and weights, which are then used in `tailwind.config.ts`. The `layout.tsx` file applies these styles to the application layout.
 
 Refer to the comments in each file for more detailed information.
+
+## Key Dependencies
+
+- **@auth/core**: Provides authentication and session management for server-side applications.
+- **next-auth**: Extends authentication capabilities for Next.js, including OAuth and session handling.
+- **drizzle-orm**: A lightweight ORM for database schema management and queries.
+- **@neondatabase/serverless**: Integration with Neon for serverless PostgreSQL databases.
+- **tailwindcss**: Utility-first CSS framework for styling.
+- **tailwindcss-animate** and **tw-animate-css**: Plugins for animations in TailwindCSS.
+- **zod**: Schema validation library for TypeScript.
+- **nodemailer**: Email sending library for server-side applications.
+- **react-hook-form**: Library for managing forms and validation in React.
+- **@hookform/resolvers**: Provides schema validation for forms using libraries like Zod.
+- **dotenv**: Manages environment variables securely.
+- **lucide-react**: Icon library for React applications.
+- **class-variance-authority** and **clsx**: Utilities for managing conditional class names in React components.
+
+## Development Tools
+
+- **eslint**: Ensures code quality and consistency.
+- **prettier**: Formats code for readability.
+- **tsx**: Executes TypeScript files directly during development.
+- **drizzle-kit**: CLI tool for managing database migrations and schema generation.
+
+## Scripts
+
+- `dev`: Start the development server.
+- `dev:network`: Start the development server with network access.
+- `build`: Build the application for production.
+- `start`: Start the production server.
+- `lint`: Run linting checks.
+
+## Environment Variables
+
+This project uses `dotenv` to manage environment variables. Ensure you have a `.env` file with the required variables.
+
+## Database
+
+The project integrates with Neon using `@neondatabase/serverless` and `drizzle-orm` for database management.
+
+## Styling
+
+The project uses `tailwindcss` for styling, along with plugins like `tailwindcss-animate` and `tw-animate-css` for animations.
 
 ## License
 
