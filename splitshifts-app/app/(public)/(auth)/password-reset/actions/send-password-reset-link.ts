@@ -7,6 +7,7 @@ import { eq } from 'drizzle-orm';
 import { users } from '@/db/usersSchema';
 import { randomBytes } from 'crypto';
 import { passwordResetTokenSchema } from '@/db/passwordResetTokenSchema';
+import { mailer } from '@/app/lib/email';
 
 /**
  * Retrieves the user from the database based on their email address.
@@ -57,6 +58,16 @@ export async function resetPassword(emailAddress: string) {
         tokenExpiration,
       },
     });
+  const resetLink = `${process.env.SITE_BASE_URL}/update-password?token=${passwordResetToken}`;
+
+  await mailer.sendMail({
+    from: 'test@resend.dev',
+    subject: 'Your password reset request',
+    to: emailAddress,
+    html: `Hey, ${emailAddress}! You requested to reset your password.
+Here's your password reset link. This link will expire in 1 hour:
+<a href="${resetLink}">${resetLink}</a>`,
+  });
 }
 
 // 'use server';
