@@ -47,7 +47,7 @@ type Props = {
 
 /**
  * UpdatePasswordForm
- * 
+ *
  * Displays a card with either:
  * - The form to update password (if the reset token is valid), or
  * - A link to request another reset token (if invalid or expired).
@@ -77,7 +77,7 @@ export default function UpdatePasswordForm({ token, isTokenValid }: Props) {
 
 /**
  * UpdatePasswordFields
- * 
+ *
  * Handles the form rendering, validation, and submission logic
  * using react-hook-form and zod. Displays toast feedback and errors.
  */
@@ -89,7 +89,7 @@ function UpdatePasswordFields({ token }: { token: string }) {
     control,
     setError,
     reset,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting, isSubmitSuccessful, errors },
   } = form;
 
   /**
@@ -105,10 +105,8 @@ function UpdatePasswordFields({ token }: { token: string }) {
       password: data.password,
       passwordConfirm: data.passwordConfirm,
     });
-    if (response?.error) {
-      setError('root', {
-        message: response.message,
-      });
+    if (response?.tokenInvalid) {
+      window.location.reload();
     } else {
       toast({
         title: 'Password Updated',
@@ -118,7 +116,18 @@ function UpdatePasswordFields({ token }: { token: string }) {
     }
   };
 
-  return (
+  const SubmitSuccessfulMessage = () => (
+    <div>
+      Your password has been updated.{' '}
+      <Link href='/login' className='underline'>
+        Click here to login to your account
+      </Link>
+    </div>
+  );
+
+  return isSubmitSuccessful ? (
+    <SubmitSuccessfulMessage />
+  ) : (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <fieldset disabled={isSubmitting} className='space-y-8'>
