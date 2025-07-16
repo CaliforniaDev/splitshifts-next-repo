@@ -8,6 +8,8 @@ import {
   CardTitle,
 } from '@/app/components/ui/card';
 import { Label } from '@/app/components/ui/label';
+import TwoFactorAuthForm from './two-factor-auth-form/index';
+
 
 export default async function Dashboard() {
   const session = await auth();
@@ -24,6 +26,7 @@ export default async function Dashboard() {
       <CardContent>
         <Label>Email Address</Label>
         <div className='text-on-surface-variant'>{session?.user?.email}</div>
+        <TwoFactorAuthForm />
       </CardContent>
     </Card>
   );
