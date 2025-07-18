@@ -123,6 +123,8 @@ Refer to the comments in each file for more detailed information.
 - **dotenv**: Manages environment variables securely.
 - **lucide-react**: Icon library for React applications.
 - **class-variance-authority** and **clsx**: Utilities for managing conditional class names in React components.
+- **otplib**: is a JavaScript One Time Password (OTP) library for OTP generation and verification.
+- **qrcode.react**: A React component to generate QR codes for rendering to the DOM.
 
 ## Development Tools
 
