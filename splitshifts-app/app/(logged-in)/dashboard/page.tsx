@@ -8,11 +8,22 @@ import {
   CardTitle,
 } from '@/app/components/ui/card';
 import { Label } from '@/app/components/ui/label';
-import TwoFactorAuthForm from './two-factor-auth-form/index';
 
+import TwoFactorAuthForm from './two-factor-auth-form/index';
+import db from '@/db/drizzle';
+import { users } from '@/db/usersSchema';
+import { eq } from 'drizzle-orm';
 
 export default async function Dashboard() {
   const session = await auth();
+
+  const [user] = await db
+    .select({
+      twoFactorEnabled: users.twoFactorEnabled,
+    })
+    .from(users)
+    .where(eq(users.id, parseInt(session?.user?.id!)));
+
   return (
     // <section className='flex flex-1 rounded-xl bg-surface-container-low p-4'>
     //   <div className=''>
@@ -26,7 +37,7 @@ export default async function Dashboard() {
       <CardContent>
         <Label>Email Address</Label>
         <div className='text-on-surface-variant'>{session?.user?.email}</div>
-        <TwoFactorAuthForm />
+        <TwoFactorAuthForm twoFactorEnabled={user.twoFactorEnabled ?? false} />
       </CardContent>
     </Card>
   );
