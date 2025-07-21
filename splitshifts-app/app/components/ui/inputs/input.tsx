@@ -125,19 +125,28 @@ interface InputProps
  * @param props InputProps
  */
 export default function Input({
+  // Primary/required props
   id,
   label,
   value,
   defaultValue,
+
+  // Error and supporting text
   error = false,
   errorMessage = '',
   supportingText = '',
+
+  // Accessibility and state
   disabled = false,
-  onChange,
-  className = '',
-  onBlur,
-  "data-testid": dataTestId = 'input',
   required = false,
+  className = '',
+  "data-testid": dataTestId = 'input',
+
+  // Callbacks
+  onChange,
+  onBlur,
+
+  // Rest props
   ...props
 }: InputProps & { "data-testid"?: string; required?: boolean }) {
   const [isFocused, setIsFocused] = useState(false);
