@@ -117,20 +117,29 @@ interface InputProps
   value?: string;
 }
 
+/**
+ * Input component for SplitShifts
+ * - Accessible, supports controlled/uncontrolled usage
+ * - Shows error or supporting text
+ * - Uses Tailwind and CVA for styling
+ * @param props InputProps
+ */
 export default function Input({
   id,
   label,
   value,
   defaultValue,
-  error,
-  errorMessage,
-  supportingText,
-  disabled,
+  error = false,
+  errorMessage = '',
+  supportingText = '',
+  disabled = false,
   onChange,
-  className,
+  className = '',
   onBlur,
+  "data-testid": dataTestId = 'input',
+  required = false,
   ...props
-}: InputProps) {
+}: InputProps & { "data-testid"?: string; required?: boolean }) {
   const [isFocused, setIsFocused] = useState(false);
   const uncontrolledValueRef = useRef<HTMLInputElement>(null);
 
@@ -159,13 +168,14 @@ export default function Input({
   const handleFocus = () => setIsFocused(true);
   const handleBlur = () => setIsFocused(false);
   return (
-    <div className='group relative'>
+    <div className='group relative' data-testid={dataTestId}>
       <span className='relative block w-full'>
         <input
           id={inputId}
           disabled={disabled}
           aria-invalid={!!error}
           aria-describedby={describedBy}
+          aria-required={required}
           className={cn(
             inputVariants({
               focused: isFocused,
@@ -202,13 +212,13 @@ export default function Input({
       </span>
 
       {/* Supporting Text OR Error Message (Show Only One) */}
-      {error && !disabled ? (
+      {error && !disabled && errorMessage ? (
         <p
           id={errorId}
           aria-live='assertive'
           className='typescale-body-small px-4 pb-0 pt-1 text-error'
         >
-          {errorMessage ?? 'There is an error'}
+          {errorMessage ?? 'An error occurred.'}
         </p>
       ) : supportingText && !disabled ? (
         <p
