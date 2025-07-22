@@ -56,13 +56,13 @@ export const activateTwoFactorAuth = async (token: string) => {
     return { error: true, message: 'Unauthorized' };
   }
 
-  const userId = session.user.id;
+  const currentUserId = parseInt(session.user.id);
 
   // Fetch user's existing 2FA secret
   const [user] = await db
     .select({ twoFactorSecret: users.twoFactorSecret })
     .from(users)
-    .where(eq(users.id, parseInt(userId)));
+    .where(eq(users.id, currentUserId));
 
   // Explicitly check if the user exists
   if (!user) {
@@ -79,7 +79,7 @@ export const activateTwoFactorAuth = async (token: string) => {
     await db
       .update(users)
       .set({ twoFactorEnabled: true })
-      .where(eq(users.id, parseInt(userId)));
+      .where(eq(users.id, currentUserId));
   }
 };
 
@@ -88,12 +88,12 @@ export const disableTwoFactorAuth = async () => {
   if (!session?.user?.id) {
     return { error: true, message: 'Unauthorized' };
   }
-  const userSessionId = session.user.id;
+  const currentUserId = parseInt(session.user.id);
 
   await db
     .update(users)
     .set({ twoFactorEnabled: false })
-    .where(eq(users.id, parseInt(userSessionId)));
+    .where(eq(users.id, currentUserId));
 
   return {
     success: true,
