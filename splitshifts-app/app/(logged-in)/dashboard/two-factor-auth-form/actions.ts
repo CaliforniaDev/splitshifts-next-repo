@@ -48,3 +48,55 @@ export const getTwoFactorSecret = async () => {
     ),
   };
 };
+
+export const activateTwoFactorAuth = async (token: string) => {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return { error: true, message: 'Unauthorized' };
+  }
+
+  const userId = session.user.id;
+
+  // Fetch user's existing 2FA secret
+  const [user] = await db
+    .select({ twoFactorSecret: users.twoFactorSecret })
+    .from(users)
+    .where(eq(users.id, parseInt(userId)));
+
+  // Explicitly check if the user exists
+  if (!user) {
+    return { error: true, message: 'User not found' };
+  }
+
+  if (user.twoFactorSecret) {
+    const isTokenValid = authenticator.check(token, user.twoFactorSecret);
+
+    if (!isTokenValid) {
+      return { error: true, message: 'Invalid OTP' };
+    }
+
+    await db
+      .update(users)
+      .set({ twoFactorEnabled: true })
+      .where(eq(users.id, parseInt(userId)));
+  }
+};
+
+export const disableTwoFactorAuth = async () => {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { error: true, message: 'Unauthorized' };
+  }
+  const userSessionId = session.user.id;
+
+  await db
+    .update(users)
+    .set({ twoFactorEnabled: false })
+    .where(eq(users.id, parseInt(userSessionId)));
+
+  return {
+    success: true,
+    message: 'Two-factor authentication disabled successfully',
+  };
+};
