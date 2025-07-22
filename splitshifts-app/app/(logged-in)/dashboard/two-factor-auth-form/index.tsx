@@ -6,6 +6,7 @@ import { getTwoFactorSecret } from './actions';
 import { useToast } from '@/app/components/ui/toast';
 import { QRCodeSVG } from 'qrcode.react';
 import Button from '@/app/components/ui/buttons/button';
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/app/components/ui/inputs/otp-input';
 
 type Props = {
   twoFactorEnabled: boolean;
@@ -35,6 +36,7 @@ export default function TwoFactorAuthForm({ twoFactorEnabled }: Props) {
     setStep(Step.SHOW_QR_CODE);
     setCode(twoFactorSecret ?? '');
   };
+  
   return (
     <div>
       {!isEnabled && (
@@ -70,6 +72,33 @@ export default function TwoFactorAuthForm({ twoFactorEnabled }: Props) {
                 Cancel
               </Button>
             </div>
+          )}
+          {step === Step.CONFIRM_CODE && (
+            <form className='flex flex-col gap-2'>
+              <p className='text-muted-foreground text-xs'>
+                Please enter the one-time passcode from the Google Authenticator
+                app.
+              </p>
+              <InputOTP maxLength={6} >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                </InputOTPGroup>
+                <InputOTPSeparator />
+                <InputOTPGroup>
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
+              <Button type='submit'>
+                Submit and Activate
+              </Button>
+              <Button onClick={() => setStep(Step.SHOW_QR_CODE)} variant='outlined'>
+                Cancel
+              </Button>
+            </form>
           )}
         </div>
       )}
