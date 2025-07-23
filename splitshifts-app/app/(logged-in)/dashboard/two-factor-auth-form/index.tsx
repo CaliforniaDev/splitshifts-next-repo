@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 import {
   activateTwoFactorAuth,
@@ -32,8 +32,10 @@ export default function TwoFactorAuthForm({ twoFactorEnabled }: Props) {
   const [code, setCode] = useState('');
   const [isEnabled, setIsEnabled] = useState(twoFactorEnabled);
   const [otp, setOtp] = useState('');
+  const otpInputRef = useRef<HTMLInputElement>(null);
 
   const handleEnableClick = async () => {
+    setOtp('');
     const response = await getTwoFactorSecret();
     const { error, message, twoFactorSecret } = response;
     if (error) {
@@ -46,6 +48,16 @@ export default function TwoFactorAuthForm({ twoFactorEnabled }: Props) {
     setStep(Step.SHOW_QR_CODE);
     setCode(twoFactorSecret ?? '');
   };
+
+  // Focus OTP input when transitioning to CONFIRM_CODE step
+  useEffect(() => {
+    if (step === Step.CONFIRM_CODE && otpInputRef.current) {
+      const raf = requestAnimationFrame(() => {
+        otpInputRef.current?.focus();
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [step]);
 
   const handleOTPSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -70,6 +82,7 @@ export default function TwoFactorAuthForm({ twoFactorEnabled }: Props) {
       variant: 'success',
       description: 'Two-Factor Authentication has been disabled!',
     });
+    setOtp('');
     setStep(Step.ENABLE);
     setIsEnabled(false);
   };
@@ -106,7 +119,10 @@ export default function TwoFactorAuthForm({ twoFactorEnabled }: Props) {
               <Button
                 variant='filled'
                 className='w-full'
-                onClick={() => setStep(Step.CONFIRM_CODE)}
+                onClick={() => {
+                  setOtp('');
+                  setStep(Step.CONFIRM_CODE);
+                }}
               >
                 I have scanned the QR code
               </Button>
@@ -125,7 +141,12 @@ export default function TwoFactorAuthForm({ twoFactorEnabled }: Props) {
                 Please enter the one-time passcode from the Google Authenticator
                 app.
               </p>
-              <InputOTP maxLength={6} value={otp} onChange={setOtp}>
+              <InputOTP
+                ref={otpInputRef}
+                maxLength={6}
+                value={otp}
+                onChange={setOtp}
+              >
                 <InputOTPGroup>
                   <InputOTPSlot index={0} />
                   <InputOTPSlot index={1} />
@@ -142,7 +163,10 @@ export default function TwoFactorAuthForm({ twoFactorEnabled }: Props) {
                 Submit and Activate
               </Button>
               <Button
-                onClick={() => setStep(Step.SHOW_QR_CODE)}
+                onClick={() => {
+                  setOtp('');
+                  setStep(Step.SHOW_QR_CODE);
+                }}
                 variant='outlined'
               >
                 Cancel
