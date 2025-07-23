@@ -2,11 +2,20 @@
 
 import { useState } from 'react';
 
-import { getTwoFactorSecret } from './actions';
+import {
+  activateTwoFactorAuth,
+  disableTwoFactorAuth,
+  getTwoFactorSecret,
+} from './actions';
 import { useToast } from '@/app/components/ui/toast';
 import { QRCodeSVG } from 'qrcode.react';
 import Button from '@/app/components/ui/buttons/button';
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/app/components/ui/inputs/otp-input';
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from '@/app/components/ui/inputs/otp-input';
 
 type Props = {
   twoFactorEnabled: boolean;
@@ -22,23 +31,60 @@ export default function TwoFactorAuthForm({ twoFactorEnabled }: Props) {
   const [step, setStep] = useState(Step.ENABLE);
   const [code, setCode] = useState('');
   const [isEnabled, setIsEnabled] = useState(twoFactorEnabled);
+  const [otp, setOtp] = useState('');
+
   const handleEnableClick = async () => {
     const response = await getTwoFactorSecret();
     const { error, message, twoFactorSecret } = response;
     if (error) {
       toast({
         variant: 'destructive',
-        title: message,
+        description: message,
       });
       return;
     }
-
     setStep(Step.SHOW_QR_CODE);
     setCode(twoFactorSecret ?? '');
   };
-  
+
+  const handleOTPSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const response = await activateTwoFactorAuth(otp);
+
+    if (response?.error) {
+      toast({
+        variant: 'destructive',
+        description: response.message,
+      });
+      return;
+    }
+    toast({
+      variant: 'success',
+      description: 'Two-Factor Authentication has been enabled!',
+    });
+    setIsEnabled(true);
+  };
+  const handleDisableTwoFactorAuth = async () => {
+    await disableTwoFactorAuth();
+    toast({
+      variant: 'success',
+      description: 'Two-Factor Authentication has been disabled!',
+    });
+    setStep(Step.ENABLE);
+    setIsEnabled(false);
+  };
+
   return (
     <div>
+      {!!isEnabled && (
+        <Button
+          onClick={handleDisableTwoFactorAuth}
+          variant='tonal'
+          className='w-full'
+        >
+          Disable Two-Factor Authentication
+        </Button>
+      )}
       {!isEnabled && (
         <div>
           {step === 1 && (
@@ -50,7 +96,7 @@ export default function TwoFactorAuthForm({ twoFactorEnabled }: Props) {
               Enable Two-Factor Authentication
             </Button>
           )}
-          {step === 2 && (
+          {step === Step.SHOW_QR_CODE && (
             <div className='flex flex-col items-center gap-4'>
               <p className='typescale-label-medium text-surface-variant py-2'>
                 Scan the QR code below in your Google Authenticator app or any
@@ -74,28 +120,31 @@ export default function TwoFactorAuthForm({ twoFactorEnabled }: Props) {
             </div>
           )}
           {step === Step.CONFIRM_CODE && (
-            <form className='flex flex-col gap-2'>
+            <form onSubmit={handleOTPSubmit} className='flex flex-col gap-2'>
               <p className='text-muted-foreground text-xs'>
                 Please enter the one-time passcode from the Google Authenticator
                 app.
               </p>
-              <InputOTP maxLength={6} >
+              <InputOTP maxLength={6} value={otp} onChange={setOtp}>
                 <InputOTPGroup>
                   <InputOTPSlot index={0} />
                   <InputOTPSlot index={1} />
                   <InputOTPSlot index={2} />
                 </InputOTPGroup>
-                <InputOTPSeparator />
+                <InputOTPSeparator variant='dash' />
                 <InputOTPGroup>
                   <InputOTPSlot index={3} />
                   <InputOTPSlot index={4} />
                   <InputOTPSlot index={5} />
                 </InputOTPGroup>
               </InputOTP>
-              <Button type='submit'>
+              <Button disabled={otp.length !== 6} type='submit'>
                 Submit and Activate
               </Button>
-              <Button onClick={() => setStep(Step.SHOW_QR_CODE)} variant='outlined'>
+              <Button
+                onClick={() => setStep(Step.SHOW_QR_CODE)}
+                variant='outlined'
+              >
                 Cancel
               </Button>
             </form>
