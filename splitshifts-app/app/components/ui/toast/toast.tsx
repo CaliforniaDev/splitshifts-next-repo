@@ -32,13 +32,15 @@ export const hoverOverlay =
   'relative overflow-hidden before:absolute before:inset-0 before:bg-inverse-primary before:opacity-0 before:pointer-events-none before:transition-opacity hover:before:opacity-8';
 
 const toastVariants = cva(
-  `${hoverOverlay} group pointer-events-auto relative flex w-full items-center justify-between gap-2 rounded-[4px] transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:sm:slide-in-from-bottom-full`,
+  `${hoverOverlay} group pointer-events-auto relative h-[48px] pl-4 shadow-elevation-3 flex w-full items-center justify-between gap-2 rounded-[4px] transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:sm:slide-in-from-bottom-full`,
   {
     variants: {
       variant: {
-        default: 'relative bg-inverse-surface h-[48px] pl-4 shadow-elevation-3',
+        default: 'bg-inverse-surface text-inverse-on-surface',
         destructive:
-          'destructive group border-destructive bg-destructive text-destructive-foreground',
+          'destructive group border-destructive bg-error text-on-error',
+        success:
+          'bg-tertiary text-on-tertiary',
       },
     },
     defaultVariants: {
@@ -102,8 +104,6 @@ const ToastClose = ({
   </ToastPrimitives.Close>
 );
 ToastClose.displayName = 'ToastClose';
-
-
 
 const ToastDescription = ({
   ref,
