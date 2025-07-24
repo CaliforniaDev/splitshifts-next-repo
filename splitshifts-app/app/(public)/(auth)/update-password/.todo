@@ -1,7 +1,3 @@
-
-- Continue working on the updatePasswordForm
-- change component file name convention to kebab case
-
 - add submitting icons animations to all submit buttons
 - update all components to MODERN standards
 - update toast component to a sonner
