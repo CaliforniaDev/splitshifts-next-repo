@@ -1,5 +1,4 @@
 
-- Clean up comment inside of the update-password-form-data file
 - Continue working on the updatePasswordForm
 - change component file name convention to kebab case
 
