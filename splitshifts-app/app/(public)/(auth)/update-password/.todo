@@ -1,4 +1,4 @@
-- Possibly will be removing the validation folder because there is no use for it.... 
+
 - Clean up comment inside of the update-password-form-data file
 - Continue working on the updatePasswordForm
 - change component file name convention to kebab case
