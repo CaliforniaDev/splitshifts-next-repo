@@ -42,6 +42,7 @@ const config: Config = {
         scrim: '#000000',
         'inverse-surface': '#2D3135',
         'inverse-on-surface': '#EEF1F6',
+        'inverse-primary': '#A0CAFD',
 
         'surface-dim': '#D7DADF',
         'surface-bright': '#F7F9FF',
@@ -90,6 +91,7 @@ const config: Config = {
         'state-drag': '0.16',
       },
       boxShadow: {
+        'elevation-0': 'none',
         'elevation-1':
           '0px 4px 4px 0px rgba(0, 0, 0, 0.25), 0px 1px 2px 0px rgba(0, 0, 0, 0.30);',
         'elevation-2':
@@ -107,10 +109,19 @@ const config: Config = {
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       transitionProperty: {
-        'textfield': 'border, background-color, color, padding',
+        textfield: 'border, background-color, color, padding',
+      },
+      keyframes: {
+        'caret-blink': {
+          '0%,70%,100%': { opacity: '1' },
+          '20%,50%': { opacity: '0' },
+        },
+      },
+      animation: {
+        'caret-blink': 'caret-blink 1.25s ease-out infinite',
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate')],
 };
 export default config;

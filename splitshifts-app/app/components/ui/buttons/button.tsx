@@ -1,72 +1,91 @@
 'use client';
-import clsx from 'clsx';
-import {
-  baseStyle,
-  styles,
-  stateLayer,
-  sizeStyles,
-  disabledStyle,
-  StyleVariants,
-  SizeVariants,
-} from './styles';
-
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: StyleVariants;
-  size?: SizeVariants;
-  children: React.ReactNode;
-  className?: string;
-  disabled?: boolean;
+import Link from 'next/link';
+import { ElementType, ReactNode } from 'react';
+import { twMerge } from 'tailwind-merge';
+import type { VariantProps } from 'class-variance-authority';
+import { buttonVariants } from './variants';
+// Define the types for the component props
+export interface ButtonProps<T extends ElementType = 'button'>
+  extends VariantProps<typeof buttonVariants> {
+  as?: T | 'next-link'; // Allows "next-link" but not "a"
+  href?: string; // Required when using a link
+  children: ReactNode; // Button content
+  icon?: ReactNode; // Optional icon to display
+  className?: string; // Custom styles
+  disabled?: boolean; // Disables button interaction
 }
 
 /**
- * The `Button` component is a reusable styled button that supports multiple variants
- * and sizes. It provides flexibility with different styles, including elevated, filled,
- * tonal, outlined, and text buttons, along with size options.
- *
- * Props:
- * - `variant` (optional, StyleVariants): The style variant of the button. Available values:
- *     - `'elevated'`: Adds shadow and background.
- *     - `'filled'`: Solid color background.
- *     - `'tonal'`: Background with a more subtle tone.
- *     - `'outlined'`: No background, only a border.
- *     - `'text'`: No background or border, just text.
- *   Default: `'filled'`.
- * - `size` (optional, SizeVariants): The size variant of the button. Available values:
- *     - `'default'`: Normal size.
- *     - `'large'`: Larger size with more padding.
- *   Default: `'default'`.
- * - `children` (ReactNode): The content to display inside the button, usually text.
- * - `className` (optional, string): Additional custom classes to apply to the button.
- *   This can be used to extend or override the default styles.
- * - `disabled` (optional, boolean): If true, the button will be disabled and non-interactive.
- *   Adds appropriate styling for disabled state.
- * - `rest` (any): Additional props to pass to the underlying `<button>` element, such as event handlers
- *   like `onClick`.
- *
- * @param {ButtonProps} props The props for the Button component.
- * @returns The rendered Button component with the provided styling and content.
+ * Utility function to check if a given `href` is an external link.
+ * External links start with "http://" or "https://".
  */
+const isExternalLink = (href?: string): boolean => {
+  return !!href && (href.startsWith('http://') || href.startsWith('https://'));
+};
 
-export default function Button({
+export default function Button<T extends ElementType = 'button'>({
+  as,
+  href,
   variant = 'filled',
   size = 'default',
-  children = 'Button',
-  className = '',
+  children,
+  icon,
+  className,
   disabled = false,
   ...rest
-}: ButtonProps) {
-  className = clsx(
-    className,
-    baseStyle,
-    styles[variant],
-    stateLayer[variant],
-    sizeStyles[size],
-    disabled ? disabledStyle[variant] : '',
+}: ButtonProps<T> &
+  Omit<React.ComponentPropsWithoutRef<T>, keyof ButtonProps<T>>) {
+  const isNextLink = as === 'next-link'; // Checks if we are using Next.js <Link>
+  const isExternal = isExternalLink(href); // Determines if the link is external
+
+  const mergedClass = twMerge(
+    buttonVariants({
+      variant,
+      size,
+      disabled,
+      className,
+    }),
+    'text-center',
   );
 
+  // Throw an error if someone tries to use `as="a"`
+  if (as === 'a') {
+    throw new Error('❌ <a> tags are not allowed. Use "next-link" instead.');
+  }
+
+  // Warn if href is provided but `as="next-link"` is missing
+  if (href && !isNextLink) {
+    console.warn(
+      `⚠️ Warning: href="${href}" provided but as="next-link" is missing.`,
+    );
+  }
+
+  // If `as="next-link"`, render a Next.js <Link>
+  if (isNextLink) {
+    return (
+      <Link
+        href={href!}
+        target={isExternal ? '_blank' : undefined} // Open external links in a new tab
+        rel={isExternal ? 'noopener noreferrer' : undefined} // Security best practice for external links
+        className={mergedClass}
+        {...rest}
+      >
+        {children}
+      </Link>
+    );
+  }
+
+  // Default to a button or other valid HTML element
+  const Component = as || 'button';
+
   return (
-    <button className={className} disabled={disabled} {...rest}>
-      <span className='pointer-events-none relative'>{children}</span>
-    </button>
+    <Component className={mergedClass} disabled={disabled} {...rest}>
+      <span className='pointer-events-none relative flex items-center justify-center gap-2'>
+        {icon && (
+          <span className='h-[18px] w-[18px] flex-shrink-0'>{icon}</span>
+        )}
+        {children}
+      </span>
+    </Component>
   );
 }
