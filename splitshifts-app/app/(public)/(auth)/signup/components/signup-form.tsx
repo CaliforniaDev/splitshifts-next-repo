@@ -204,12 +204,13 @@ function SignUpFormCard({ form, isSubmitting, onSubmit }: Props) {
                 />
               </div>
               <Button
-                disabled={isSubmitting}
+                loading={isSubmitting}
+                loadingText='Submitting...'
                 className='w-full'
                 type='submit'
                 variant='filled'
               >
-                {isSubmitting ? 'Submitting...' : 'Get Started'}
+                Get Started
               </Button>
             </fieldset>
           </form>

@@ -175,12 +175,13 @@ function UpdatePasswordFields({ token }: { token: string }) {
             <FormMessage>{errors.root?.message}</FormMessage>
           )}
           <Button
-            disabled={isSubmitting}
+            loading={isSubmitting}
+            loadingText='Updating Password...'
             className='w-full'
             type='submit'
             variant='filled'
           >
-            {isSubmitting ? 'Submitting...' : 'Update Password'}
+            Update Password
           </Button>
         </fieldset>
       </form>

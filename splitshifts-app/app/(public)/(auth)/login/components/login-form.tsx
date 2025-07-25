@@ -211,12 +211,13 @@ function LoginCard({
               )}
               <div className='flex flex-col gap-4'>
                 <Button
-                  disabled={isSubmitting}
+                  loading={isSubmitting}
+                  loadingText='Logging in...'
                   className='w-full'
                   type='submit'
                   variant='filled'
                 >
-                  {isSubmitting ? 'logging in' : 'Login'}
+                  Login
                 </Button>
               </div>
             </fieldset>
