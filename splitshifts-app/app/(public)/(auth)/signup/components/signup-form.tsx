@@ -44,12 +44,17 @@ export default function SignUpForm() {
         Object.entries(response.fieldErrors).forEach(([field, message]) => {
           form.setError(field as keyof SignUpFormData, { message });
         });
-        console.error(response);
+        return; // Exit early after handling field errors
       }
-      console.log(response); // Logs successful registration
-    } catch (error) {
-      console.error('An unexpected error occurred', error);
 
+      // Handle general API errors
+      if (response?.error) {
+        form.setError('root', {
+          type: 'server',
+          message: response.message || 'Registration failed. Please try again.',
+        });
+      }
+    } catch (error) {
       form.setError('root', {
         type: 'server',
         message: 'An unexpected error occurred. Try again later.',
