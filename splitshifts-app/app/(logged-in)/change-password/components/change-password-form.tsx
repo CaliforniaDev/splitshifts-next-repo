@@ -117,12 +117,13 @@ export default function ChangePasswordForm() {
                 <FormMessage>{form.formState.errors.root?.message}</FormMessage>
               )}
               <Button
-                disabled={isSubmitting}
+                loading={isSubmitting}
+                loadingText='Submitting...'
                 className='w-full'
                 type='submit'
                 variant='filled'
               >
-                {isSubmitting ? 'Submitting...' : 'Change Password'}
+                Change Password
               </Button>
             </fieldset>
           </form>

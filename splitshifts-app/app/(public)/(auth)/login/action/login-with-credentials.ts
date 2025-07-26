@@ -6,10 +6,10 @@ import { signIn } from '@/auth';
 import db from '@/db/drizzle';
 import { users } from '@/db/usersSchema';
 import { loginFormSchema } from '@/app/(public)/(auth)/validation/auth-schema';
-import { LoginUserData, LoginResponse } from '../types/login-form-data';
+import { LoginFormData, LoginResponse } from '../types/login-form-data';
 
 export const loginWithCredentials = async (
-  data: LoginUserData,
+  data: LoginFormData,
 ): Promise<LoginResponse> => {
   const validation = loginFormSchema.safeParse(data);
   if (!validation.success) {
@@ -37,15 +37,20 @@ export const loginWithCredentials = async (
       error: false,
     };
   } catch (e) {
+    // Provide different error messages based on whether OTP was provided
+    const errorMessage = token 
+      ? 'Invalid OTP code. Please check your authenticator app and try again.'
+      : 'Incorrect email or password.';
+    
     return {
       error: true,
-      message: 'Incorrect email or password.',
+      message: errorMessage,
     };
   }
 };
 
 export const preLoginCheck = async (
-  data: Pick<LoginUserData, 'email' | 'password'>,
+  data: Pick<LoginFormData, 'email' | 'password'>,
 ): Promise<LoginResponse & { twoFactorEnabled?: boolean }> => {
   // Fetch the user from the database
   const [user] = await db
@@ -57,7 +62,7 @@ export const preLoginCheck = async (
   if (!user) {
     return {
       error: true,
-      message: 'Incorrect credentials',
+      message: 'Incorrect email or password.',
     };
   }
 
@@ -67,7 +72,7 @@ export const preLoginCheck = async (
   if (!passwordCorrect) {
     return {
       error: true,
-      message: 'Incorrect credentials',
+      message: 'Incorrect email or password.',
     };
   }
   return {

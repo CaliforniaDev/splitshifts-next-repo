@@ -64,7 +64,11 @@ function ResetPasswordSuccessCard({ form }: Pick<Props, 'form'>) {
       </CardHeader>
       <CardContent role='status' aria-live='polite'>
         If you have an account with us, you will receive a password reset link
-        via email at <span className='font-semibold text-on-surface-variant'>{maskedEmail}</span>.
+        via email at{' '}
+        <span className='font-semibold text-on-surface-variant'>
+          {maskedEmail}
+        </span>
+        .
       </CardContent>
     </Card>
   );
@@ -110,20 +114,13 @@ function ResetPasswordFormCard({ form, handleSubmit, isSubmitting }: Props) {
               )}
               <div className='flex flex-col gap-4'>
                 <Button
-                  disabled={isSubmitting}
+                  loading={isSubmitting}
+                  loadingText='Sending Reset Link...'
                   className='w-full'
                   type='submit'
                   variant='filled'
-                  icon={
-                    isSubmitting ? (
-                      <Loader
-                        className='h-4 w-4 animate-spin'
-                        aria-hidden='true'
-                      />
-                    ) : null
-                  }
                 >
-                  {isSubmitting ? 'Sending Reset Link...' : 'Send Reset Link'}
+                  Send Reset Link
                 </Button>
               </div>
             </fieldset>
