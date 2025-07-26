@@ -103,3 +103,10 @@ export const loginFormSchema = z.object({
 export const passwordResetSchema = z.object({
   email: z.string().email(),
 });
+
+export const otpSchema = z.object({
+  otp: z
+    .string()
+    .length(6, 'OTP must be exactly 6 digits')
+    .regex(/^\d+$/, { message: 'OTP must contain only numbers' }),
+});
