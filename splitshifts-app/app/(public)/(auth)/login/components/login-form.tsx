@@ -7,10 +7,11 @@ import { useRouter } from 'next/navigation';
 import { useWatch } from 'react-hook-form';
 
 // ---Hooks------------------------------------------------------------
-import { useLoginForm } from '../hooks/use-login-form';
+import { useLoginForm, useOtpForm } from '../hooks/use-login-form';
 
 // ---Types-------------------------------------------------------------
 import type { LoginFormData } from '../types/login-form-data';
+import type { OtpFormData } from '../types/login-form-data';
 
 // ---Actions-----------------------------------------------------------
 import {
@@ -44,36 +45,69 @@ import {
 } from '@/app/components/ui/inputs/otp-input';
 import { toast } from '@/app/components/ui/toast';
 
+// ---Constants--------------------------------------------------------
 enum Step {
   INITIAL = 1,
   REQUIRE_OTP = 2,
 }
 
+/**
+ * Main login form component that handles two-step authentication flow:
+ * 1. Initial step: Email and password validation
+ * 2. OTP step: Two-factor authentication (if enabled)
+ */
 export default function LoginForm() {
+  // ---State Management-------------------------------------------------
   const [step, setStep] = useState(Step.INITIAL);
-  const [otp, setOtp] = useState('');
   const otpInputRef = useRef<HTMLInputElement>(null);
+  
+  // ---Form Hooks-------------------------------------------------------
   const form = useLoginForm();
+  const otpForm = useOtpForm();
+  
+  // ---Router & Navigation----------------------------------------------
   const router = useRouter();
   const isSubmitting = form.formState.isSubmitting;
 
-  // watch the email field to create a dynamic link for password reset
+  // ---Dynamic Password Reset Link-------------------------------------
+  // Watch the email field to create a dynamic link for password reset
   const watchedEmail = useWatch({ control: form.control, name: 'email' });
   const resetPasswordHref = watchedEmail
     ? `/password-reset?email=${encodeURIComponent(watchedEmail)}`
     : '/password-reset';
 
+  // ---Effects----------------------------------------------------------
+  /**
+   * Auto-focus the OTP input when transitioning to the OTP step.
+   * Uses requestAnimationFrame to ensure the input is rendered first.
+   */
+  useEffect(() => {
+    if (step === Step.REQUIRE_OTP && otpInputRef.current) {
+      const raf = requestAnimationFrame(() => {
+        otpInputRef.current?.focus();
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [step]);
+
+  // ---Event Handlers--------------------------------------------------
+  /**
+   * Handles the initial login form submission (email and password).
+   * Performs pre-login check and determines if OTP is required.
+   */
   const handleSubmit = async (data: LoginFormData) => {
     const preLoginCheckResponse = await preLoginCheck({
       email: data.email,
       password: data.password,
     });
+    
     if (preLoginCheckResponse.error) {
       form.setError('root', {
         message: preLoginCheckResponse.message,
       });
       return;
     }
+    
     if (preLoginCheckResponse.twoFactorEnabled) {
       setStep(Step.REQUIRE_OTP);
     } else {
@@ -81,6 +115,7 @@ export default function LoginForm() {
         email: data.email,
         password: data.password,
       });
+      
       if (response?.error) {
         form.setError('root', {
           message: response.message,
@@ -91,21 +126,15 @@ export default function LoginForm() {
     }
   };
 
-  useEffect(() => {
-    if (step === Step.REQUIRE_OTP && otpInputRef.current) {
-      const raf = requestAnimationFrame(() => {
-        otpInputRef.current?.focus();
-      });
-      return () => cancelAnimationFrame(raf);
-    }
-  }, [step]);
-
-  const handleOTPSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  /**
+   * Handles OTP form submission for two-factor authentication.
+   * Combines email/password from the initial form with the OTP token.
+   */
+  const handleOTPSubmit = async (data: OtpFormData) => {
     const response = await loginWithCredentials({
       email: form.getValues('email'),
       password: form.getValues('password'),
-      token: otp,
+      token: data.otp,
     });
 
     if (response?.error) {
@@ -117,6 +146,8 @@ export default function LoginForm() {
       router.push('/dashboard');
     }
   };
+
+  // ---Render-----------------------------------------------------------
   return (
     <>
       {step === Step.INITIAL && (
@@ -129,9 +160,8 @@ export default function LoginForm() {
       )}
       {step === Step.REQUIRE_OTP && (
         <OtpCard
+          otpForm={otpForm}
           handleOTPSubmit={handleOTPSubmit}
-          otp={otp}
-          setOtp={setOtp}
           ref={otpInputRef}
         />
       )}
@@ -139,9 +169,14 @@ export default function LoginForm() {
   );
 }
 
-// ---Components--------------------------------------------------------
-// This component is used to render the login card with form fields and actions.
+// ---Sub-Components---------------------------------------------------
 
+/**
+ * LoginCard Component
+ * 
+ * Renders the initial login form with email and password fields.
+ * Includes form validation, error handling, and navigation links.
+ */
 interface LoginCardProps {
   form: ReturnType<typeof useLoginForm>;
   isSubmitting: boolean;
@@ -241,15 +276,22 @@ function LoginCard({
     </Card>
   );
 }
-// This component is used to render the OTP input card when two-factor authentication is required.
+
+/**
+ * OtpCard Component
+ * 
+ * Renders the OTP verification form for two-factor authentication.
+ * Uses InputOTP component for 6-digit code entry with validation.
+ */
 interface OtpCardProps {
-  otp: string;
-  setOtp: (otp: string) => void;
-  handleOTPSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
+  otpForm: ReturnType<typeof useOtpForm>;
+  handleOTPSubmit: (data: OtpFormData) => Promise<void>;
   ref: React.RefObject<HTMLInputElement | null>;
 }
 
-function OtpCard({ otp, setOtp, ref, handleOTPSubmit }: OtpCardProps) {
+function OtpCard({ otpForm, handleOTPSubmit, ref }: OtpCardProps) {
+  const isOtpSubmitting = otpForm.formState.isSubmitting;
+
   return (
     <Card className='w-[720px] shadow-elevation-0'>
       <CardHeader>
@@ -259,28 +301,53 @@ function OtpCard({ otp, setOtp, ref, handleOTPSubmit }: OtpCardProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form className='flex flex-col gap-2' onSubmit={handleOTPSubmit}>
-          <p className='text-muted-foreground text-xs'>
-            Please enter the one-time passcode from the Google Authenticator
-            app.
-          </p>
-          <InputOTP ref={ref} maxLength={6} value={otp} onChange={setOtp}>
-            <InputOTPGroup>
-              <InputOTPSlot index={0} />
-              <InputOTPSlot index={1} />
-              <InputOTPSlot index={2} />
-            </InputOTPGroup>
-            <InputOTPSeparator variant='dash' />
-            <InputOTPGroup>
-              <InputOTPSlot index={3} />
-              <InputOTPSlot index={4} />
-              <InputOTPSlot index={5} />
-            </InputOTPGroup>
-          </InputOTP>
-          <Button type='submit' disabled={otp.length !== 6}>
-            Verify OTP
-          </Button>
-        </form>
+        <Form {...otpForm}>
+          <form className='flex flex-col gap-2' onSubmit={otpForm.handleSubmit(handleOTPSubmit)}>
+            <p className='text-muted-foreground text-xs'>
+              Please enter the one-time passcode from the Google Authenticator
+              app.
+            </p>
+            <FormField
+              name='otp'
+              control={otpForm.control}
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <FormControl>
+                    <InputOTP 
+                      ref={ref} 
+                      maxLength={6} 
+                      value={field.value} 
+                      onChange={field.onChange}
+                    >
+                      <InputOTPGroup>
+                        <InputOTPSlot index={0} />
+                        <InputOTPSlot index={1} />
+                        <InputOTPSlot index={2} />
+                      </InputOTPGroup>
+                      <InputOTPSeparator variant='dash' />
+                      <InputOTPGroup>
+                        <InputOTPSlot index={3} />
+                        <InputOTPSlot index={4} />
+                        <InputOTPSlot index={5} />
+                      </InputOTPGroup>
+                    </InputOTP>
+                  </FormControl>
+                  {fieldState.error && (
+                    <FormMessage>{fieldState.error.message}</FormMessage>
+                  )}
+                </FormItem>
+              )}
+            />
+            <Button 
+              loading={isOtpSubmitting}
+              loadingText='Verifying OTP...'
+              type='submit' 
+              disabled={otpForm.watch('otp').length !== 6}
+            >
+              Verify OTP
+            </Button>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );
