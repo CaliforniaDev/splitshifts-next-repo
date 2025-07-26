@@ -171,7 +171,6 @@ The project uses `nodemailer` in combination with Resend for sending transaction
    ```
 
 3. Example usage:
-3. Example usage:
    ```javascript
    import nodemailer from 'nodemailer';
    import { Resend } from '@resend/client';
@@ -179,12 +178,12 @@ The project uses `nodemailer` in combination with Resend for sending transaction
    const resend = new Resend(process.env.RESEND_API_KEY);
 
    const transporter = nodemailer.createTransporter({
+   const transporter = nodemailer.createTransport({
      service: 'Resend',
      auth: {
        api_key: process.env.RESEND_API_KEY,
      },
    });
-
    const mailOptions = {
      from: process.env.EMAIL_FROM,
      to: 'recipient@example.com',
@@ -200,7 +199,9 @@ The project uses `nodemailer` in combination with Resend for sending transaction
      // Handle email send error appropriately
      throw new Error('Failed to send email');
    }
-   ```## License
+   ```
+
+## License
 
 All Rights Reserved
 

@@ -97,7 +97,7 @@ export default function Button<T extends ElementType = 'button'>({
       >
         <span className='pointer-events-none relative flex items-center justify-center gap-2'>
           {displayIcon && (
-            <span className='flex items-center justify-center flex-shrink-0'>{displayIcon}</span>
+            <span className='h-[18px] w-[18px] flex items-center justify-center flex-shrink-0'>{displayIcon}</span>
           )}
           {displayChildren}
         </span>

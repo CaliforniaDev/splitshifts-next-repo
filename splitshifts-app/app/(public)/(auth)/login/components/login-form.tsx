@@ -291,6 +291,7 @@ interface OtpCardProps {
 
 function OtpCard({ otpForm, handleOTPSubmit, ref }: OtpCardProps) {
   const isOtpSubmitting = otpForm.formState.isSubmitting;
+  const otpValue = useWatch({ control: otpForm.control, name: 'otp' });
 
   return (
     <Card className='w-[720px] shadow-elevation-0'>
@@ -342,7 +343,7 @@ function OtpCard({ otpForm, handleOTPSubmit, ref }: OtpCardProps) {
               loading={isOtpSubmitting}
               loadingText='Verifying OTP...'
               type='submit' 
-              disabled={otpForm.watch('otp').length !== 6}
+              disabled={otpValue?.length !== 6}
             >
               Verify OTP
             </Button>
