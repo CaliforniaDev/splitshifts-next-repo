@@ -92,7 +92,7 @@ export default function TwoFactorAuthForm({ twoFactorEnabled }: Props) {
       {!!isEnabled && (
         <Button
           onClick={handleDisableTwoFactorAuth}
-          variant='tonal'
+          variant='destructive'
           className='w-full'
         >
           Disable Two-Factor Authentication
