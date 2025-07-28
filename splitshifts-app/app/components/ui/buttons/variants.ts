@@ -14,6 +14,8 @@ export const buttonVariants = cva(
         outlined:
           'border border-outline text-primary before:bg-primary before:opacity-0 hover:before:opacity-8',
         text: 'text-primary before:bg-primary before:opacity-0 hover:before:opacity-8',
+        destructive:
+          'bg-error text-on-error before:bg-on-primary before:opacity-0 hover:before:opacity-8',
       },
       size: {
         default: 'typescale-label-large px-6 py-2.5',
