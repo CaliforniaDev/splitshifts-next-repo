@@ -54,7 +54,7 @@ type Props = {
  */
 export default function UpdatePasswordForm({ token, isTokenValid }: Props) {
   return (
-    <Card className='w-full max-w-[720px] shadow-elevation-0'>
+    <Card className='w-full shadow-elevation-0'>
       <CardHeader>
         <CardTitle>
           {isTokenValid

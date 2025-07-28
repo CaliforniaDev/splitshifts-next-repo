@@ -75,7 +75,7 @@ export default function SignUpForm() {
 
 function SignUpSuccessCard() {
   return (
-    <Card className='w-[720px] border-red-50 shadow-elevation-0'>
+    <Card className='w-full border-red-50 shadow-elevation-0'>
       <CardHeader aria-live='polite' role='status'>
         <CardTitle>Registration Successful!</CardTitle>
         <CardDescription className='typescale-body-large'>
@@ -99,7 +99,7 @@ interface Props {
 
 function SignUpFormCard({ form, isSubmitting, onSubmit }: Props) {
   return (
-    <Card className='w-[720px] shadow-elevation-0'>
+    <Card className='w-full shadow-elevation-0'>
       <CardHeader>
         <CardTitle>Welcome | Sign Up Today</CardTitle>
         <CardDescription className='typescale-body-large'>

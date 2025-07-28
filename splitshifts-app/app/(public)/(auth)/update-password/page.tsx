@@ -16,8 +16,6 @@ export default async function UpdatePasswordPage({
   // Check token validity before rendering the form
   const isTokenValid = token ? await validateResetToken(token) : false;
   return (
-    <main className='flex min-h-screen justify-center'>
-      <UpdatePasswordForm token={token ?? ''} isTokenValid={isTokenValid} />
-    </main>
+    <UpdatePasswordForm token={token ?? ''} isTokenValid={isTokenValid} />
   );
 }

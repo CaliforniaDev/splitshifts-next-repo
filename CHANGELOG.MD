@@ -35,13 +35,58 @@
 - **Database Schema**: Defined schemas for users and password reset tokens in `usersSchema.ts` and `passwordResetTokenSchema.ts`.
 - **Hero Section**: Created a reusable `hero-section.tsx` component for the landing page.
 - **Custom Fonts**: Integrated custom fonts and typography settings using `fonts.ts` and `typography.css`.
+- **Two-Factor Authentication System**: Implemented comprehensive 2FA functionality with OTP (One-Time Password) support:
+  - **OTP Input Component**: Created a specialized OTP input component (`otp-input.tsx`) with 6-digit verification support
+  - **QR Code Generation**: Integrated QR code generation for authenticator app setup using `qrcode.react`
+  - **TOTP Support**: Added Time-based One-Time Password support using `otplib` for secure 2FA verification
+  - **Two-Step Login Flow**: Enhanced login process with conditional 2FA step for users with authentication enabled
+  - **OTP Validation**: Implemented secure OTP validation schemas and form handling
+  - **Authenticator Integration**: Support for popular authenticator apps (Google Authenticator, Authy, etc.)
+  - **2FA Management Dashboard**: Built complete 2FA setup and management interface in user dashboard with enable/disable functionality
+- **Complete Authentication System**: Implemented full user authentication flow with multiple components:
+  - **Sign-Up Form**: Comprehensive user registration with first name, last name, email, password, and password confirmation validation
+  - **Login Form**: Multi-step login component supporting both password and OTP authentication
+  - **Password Reset Flow**: Complete password reset system with email verification and secure token-based reset links
+  - **Update Password Form**: Secure password update functionality with token validation and server-side verification
+  - **Logout Functionality**: Clean logout implementation with session termination
+- **Authentication Validation Schemas**: Robust form validation using Zod:
+  - **Name Schema**: Validates first and last names with character limits and allowed characters
+  - **Password Schema**: Complex password validation with minimum length and special character requirements
+  - **Password Match Schema**: Ensures password confirmation matches original password
+  - **Sign-Up Schema**: Combined validation for complete registration form
+  - **Login Schema**: Email and password validation for login attempts
+  - **Password Reset Schema**: Email validation for password reset requests
+  - **OTP Schema**: 6-digit numeric code validation for two-factor authentication
+- **Authentication Actions & Server Functions**: Server-side authentication handlers:
+  - **User Registration**: Secure user creation with password hashing and database storage
+  - **Password Reset Actions**: Token generation, email sending, and password update functionality
+  - **2FA Actions**: Enable/disable 2FA, secret generation, and QR code creation
+  - **Session Management**: Login/logout actions with NextAuth.js integration
+- **Authentication UI Components**: 
+  - **OTP Input**: Specialized 6-digit OTP input component with accessible design
+  - **Logout Button**: Reusable logout button component with proper error handling
+  - **Authentication Cards**: Consistent card-based design for all auth forms
+  - **Success/Error States**: User feedback components for authentication flows
+- **Enhanced Authentication Components**: 
+  - **OTP Forms**: Dedicated OTP input and validation components with real-time verification
+  - **Authentication Hooks**: Custom hooks for managing form state and validation logic across all auth forms
+- **AppNavigation Component**: Implemented a smart navigation component (`app-navigation.tsx`) that conditionally renders the navbar based on the current route, automatically hiding navigation on authentication pages while preserving it on other public pages.
 
 ### Changed
 - Extracted shared Tailwind CSS styles for `Button` and `LinkButton` components into a separate file (`buttonStyles.ts`) to ensure consistency and reusability across both components.
 - **Folder Structure**: Organized the app into `(public)` and `(logged-in)` sections for better separation of concerns.
 - **Component Refactoring**: Improved the structure and readability of reusable components like `Button` and `TextField`.
 - **Error Handling**: Enhanced error handling across API routes and form submissions.
+- **Navigation Logic**: Refactored navigation rendering logic to use `pathname.startsWith()` instead of `pathname.includes()` for more precise route matching and better security.
 
 ### Fixed
 - **Accessibility**: Improved accessibility features in form components and navigation elements.
 - **Peer Dependency Warnings**: Resolved peer dependency issues for `nodemailer` and other packages.
+- **Navigation on Auth Pages**: Removed navbar from authentication pages (login, signup, password-reset, update-password) while preserving it on other public pages for a cleaner authentication user experience.
+- **Route Matching Security**: Fixed potential false positives in route matching by using `startsWith()` method for more precise path detection.
+- **Two-Factor Authentication Flow**: Resolved multi-step authentication flow with proper state management and validation.
+
+### Security
+- **Secure Route Matching**: Implemented defensive programming practices in navigation component to prevent accidental navbar hiding on non-authentication pages with similar path segments.
+- **Two-Factor Authentication**: Enhanced security with TOTP-based 2FA system providing additional protection layer for user accounts.
+- **OTP Validation**: Secure 6-digit OTP validation with time-based expiration and rate limiting considerations.

@@ -1,6 +1,7 @@
 - update all components to MODERN standards
 - update toast component to a sonner
 - change color of button for the Disable Two-Factor Auth button
+- remove reset password page from the loggin-in directory. It serves no purpose.
 
 
  S6 - 34

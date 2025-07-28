@@ -191,7 +191,7 @@ function LoginCard({
   resetPasswordHref,
 }: LoginCardProps) {
   return (
-    <Card className='w-[720px] shadow-elevation-0'>
+    <Card className='w-full border-none shadow-elevation-0'>
       <CardHeader>
         <CardTitle>Login to your account</CardTitle>
         <CardDescription className='typescale-body-large'>
@@ -294,7 +294,7 @@ function OtpCard({ otpForm, handleOTPSubmit, ref }: OtpCardProps) {
   const otpValue = useWatch({ control: otpForm.control, name: 'otp' });
 
   return (
-    <Card className='w-[720px] shadow-elevation-0'>
+    <Card className='w-full shadow-elevation-0'>
       <CardHeader>
         <CardTitle>One-Time Passcode</CardTitle>
         <CardDescription className='typescale-body-large'>
