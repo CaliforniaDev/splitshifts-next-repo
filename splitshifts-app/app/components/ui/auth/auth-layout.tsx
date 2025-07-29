@@ -1,7 +1,9 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { cn } from '@/app/lib/utils';
+import Logo from '@/app/components/ui/logo';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -28,6 +30,16 @@ interface AuthLayoutProps {
    * Defaults to true
    */
   showOverlay?: boolean;
+  /**
+   * Whether to show the logo at the top of the form
+   * Defaults to true
+   */
+  showLogo?: boolean;
+  /**
+   * URL to navigate to when logo is clicked
+   * Defaults to home page '/'
+   */
+  logoHref?: string;
 }
 
 /**
@@ -50,6 +62,8 @@ export default function AuthLayout({
   className,
   reverse = false,
   showOverlay = true,
+  showLogo = true,
+  logoHref = '/',
 }: AuthLayoutProps) {
   return (
     <div
@@ -85,6 +99,13 @@ export default function AuthLayout({
         )}
       >
         <div className='w-full max-w-md lg:max-w-lg xl:max-w-xl'>
+          {showLogo && (
+            <div className='px-6'>
+              <Link href={logoHref} className='inline-block'>
+                <Logo className='w-auto' />
+              </Link>
+            </div>
+          )}
           {children}
         </div>
       </div>
@@ -102,6 +123,8 @@ export function AuthLayoutWide({
   imageAlt = 'Abstract image',
   className,
   reverse = false,
+  showLogo = true,
+  logoHref = '/',
 }: AuthLayoutProps) {
   return (
     <div
@@ -133,7 +156,16 @@ export function AuthLayoutWide({
           reverse ? 'lg:order-1' : 'lg:order-2',
         )}
       >
-        <div className='w-full max-w-md lg:max-w-lg'>{children}</div>
+        <div className='w-full max-w-md lg:max-w-lg'>
+          {showLogo && (
+            <div className='px-6'>
+              <Link href={logoHref} className='inline-block'>
+                <Logo className='w-auto' />
+              </Link>
+            </div>
+          )}
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -149,6 +181,8 @@ export function AuthLayoutCompact({
   imageAlt = 'Abstract image',
   className,
   reverse = false,
+  showLogo = true,
+  logoHref = '/',
 }: AuthLayoutProps) {
   return (
     <div
@@ -180,7 +214,16 @@ export function AuthLayoutCompact({
           reverse ? 'lg:order-1' : 'lg:order-2',
         )}
       >
-        <div className='w-full max-w-sm'>{children}</div>
+        <div className='w-full max-w-sm'>
+          {showLogo && (
+            <div className='px-6'>
+              <Link href={logoHref} className='inline-block'>
+                <Logo className='w-auto' />
+              </Link>
+            </div>
+          )}
+          {children}
+        </div>
       </div>
     </div>
   );
