@@ -41,6 +41,12 @@ SplitShifts is a web application designed to streamline the scheduling process f
   - **Reusable Forms**: Button, input, card, and form components with validation
   - **OTP Input Component**: Specialized 6-digit OTP input with accessibility features
   - **Authentication Cards**: Consistent card-based design for all auth flows
+  - **AuthLayout System**: Professional responsive layout for authentication pages
+    - **Three Layout Variants**: Default (50/50), Wide (60/40), and Compact (66/33) split layouts
+    - **Responsive Design**: Mobile-first approach with image hidden on mobile devices
+    - **Smart Image Loading**: Next.js Image optimization with conditional loading based on screen size
+    - **Clickable Logo**: Integrated logo component with navigation back to home page
+    - **Flexible Customization**: Configurable image sources, overlay options, and layout direction
 - **Advanced Form Validation**: Real-time validation using Zod schemas
   - **Client-side Validation**: Immediate feedback on form inputs
   - **Server-side Validation**: Secure validation of all authentication data

@@ -3,6 +3,18 @@
 ## [Unreleased]
 
 ### Added
+- **AuthLayout System**: Comprehensive responsive layout system for authentication pages
+  - **Three Layout Variants**: Default (50/50), Wide (60/40), and Compact (66/33) split layouts for different use cases
+  - **Mobile-First Design**: Responsive grid system that hides images on mobile and shows forms full-width
+  - **Performance Optimization**: Next.js Image component with smart sizing (`sizes` attribute) for conditional loading
+  - **Flexible Customization**: Configurable image sources, alt text, overlay options, and layout direction (reverse)
+  - **Clickable Logo Integration**: Logo component with navigation functionality back to home page
+  - **Consistent Spacing**: Proper alignment between logo and form content with design system padding
+  - **JSDoc Documentation**: Comprehensive documentation with usage examples and parameter descriptions
+- **Enhanced Button Component**: Added comprehensive JSDoc documentation with usage examples and parameter descriptions
+- **Improved Auth Form Navigation**: Fixed back button functionality in OTP forms to use state management instead of page navigation
+- **Form State Management**: Enhanced login flow with proper state preservation between login and OTP steps
+- **Security Improvements**: OTP field clearing on navigation back to maintain security best practices
 - Set up the initial project structure for the SplitShifts application.
 - Configured Next.js with TypeScript for type-safe development.
 - Integrated Tailwind CSS for utility-first styling.
@@ -38,7 +50,7 @@
 - **Two-Factor Authentication System**: Implemented comprehensive 2FA functionality with OTP (One-Time Password) support:
   - **OTP Input Component**: Created a specialized OTP input component (`otp-input.tsx`) with 6-digit verification support
   - **QR Code Generation**: Integrated QR code generation for authenticator app setup using `qrcode.react`
-  - **TOTP Support**: Added Time-based One-Time Password support using `otplib` for secure 2FA verification
+  - **OTP Support**: Added Time-based One-Time Password support using `otplib` for secure 2FA verification
   - **Two-Step Login Flow**: Enhanced login process with conditional 2FA step for users with authentication enabled
   - **OTP Validation**: Implemented secure OTP validation schemas and form handling
   - **Authenticator Integration**: Support for popular authenticator apps (Google Authenticator, Authy, etc.)
