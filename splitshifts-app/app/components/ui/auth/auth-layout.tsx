@@ -123,6 +123,7 @@ export function AuthLayoutWide({
   imageAlt = 'Abstract image',
   className,
   reverse = false,
+  showOverlay = true,
   showLogo = true,
   logoHref = '/',
 }: AuthLayoutProps) {
@@ -145,7 +146,9 @@ export function AuthLayoutWide({
           priority
           sizes='(max-width: 1024px) 0px, 60vw'
         />
-        <div className='absolute inset-0 bg-gradient-to-r from-black/5 to-transparent' />
+        {showOverlay && (
+          <div className='absolute inset-0 bg-gradient-to-r from-black/5 to-transparent' />
+        )}
       </div>
 
       {/* Form Section - Full width on mobile, 2/5 on desktop */}
@@ -181,6 +184,7 @@ export function AuthLayoutCompact({
   imageAlt = 'Abstract image',
   className,
   reverse = false,
+  showOverlay = true,
   showLogo = true,
   logoHref = '/',
 }: AuthLayoutProps) {
@@ -203,7 +207,9 @@ export function AuthLayoutCompact({
           priority
           sizes='(max-width: 1024px) 0px, 66.67vw'
         />
-        <div className='absolute inset-0 bg-gradient-to-r from-black/5 to-transparent' />
+        {showOverlay && (
+          <div className='absolute inset-0 bg-gradient-to-r from-black/5 to-transparent' />
+        )}
       </div>
 
       {/* Form Section - Full width on mobile, 1/3 on desktop */}
