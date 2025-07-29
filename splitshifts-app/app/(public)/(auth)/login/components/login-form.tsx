@@ -162,6 +162,10 @@ export default function LoginForm() {
         <OtpCard
           otpForm={otpForm}
           handleOTPSubmit={handleOTPSubmit}
+          onBackToLogin={() => {
+            otpForm.reset();
+            setStep(Step.INITIAL);
+          }}
           ref={otpInputRef}
         />
       )}
@@ -286,10 +290,11 @@ function LoginCard({
 interface OtpCardProps {
   otpForm: ReturnType<typeof useOtpForm>;
   handleOTPSubmit: (data: OtpFormData) => Promise<void>;
+  onBackToLogin: () => void;
   ref: React.RefObject<HTMLInputElement | null>;
 }
 
-function OtpCard({ otpForm, handleOTPSubmit, ref }: OtpCardProps) {
+function OtpCard({ otpForm, handleOTPSubmit, onBackToLogin, ref }: OtpCardProps) {
   const isOtpSubmitting = otpForm.formState.isSubmitting;
   const otpValue = useWatch({ control: otpForm.control, name: 'otp' });
 
@@ -349,6 +354,13 @@ function OtpCard({ otpForm, handleOTPSubmit, ref }: OtpCardProps) {
               disabled={otpValue?.length !== 6}
             >
               Verify OTP
+            </Button>
+            <Button 
+              variant='outlined'
+              onClick={onBackToLogin}
+              type='button'
+            >
+              Back to Login
             </Button>
           </form>
         </Form>
