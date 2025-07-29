@@ -60,11 +60,11 @@ export default function LoginForm() {
   // ---State Management-------------------------------------------------
   const [step, setStep] = useState(Step.INITIAL);
   const otpInputRef = useRef<HTMLInputElement>(null);
-  
+
   // ---Form Hooks-------------------------------------------------------
   const form = useLoginForm();
   const otpForm = useOtpForm();
-  
+
   // ---Router & Navigation----------------------------------------------
   const router = useRouter();
   const isSubmitting = form.formState.isSubmitting;
@@ -100,14 +100,14 @@ export default function LoginForm() {
       email: data.email,
       password: data.password,
     });
-    
+
     if (preLoginCheckResponse.error) {
       form.setError('root', {
         message: preLoginCheckResponse.message,
       });
       return;
     }
-    
+
     if (preLoginCheckResponse.twoFactorEnabled) {
       setStep(Step.REQUIRE_OTP);
     } else {
@@ -115,7 +115,7 @@ export default function LoginForm() {
         email: data.email,
         password: data.password,
       });
-      
+
       if (response?.error) {
         form.setError('root', {
           message: response.message,
@@ -173,7 +173,7 @@ export default function LoginForm() {
 
 /**
  * LoginCard Component
- * 
+ *
  * Renders the initial login form with email and password fields.
  * Includes form validation, error handling, and navigation links.
  */
@@ -279,7 +279,7 @@ function LoginCard({
 
 /**
  * OtpCard Component
- * 
+ *
  * Renders the OTP verification form for two-factor authentication.
  * Uses InputOTP component for 6-digit code entry with validation.
  */
@@ -294,7 +294,7 @@ function OtpCard({ otpForm, handleOTPSubmit, ref }: OtpCardProps) {
   const otpValue = useWatch({ control: otpForm.control, name: 'otp' });
 
   return (
-    <Card className='w-full shadow-elevation-0'>
+    <Card className='w-full border-none shadow-elevation-0'>
       <CardHeader>
         <CardTitle>One-Time Passcode</CardTitle>
         <CardDescription className='typescale-body-large'>
@@ -303,7 +303,10 @@ function OtpCard({ otpForm, handleOTPSubmit, ref }: OtpCardProps) {
       </CardHeader>
       <CardContent>
         <Form {...otpForm}>
-          <form className='flex flex-col gap-2' onSubmit={otpForm.handleSubmit(handleOTPSubmit)}>
+          <form
+            className='flex flex-col gap-2'
+            onSubmit={otpForm.handleSubmit(handleOTPSubmit)}
+          >
             <p className='text-muted-foreground text-xs'>
               Please enter the one-time passcode from the Google Authenticator
               app.
@@ -314,10 +317,10 @@ function OtpCard({ otpForm, handleOTPSubmit, ref }: OtpCardProps) {
               render={({ field, fieldState }) => (
                 <FormItem>
                   <FormControl>
-                    <InputOTP 
-                      ref={ref} 
-                      maxLength={6} 
-                      value={field.value} 
+                    <InputOTP
+                      ref={ref}
+                      maxLength={6}
+                      value={field.value}
                       onChange={field.onChange}
                     >
                       <InputOTPGroup>
@@ -339,10 +342,10 @@ function OtpCard({ otpForm, handleOTPSubmit, ref }: OtpCardProps) {
                 </FormItem>
               )}
             />
-            <Button 
+            <Button
               loading={isOtpSubmitting}
               loadingText='Verifying OTP...'
-              type='submit' 
+              type='submit'
               disabled={otpValue?.length !== 6}
             >
               Verify OTP
