@@ -46,7 +46,7 @@ export default function ChangePasswordForm() {
     }
   };
   return (
-    <Card className='w-[750px] shadow-elevation-0'>
+    <Card className='w-full max-w-[750px] shadow-elevation-0'>
       <CardHeader>
         <CardTitle>Change Password</CardTitle>
         <CardDescription></CardDescription>

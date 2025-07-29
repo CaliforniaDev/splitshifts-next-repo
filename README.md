@@ -25,7 +25,40 @@ SplitShifts is a web application designed to streamline the scheduling process f
 
 ### Implemented Features
 
-- None yet (project setup in progress)
+- **Complete Authentication System**: Full-featured user authentication with secure registration, login, and session management
+  - **User Registration**: Sign-up form with first name, last name, email, password validation and confirmation
+  - **Secure Login**: Multi-step login process with email/password authentication
+  - **Password Reset Flow**: Email-based password reset with secure token validation
+  - **Password Updates**: Secure password change functionality for authenticated users
+  - **Session Management**: Automatic session handling with NextAuth.js integration
+- **Two-Factor Authentication (2FA)**: Enterprise-grade security with TOTP support
+  - **QR Code Setup**: Generate QR codes for authenticator apps (Google Authenticator, Authy, etc.)
+  - **6-Digit OTP Verification**: Secure time-based one-time password validation
+  - **2FA Management**: Enable/disable 2FA from user dashboard
+  - **Multi-Step Login**: Conditional 2FA verification during login process
+- **Conditional Navigation**: Smart navigation component that automatically hides the navbar on authentication pages while preserving it on public pages
+- **Responsive UI Components**: Comprehensive component library with consistent styling
+  - **Reusable Forms**: Button, input, card, and form components with validation
+  - **OTP Input Component**: Specialized 6-digit OTP input with accessibility features
+  - **Authentication Cards**: Consistent card-based design for all auth flows
+  - **AuthLayout System**: Professional responsive layout for authentication pages
+    - **Three Layout Variants**: Default (50/50), Wide (60/40), and Compact (66/33) split layouts
+    - **Responsive Design**: Mobile-first approach with image hidden on mobile devices
+    - **Smart Image Loading**: Next.js Image optimization with conditional loading based on screen size
+    - **Clickable Logo**: Integrated logo component with navigation back to home page
+    - **Flexible Customization**: Configurable image sources, overlay options, and layout direction
+- **Advanced Form Validation**: Real-time validation using Zod schemas
+  - **Client-side Validation**: Immediate feedback on form inputs
+  - **Server-side Validation**: Secure validation of all authentication data
+  - **Error Handling**: Comprehensive error states and user feedback
+- **Email Integration**: Transactional email support for password resets and notifications
+- **Database Integration**: PostgreSQL with Drizzle ORM for secure user data storage
+- **Security Features**: 
+  - **Password Hashing**: Secure password storage with bcrypt
+  - **Token-based Reset**: Secure password reset tokens with expiration
+  - **Route Protection**: Authentication middleware for protected routes
+  - **Session Security**: Secure session management and CSRF protection
+- **TypeScript Support**: Full TypeScript implementation for type safety and better developer experience
 
 ### Planned Features
 
@@ -38,11 +71,15 @@ SplitShifts is a web application designed to streamline the scheduling process f
 
 ## Technologies Used
 
-- Next.js
-- React.js
-- Tailwind CSS
-- Node.js
-- MongoDB
+- **Next.js 15**: React framework with App Router for server-side rendering and routing
+- **React 19**: Frontend library for building user interfaces
+- **TypeScript**: Static type checking for enhanced developer experience
+- **Tailwind CSS**: Utility-first CSS framework for responsive design
+- **PostgreSQL**: Relational database via Neon serverless platform
+- **Drizzle ORM**: Type-safe database operations and schema management
+- **NextAuth.js**: Authentication and session management
+- **Zod**: Schema validation for forms and API endpoints
+- **React Hook Form**: Performant forms with minimal re-renders
 
 ## Services and Tools
 
@@ -58,8 +95,9 @@ This application leverages the following services and tools:
 
 Before you begin, ensure you have met the following requirements:
 
-- Node.js and npm installed
-- MongoDB installed and running
+- **Node.js** (v18 or higher) and **pnpm** installed
+- **PostgreSQL** database (via Neon or local setup)
+- **Environment variables** configured (see Environment Variables section)
 
 ### Installation
 
@@ -72,13 +110,20 @@ Before you begin, ensure you have met the following requirements:
 2. Navigate to project directory:
 
    ```bash
-   cd splitshifts-app
+   cd splitshifts-next-repo/splitshifts-app
    ```
 
 3. Install dependencies:
 
    ```bash
-   npm install
+   pnpm install
+   ```
+
+4. Set up environment variables:
+
+   ```bash
+   cp .env.example .env.local
+   # Edit .env.local with your configuration
    ```
 
 ### Running the Development Server
@@ -86,7 +131,7 @@ Before you begin, ensure you have met the following requirements:
 1. Start the development server:
 
    ```bash
-   npm run dev
+   pnpm run dev
    ```
 
 2. Open your browser and visit 'http://localhost:3000' to see the app in action.
@@ -135,11 +180,11 @@ Refer to the comments in each file for more detailed information.
 
 ## Scripts
 
-- `dev`: Start the development server.
-- `dev:network`: Start the development server with network access.
+- `dev`: Start the development server with Turbopack for faster builds.
+- `dev:network`: Start the development server with network access on all interfaces.
 - `build`: Build the application for production.
 - `start`: Start the production server.
-- `lint`: Run linting checks.
+- `lint`: Run linting checks using ESLint.
 
 ## Environment Variables
 
@@ -161,7 +206,7 @@ The project uses `nodemailer` in combination with Resend for sending transaction
 
 1. Install `nodemailer` and Resend:
    ```bash
-   npm install nodemailer @resend/client
+   pnpm install nodemailer @resend/client
    ```
 
 2. Set up environment variables in your `.env` file:
@@ -200,6 +245,76 @@ The project uses `nodemailer` in combination with Resend for sending transaction
      throw new Error('Failed to send email');
    }
    ```
+
+## Authentication & Navigation
+
+### Complete Authentication System
+
+The application features a comprehensive authentication system built with NextAuth.js and modern security practices:
+
+#### **User Registration & Login**
+- **Sign-Up Flow**: Multi-field registration with first name, last name, email, password, and confirmation
+- **Login System**: Secure email/password authentication with optional 2FA verification
+- **Form Validation**: Real-time client and server-side validation using Zod schemas
+- **Error Handling**: Comprehensive error states with user-friendly feedback
+
+#### **Password Management**
+- **Password Reset**: Email-based password reset with secure token validation
+- **Password Updates**: In-app password change functionality for authenticated users
+- **Security Requirements**: Enforced password complexity with special characters and minimum length
+- **Token Security**: Time-limited password reset tokens with automatic expiration
+
+#### **Two-Factor Authentication (2FA)**
+- **TOTP Implementation**: Time-based One-Time Password using industry-standard algorithms
+- **QR Code Setup**: Generate QR codes for popular authenticator apps (Google Authenticator, Authy, Microsoft Authenticator)
+- **Multi-Step Login**: Conditional 2FA verification during login process
+- **Dashboard Management**: Enable/disable 2FA from user dashboard with real-time setup
+- **6-Digit Verification**: Secure OTP input component with accessibility features
+
+#### **Session & Security**
+- **Session Management**: Automatic session handling with NextAuth.js
+- **Route Protection**: Authentication middleware for protected routes
+- **Logout Functionality**: Clean logout with session termination
+- **Security Headers**: CSRF protection and secure cookie handling
+- **Password Hashing**: Secure password storage using bcrypt
+
+### Smart Navigation System
+
+The app implements an intelligent navigation system with conditional rendering:
+
+#### **Route-Based Navigation**
+- **Conditional Rendering**: Navigation automatically hides on authentication pages (`/login`, `/signup`, `/password-reset`, `/update-password`)
+- **Secure Matching**: Uses `pathname.startsWith()` for precise route detection and security
+- **Consistent UX**: Maintains navigation on all public pages while providing clean auth experiences
+- **Performance Optimized**: Client-side route detection with minimal re-renders
+
+#### **Component Architecture**
+
+```typescript
+// AppNavigation component automatically handles navbar visibility
+export default function AppNavigation() {
+  const pathname = usePathname();
+  
+  const authRoutes = ['/login', '/signup', '/password-reset', '/update-password'];
+  const isAuthPage = authRoutes.some(route => pathname.startsWith(route));
+
+  return isAuthPage ? null : <LandingNav />;
+}
+```
+
+### Authentication Components
+
+#### **Form Components**
+- **SignUpForm**: Complete registration form with validation
+- **LoginForm**: Multi-step login with 2FA support
+- **PasswordResetForm**: Email-based password reset request
+- **UpdatePasswordForm**: Secure password change with token validation
+- **TwoFactorAuthForm**: 2FA setup and management interface
+
+#### **UI Components**
+- **OTPInput**: Specialized 6-digit OTP input with keyboard navigation
+- **LogoutButton**: Reusable logout component with error handling
+- **AuthenticationCards**: Consistent card-based design for all auth flows
 
 ## License
 

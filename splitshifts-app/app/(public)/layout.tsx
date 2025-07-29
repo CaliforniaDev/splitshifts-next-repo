@@ -2,7 +2,7 @@
 
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { LandingNav } from '@/app/components/ui/nav/landing';
+import AppNavigation from '@/app/components/ui/nav/app-navigation';
 
 export default async function PublicLayout({
   children,
@@ -13,9 +13,10 @@ export default async function PublicLayout({
   if (!!session?.user?.id) {
     redirect('/dashboard');
   }
+
   return (
     <>
-      <LandingNav />
+      <AppNavigation />
       <main>{children}</main>
     </>
   );

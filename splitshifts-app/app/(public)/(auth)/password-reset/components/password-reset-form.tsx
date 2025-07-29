@@ -55,7 +55,7 @@ function ResetPasswordSuccessCard({ form }: Pick<Props, 'form'>) {
   const email = form.getValues('email');
   const maskedEmail = maskEmail(email);
   return (
-    <Card className='w-[720px] shadow-elevation-0'>
+    <Card className='w-full border-none shadow-elevation-0'>
       <CardHeader>
         <CardTitle>Password Reset Link Sent</CardTitle>
         <CardDescription>
@@ -76,7 +76,7 @@ function ResetPasswordSuccessCard({ form }: Pick<Props, 'form'>) {
 
 function ResetPasswordFormCard({ form, handleSubmit, isSubmitting }: Props) {
   return (
-    <Card className='w-[720px] shadow-elevation-0'>
+    <Card className='w-full border-none shadow-elevation-0'>
       <CardHeader>
         <CardTitle>Password Reset</CardTitle>
         <CardDescription>

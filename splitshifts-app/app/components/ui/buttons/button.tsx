@@ -7,34 +7,61 @@ import { Loader } from 'lucide-react';
 import { buttonVariants } from './variants';
 
 /**
- * Button component that supports multiple rendering modes:
- * - Regular button elements
- * - Next.js Link components (internal/external)
- * - Custom HTML elements
- * - Built-in loading states with spinner
+ * Props interface for the Button component
+ * 
+ * @template T - The element type to render (defaults to 'button')
  */
-
-// Define the types for the component props
 export interface ButtonProps<T extends ElementType = 'button'>
   extends VariantProps<typeof buttonVariants> {
-  as?: T | 'next-link'; // Allows "next-link" but not "a"
-  href?: string; // Required when using a link
-  children: ReactNode; // Button content
-  icon?: ReactNode; // Optional icon to display
-  className?: string; // Custom styles
-  disabled?: boolean; // Disables button interaction
-  loading?: boolean; // Shows loading spinner and disables button
-  loadingText?: string; // Optional custom text to show when loading
+  /** The element type to render or 'next-link' for Next.js Link components */
+  as?: T | 'next-link';
+  /** URL for link variants (required when using 'next-link') */
+  href?: string;
+  /** Button content */
+  children: ReactNode;
+  /** Optional icon to display */
+  icon?: ReactNode;
+  /** Custom CSS classes */
+  className?: string;
+  /** Disables button interaction */
+  disabled?: boolean;
+  /** Shows loading spinner and disables button */
+  loading?: boolean;
+  /** Optional custom text to show when loading */
+  loadingText?: string;
 }
 
 /**
- * Utility function to check if a given `href` is an external link.
- * External links start with "http://" or "https://".
+ * Utility function to check if a given URL is an external link
+ * 
+ * @param href - The URL to check
+ * @returns True if the URL starts with http:// or https://
  */
 const isExternalLink = (href?: string): boolean => {
   return !!href && (href.startsWith('http://') || href.startsWith('https://'));
 };
 
+/**
+ * Button component that supports multiple rendering modes and polymorphic behavior
+ * 
+ * A flexible button component that can render as different HTML elements,
+ * Next.js Link components, or regular buttons with built-in loading states.
+ * 
+ * @example
+ * ```tsx
+ * // Regular button
+ * <Button variant="filled">Click me</Button>
+ * 
+ * // Next.js Link  
+ * <Button as="next-link" href="/dashboard">Go to Dashboard</Button>
+ * 
+ * // Loading state
+ * <Button loading loadingText="Saving...">Save</Button>
+ * 
+ * // With icon
+ * <Button icon={<PlusIcon />}>Add Item</Button>
+ * ```
+ */
 export default function Button<T extends ElementType = 'button'>({
   as,
   href,
