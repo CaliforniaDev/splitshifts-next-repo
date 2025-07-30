@@ -43,6 +43,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             throw new Error('Incorrect credentials');
           }
 
+          // Check if email is verified
+          if (!user.emailVerified) {
+            throw new Error('Email not verified');
+          }
+
           if (user.twoFactorEnabled) {
             const tokenValid = authenticator.check(
               credentials.token as string,
