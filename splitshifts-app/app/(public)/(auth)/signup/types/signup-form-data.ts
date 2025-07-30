@@ -12,4 +12,5 @@ export interface RegisterUserResponse {
   error: boolean;
   message?: string;
   fieldErrors?: Record<string, string>;
+  requiresEmailVerification?: boolean;
 }

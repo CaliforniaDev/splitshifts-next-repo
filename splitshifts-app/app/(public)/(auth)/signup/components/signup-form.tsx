@@ -79,12 +79,21 @@ function SignUpSuccessCard() {
       <CardHeader aria-live='polite' role='status'>
         <CardTitle>Registration Successful!</CardTitle>
         <CardDescription className='typescale-body-large'>
-          You can now log in to your account!
+          Please check your email and click the verification link to activate
+          your account.
         </CardDescription>
       </CardHeader>
-      <CardContent className='flex'>
+      <CardContent className='flex flex-col gap-4'>
         <Button as='next-link' href='/login' className='w-full'>
-          Login to your account
+          Continue to Login
+        </Button>
+        <Button
+          as='next-link'
+          href='/resend-verification'
+          variant='outlined'
+          className='w-full'
+        >
+          Resend Verification Email
         </Button>
       </CardContent>
     </Card>
