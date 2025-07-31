@@ -22,7 +22,9 @@ export async function verifyEmail(token: string) {
     };
   }
 
-  if (!token) {
+  // Validate token format: must be a 64-character hexadecimal string
+  const isValidToken = typeof token === 'string' && /^[a-fA-F0-9]{64}$/.test(token);
+  if (!isValidToken) {
     return {
       error: true,
       message: 'Invalid verification token.',

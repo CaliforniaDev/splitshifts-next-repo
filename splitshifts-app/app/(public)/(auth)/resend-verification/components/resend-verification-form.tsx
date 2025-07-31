@@ -104,7 +104,11 @@ export default function ResendVerificationForm() {
     } catch (error) {
       setStatus('error');
       setMessage('An unexpected error occurred. Please try again.');
-      console.error('Resend verification error:', error instanceof Error ? error.message : String(error));
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Resend verification error:', error);
+      } else {
+        console.error('Resend verification error occurred.');
+      }
     }
   };
 

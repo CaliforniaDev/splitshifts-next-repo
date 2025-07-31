@@ -270,7 +270,11 @@ function LoginCard({
               {!!form.formState.errors.root?.message && (
                 <LoginErrorDisplay
                   message={form.formState.errors.root.message}
-                  errorType={form.formState.errors.root.type as any}
+                  errorType={
+                    (typeof form.formState.errors.root.type === 'string'
+                      ? (form.formState.errors.root.type as LoginErrorType)
+                      : undefined)
+                  }
                   userEmail={form.getValues('email')}
                 />
               )}

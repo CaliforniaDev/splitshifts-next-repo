@@ -85,7 +85,7 @@ export async function sendEmailVerification(emailAddress: string) {
       },
     });
 
-  const verificationLink = `${process.env.SITE_BASE_URL}/verify-email?token=${verificationToken}`;
+  const verificationLink = `${process.env.SITE_BASE_URL}/verify-email?token=${encodeURIComponent(verificationToken)}`;
 
   // Development mode: Log verification link to console
   if (process.env.NODE_ENV === 'development') {

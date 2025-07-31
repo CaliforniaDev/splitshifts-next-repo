@@ -60,7 +60,11 @@ export default function VerifyEmailForm() {
       } catch (error) {
         setStatus('error');
         setMessage('An unexpected error occurred. Please try again.');
-        console.error('Email verification error:', error instanceof Error ? error.message : String(error));
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Email verification error:', error);
+        } else {
+          console.error('Email verification error occurred.');
+        }
       }
     };
 
