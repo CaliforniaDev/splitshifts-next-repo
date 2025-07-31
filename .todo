@@ -1,8 +1,6 @@
 - update all components to MODERN standards
 - update toast component to a sonner
 - change color of button for the Disable Two-Factor Auth button
-- remove reset password page from the loggin-in directory. It serves no purpose.
-- add focus on text input when clicking into login, register, reset-password etc so user can immediately being filling out forms/
 
 - when merging to production remove the test email from the verify email actions
 
