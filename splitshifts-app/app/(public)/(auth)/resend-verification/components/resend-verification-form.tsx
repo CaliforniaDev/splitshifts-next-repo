@@ -1,10 +1,14 @@
 'use client';
 
+// ---Core Framework---------------------------------------------------
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+
+// ---Actions-----------------------------------------------------------
 import { sendEmailVerification } from '../../signup/actions/send-email-verification';
 
+// ---UI Components-----------------------------------------------------
 import Button from '@/app/components/ui/buttons/button';
 import TextField from '@/app/components/ui/inputs/text-field';
 import {
@@ -13,15 +17,39 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter
 } from '@/app/components/ui/card';
 
+// ---Types-------------------------------------------------------------
+interface ResendFormProps {
+  email: string;
+  setEmail: (email: string) => void;
+  onSubmit: (e: React.FormEvent) => Promise<void>;
+  status: 'idle' | 'loading' | 'success' | 'error';
+  message: string;
+}
+
+interface SuccessCardProps {
+  message: string;
+  onSendAnother: () => void;
+}
+
+/**
+ * Main resend verification form component that handles email verification resend flow:
+ * 1. Initial step: Email input and validation
+ * 2. Success step: Confirmation with options to send another or return to login
+ */
 export default function ResendVerificationForm() {
+  // ---State Management-------------------------------------------------
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
-  // Pre-fill email from URL params if available
+  // ---Effects----------------------------------------------------------
+  /**
+   * Pre-fill email from URL params if available for better UX
+   */
   useEffect(() => {
     const emailParam = searchParams.get('email');
     if (emailParam) {
@@ -29,6 +57,11 @@ export default function ResendVerificationForm() {
     }
   }, [searchParams]);
 
+  // ---Event Handlers--------------------------------------------------
+  /**
+   * Handles the resend verification form submission.
+   * Validates email and calls the sendEmailVerification action.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -61,37 +94,52 @@ export default function ResendVerificationForm() {
     }
   };
 
+  /**
+   * Resets the form to send another verification email
+   */
   const handleSendAnother = () => {
     setStatus('idle');
     setMessage('');
     setEmail('');
   };
 
-  if (status === 'success') {
-    return <ResendVerificationSuccessCard message={message} onSendAnother={handleSendAnother} />;
-  }
-
+  // ---Render-----------------------------------------------------------
   return (
-    <ResendVerificationFormCard
-      email={email}
-      setEmail={setEmail}
-      onSubmit={handleSubmit}
-      status={status}
-      message={message}
-    />
+    <>
+      {status === 'success' && (
+        <ResendVerificationSuccessCard 
+          message={message} 
+          onSendAnother={handleSendAnother} 
+        />
+      )}
+      {status !== 'success' && (
+        <ResendVerificationFormCard
+          email={email}
+          setEmail={setEmail}
+          onSubmit={handleSubmit}
+          status={status}
+          message={message}
+        />
+      )}
+    </>
   );
 }
 
+// ---Sub-Components---------------------------------------------------
+
+/**
+ * ResendVerificationSuccessCard Component
+ *
+ * Renders the success state after verification email is sent.
+ * Includes options to return to login or send another email.
+ */
 function ResendVerificationSuccessCard({ 
   message, 
   onSendAnother 
-}: { 
-  message: string; 
-  onSendAnother: () => void; 
-}) {
+}: SuccessCardProps) {
   return (
     <Card className="w-full border-none shadow-elevation-0">
-      <CardHeader  aria-live="polite" role="status">
+      <CardHeader aria-live="polite" role="status">
         <div className="mb-4">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
             <svg
@@ -109,12 +157,12 @@ function ResendVerificationSuccessCard({
             </svg>
           </div>
         </div>
-        <CardTitle>Email Sent!</CardTitle>
-        <CardDescription className="typescale-body-large">
+        <CardTitle className="text-center">Email Sent!</CardTitle>
+        <CardDescription className="typescale-body-large text-center">
           {message}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="flex flex-col gap-4">
         <Link href="/login">
           <Button variant="filled" className="w-full">
             Back to Login
@@ -132,14 +180,12 @@ function ResendVerificationSuccessCard({
   );
 }
 
-interface ResendFormProps {
-  email: string;
-  setEmail: (email: string) => void;
-  onSubmit: (e: React.FormEvent) => Promise<void>;
-  status: 'idle' | 'loading' | 'success' | 'error';
-  message: string;
-}
-
+/**
+ * ResendVerificationFormCard Component
+ *
+ * Renders the main form for resending verification emails.
+ * Includes email input, validation, error handling, and navigation.
+ */
 function ResendVerificationFormCard({ 
   email, 
   setEmail, 
@@ -158,7 +204,10 @@ function ResendVerificationFormCard({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={onSubmit}>
+        <form 
+          className="flex flex-col"
+          onSubmit={onSubmit}
+        >
           <fieldset disabled={isLoading} className="space-y-4">
             <TextField
               id="email"
@@ -171,27 +220,28 @@ function ResendVerificationFormCard({
               error={status === 'error' ? message : false}
             />
 
-            <Button
-              type="submit"
-              variant="filled"
-              className="w-full"
-              loading={isLoading}
-              loadingText="Sending..."
-            >
-              Send Verification Email
-            </Button>
-
-            <div className="text-center">
-              <Link
-                href="/login"
-                className="text-sm text-blue-600 hover:text-blue-800"
+            <div className="flex flex-col gap-4">
+              <Button
+                type="submit"
+                variant="filled"
+                className="w-full"
+                loading={isLoading}
+                loadingText="Sending..."
               >
-                Back to Login
-              </Link>
+                Send Verification Email
+              </Button>
             </div>
           </fieldset>
         </form>
       </CardContent>
+      <CardFooter className='typescale-body-medium flex flex-col items-end gap-2'>
+        <Link
+          href="/login"
+          className="underline hover:text-primary hover:font-semibold transition-all duration-200"
+        >
+          Back to Login
+        </Link>
+      </CardFooter>
     </Card>
   );
 }
