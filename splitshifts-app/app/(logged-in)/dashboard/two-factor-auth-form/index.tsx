@@ -136,7 +136,7 @@ export default function TwoFactorAuthForm({ twoFactorEnabled }: Props) {
             </div>
           )}
           {step === Step.CONFIRM_CODE && (
-            <form onSubmit={handleOTPSubmit} className='flex flex-col gap-2'>
+            <form onSubmit={handleOTPSubmit} className='flex flex-col gap-4'>
               <p className='text-muted-foreground text-xs'>
                 Please enter the one-time passcode from the Google Authenticator
                 app.
