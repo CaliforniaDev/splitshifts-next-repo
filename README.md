@@ -27,10 +27,17 @@ SplitShifts is a web application designed to streamline the scheduling process f
 
 - **Complete Authentication System**: Full-featured user authentication with secure registration, login, and session management
   - **User Registration**: Sign-up form with first name, last name, email, password validation and confirmation
-  - **Secure Login**: Multi-step login process with email/password authentication
+  - **Email Verification**: Complete email verification flow with token-based validation
+    - **Verification Email Sending**: Automated verification emails sent upon registration
+    - **Token Validation**: Secure token-based email verification with expiration handling
+    - **Resend Verification**: Dedicated flow for resending verification emails with user-friendly interface
+    - **Verification Status Tracking**: Database integration for tracking email verification status
+    - **Success & Error States**: Comprehensive user feedback with animated success confirmations
+  - **Secure Login**: Multi-step login process with email/password authentication and email verification checks
   - **Password Reset Flow**: Email-based password reset with secure token validation
   - **Password Updates**: Secure password change functionality for authenticated users
   - **Session Management**: Automatic session handling with NextAuth.js integration
+  - **Enhanced User Experience**: Auto-focus functionality across all authentication forms for improved accessibility and user flow
 - **Two-Factor Authentication (2FA)**: Enterprise-grade security with TOTP support
   - **QR Code Setup**: Generate QR codes for authenticator apps (Google Authenticator, Authy, etc.)
   - **6-Digit OTP Verification**: Secure time-based one-time password validation
@@ -48,16 +55,23 @@ SplitShifts is a web application designed to streamline the scheduling process f
     - **Clickable Logo**: Integrated logo component with navigation back to home page
     - **Flexible Customization**: Configurable image sources, overlay options, and layout direction
 - **Advanced Form Validation**: Real-time validation using Zod schemas
-  - **Client-side Validation**: Immediate feedback on form inputs
+  - **Client-side Validation**: Immediate feedback on form inputs with auto-focus for better user experience
   - **Server-side Validation**: Secure validation of all authentication data
-  - **Error Handling**: Comprehensive error states and user feedback
-- **Email Integration**: Transactional email support for password resets and notifications
+  - **Error Handling**: Comprehensive error states and user feedback with structured error display components
+  - **Email Verification Integration**: Contextual error handling that provides verification resend options for unverified accounts
+- **Email Integration**: Comprehensive transactional email support
+  - **Verification Emails**: Automated email verification system with secure token delivery
+  - **Password Reset Emails**: Email-based password reset with secure links
+  - **Resend Functionality**: User-friendly resend options with proper rate limiting
+  - **Email Templates**: Professional email templates for all authentication flows
 - **Database Integration**: PostgreSQL with Drizzle ORM for secure user data storage
 - **Security Features**: 
   - **Password Hashing**: Secure password storage with bcrypt
+  - **Email Verification**: Mandatory email verification for account activation with secure token-based validation
   - **Token-based Reset**: Secure password reset tokens with expiration
-  - **Route Protection**: Authentication middleware for protected routes
+  - **Route Protection**: Authentication middleware for protected routes with email verification checks
   - **Session Security**: Secure session management and CSRF protection
+  - **Rate Limiting**: Protection against spam and abuse in email sending and verification processes
 - **TypeScript Support**: Full TypeScript implementation for type safety and better developer experience
 
 ### Planned Features
@@ -265,7 +279,7 @@ The application features a comprehensive authentication system built with NextAu
 - **Token Security**: Time-limited password reset tokens with automatic expiration
 
 #### **Two-Factor Authentication (2FA)**
-- **TOTP Implementation**: Time-based One-Time Password using industry-standard algorithms
+- **OTP Implementation**: Time-based One-Time Password using industry-standard algorithms
 - **QR Code Setup**: Generate QR codes for popular authenticator apps (Google Authenticator, Authy, Microsoft Authenticator)
 - **Multi-Step Login**: Conditional 2FA verification during login process
 - **Dashboard Management**: Enable/disable 2FA from user dashboard with real-time setup
