@@ -67,7 +67,7 @@ function VerifyEmailLoadingCard() {
     <Card className="w-full border-none shadow-elevation-0">
       <CardHeader className="text-center">
         <div className="mb-4">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-primary"></div>
         </div>
         <CardTitle>Verifying Email</CardTitle>
         <CardDescription className="typescale-body-large">
@@ -133,9 +133,9 @@ function VerifyEmailErrorCard({ message }: { message: string }) {
     <Card className="w-full border-none shadow-elevation-0">
       <CardHeader className="text-center" aria-live="polite" role="status">
         <div className="mb-4">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-error-container">
             <svg
-              className="h-6 w-6 text-red-600"
+              className="h-6 w-6 text-on-error-container"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -154,7 +154,7 @@ function VerifyEmailErrorCard({ message }: { message: string }) {
           {message}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="flex flex-col gap-4">
         <Link href="/resend-verification">
           <Button variant="filled" className="w-full">
             Request New Verification Email
