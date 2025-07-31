@@ -20,7 +20,11 @@
     - **Consistent Implementation**: All forms use `requestAnimationFrame` for proper DOM timing and TypeScript-safe ref handling
   - **Form Error Handling**: Improved error state management with proper boolean/string typing for Input components
   - **Visual Design Consistency**: Centered success states and animations across all verification flows
-- **Component Documentation & Code Quality**:
+- **Component Modernization & Code Quality**:
+  - **Input Component Migration**: Replaced legacy TextField component with modern Input component across all forms
+    - **Unified Form Interface**: Consistent input styling and behavior across all authentication forms
+    - **Enhanced TypeScript Support**: Improved type safety with better ref forwarding and prop interfaces
+    - **Better Error Handling**: Standardized error message display with boolean error states and string error messages
   - **JSDoc Documentation**: Added comprehensive documentation to verify-email components with clear usage examples
   - **Import Organization**: Structured import sections with clear categorization (Core Framework, Actions, UI Components, Types)
   - **Component Architecture**: Well-organized component structure with separated concerns and reusable sub-components
@@ -48,7 +52,7 @@
 - **LinkButton Component**: Added a `LinkButton` component that renders a styled link resembling a button. It supports the same variants (`elevated`, `filled`, `tonal`, `outlined`, `text`) and sizes (`default`, `large`) as the `Button` component for consistent styling in navigation.
 - **TopNav Component**: Styled the `TopNav` component and replaced the buttons with `LinkButton` components for navigation ("Log In" and "Start for free"). The component is functional but not yet fully reusable.
 - **Hero Section**: Added a Hero section with a headline, subheadline, and a call-to-action button.
-- **TextField Component**: Implemented a reusable `TextField` component with support for labels, error messages, supporting text, and accessibility features. The component manages focus and populated states and allows custom styling through the `className` prop.
+- **Input Component**: Implemented a modern, reusable `Input` component with support for labels, error messages, ref forwarding, and accessibility features. The component manages focus and populated states and allows custom styling through the `className` prop. This replaces the legacy TextField component for better consistency and TypeScript support.
 - **README Updates**: Documented key dependencies, development tools, scripts, environment variables, database integration, and styling.
 - **Table of Contents**: Updated the README to include new sections for better navigation.
 - **Environment Variables**: Added documentation for managing environment variables using `dotenv`.
@@ -102,14 +106,14 @@
   - **Authentication Cards**: Consistent card-based design for all auth forms
   - **Success/Error States**: User feedback components for authentication flows
 - **Enhanced Authentication Components**: 
-  - **OTP Forms**: Dedicated OTP input and validation components with real-time verification
+  - **TOTP Forms**: Dedicated OTP input and validation components with real-time verification
   - **Authentication Hooks**: Custom hooks for managing form state and validation logic across all auth forms
 - **AppNavigation Component**: Implemented a smart navigation component (`app-navigation.tsx`) that conditionally renders the navbar based on the current route, automatically hiding navigation on authentication pages while preserving it on other public pages.
 
 ### Changed
 - Extracted shared Tailwind CSS styles for `Button` and `LinkButton` components into a separate file (`buttonStyles.ts`) to ensure consistency and reusability across both components.
 - **Folder Structure**: Organized the app into `(public)` and `(logged-in)` sections for better separation of concerns.
-- **Component Refactoring**: Improved the structure and readability of reusable components like `Button` and `TextField`.
+- **Component Refactoring**: Improved the structure and readability of reusable components like `Button` and `Input` (migrated from TextField for better consistency).
 - **Error Handling**: Enhanced error handling across API routes and form submissions.
 - **Navigation Logic**: Refactored navigation rendering logic to use `pathname.startsWith()` instead of `pathname.includes()` for more precise route matching and better security.
 

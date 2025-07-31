@@ -6,7 +6,5 @@
 
 - when merging to production remove the test email from the verify email actions
 
-- remove old TexfField component and update documentation
-
 
  S6 - 34
