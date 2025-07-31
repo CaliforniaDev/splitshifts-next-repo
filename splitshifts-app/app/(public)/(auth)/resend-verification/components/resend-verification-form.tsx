@@ -10,7 +10,7 @@ import { sendEmailVerification } from '../../signup/actions/send-email-verificat
 
 // ---UI Components-----------------------------------------------------
 import Button from '@/app/components/ui/buttons/button';
-import TextField from '@/app/components/ui/inputs/text-field';
+import Input from '@/app/components/ui/inputs/input';
 import {
   Card,
   CardContent,
@@ -209,7 +209,7 @@ function ResendVerificationFormCard({
           onSubmit={onSubmit}
         >
           <fieldset disabled={isLoading} className="space-y-4">
-            <TextField
+            <Input
               id="email"
               name="email"
               label="Email Address"
@@ -217,7 +217,8 @@ function ResendVerificationFormCard({
               value={email}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
               required
-              error={status === 'error' ? message : false}
+              error={status === 'error'}
+              errorMessage={status === 'error' ? message : ''}
             />
 
             <div className="flex flex-col gap-4">
