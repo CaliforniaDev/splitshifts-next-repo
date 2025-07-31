@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 
 import { usePasswordResetForm } from '../hooks/useResetForm';
 import { resetPassword } from '../actions/send-password-reset-link';
@@ -30,6 +31,17 @@ export default function PasswordResetPageForm() {
   const form = usePasswordResetForm();
   const { formState } = form;
   const { isSubmitting, isSubmitSuccessful } = formState;
+  const emailInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus the email input when component mounts for better UX
+  useEffect(() => {
+    if (!isSubmitSuccessful && emailInputRef.current) {
+      const raf = requestAnimationFrame(() => {
+        emailInputRef.current?.focus();
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [isSubmitSuccessful]);
 
   const handleSubmit = async (data: PasswordResetFormData) => {
     await resetPassword(data.email);
@@ -41,6 +53,7 @@ export default function PasswordResetPageForm() {
       form={form}
       isSubmitting={isSubmitting}
       handleSubmit={handleSubmit}
+      emailInputRef={emailInputRef}
     />
   );
 }
@@ -49,6 +62,7 @@ interface Props {
   form: ReturnType<typeof usePasswordResetForm>;
   handleSubmit: (data: PasswordResetFormData) => Promise<void>;
   isSubmitting: boolean;
+  emailInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 function ResetPasswordSuccessCard({ form }: Pick<Props, 'form'>) {
@@ -74,7 +88,7 @@ function ResetPasswordSuccessCard({ form }: Pick<Props, 'form'>) {
   );
 }
 
-function ResetPasswordFormCard({ form, handleSubmit, isSubmitting }: Props) {
+function ResetPasswordFormCard({ form, handleSubmit, isSubmitting, emailInputRef }: Props) {
   return (
     <Card className='w-full border-none shadow-elevation-0'>
       <CardHeader>
@@ -98,6 +112,7 @@ function ResetPasswordFormCard({ form, handleSubmit, isSubmitting }: Props) {
                     <FormControl>
                       <Input
                         {...field}
+                        ref={emailInputRef}
                         label='Email *'
                         type='email'
                         onBlur={field.onBlur}

@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { useSignUpForm } from '../hooks/use-signup-form';
 import { registerUser } from '../actions/register-user';
@@ -28,6 +29,17 @@ export default function SignUpForm() {
   const form = useSignUpForm();
   const isSubmitting = form.formState.isSubmitting;
   const isSubmitSuccessful = form.formState.isSubmitSuccessful;
+  const firstNameInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus the first name input when component mounts for better UX
+  useEffect(() => {
+    if (!isSubmitSuccessful && firstNameInputRef.current) {
+      const raf = requestAnimationFrame(() => {
+        firstNameInputRef.current?.focus();
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [isSubmitSuccessful]);
 
   const submitHandler = async (data: SignUpFormData) => {
     try {
@@ -69,6 +81,7 @@ export default function SignUpForm() {
       form={form}
       isSubmitting={isSubmitting}
       onSubmit={submitHandler}
+      firstNameInputRef={firstNameInputRef}
     />
   );
 }
@@ -104,9 +117,10 @@ interface Props {
   form: UseFormReturn<SignUpFormData>;
   isSubmitting: boolean;
   onSubmit: (data: SignUpFormData) => Promise<void>;
+  firstNameInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
-function SignUpFormCard({ form, isSubmitting, onSubmit }: Props) {
+function SignUpFormCard({ form, isSubmitting, onSubmit, firstNameInputRef }: Props) {
   return (
     <Card className='w-full border-none shadow-elevation-0'>
       <CardHeader>
@@ -128,6 +142,7 @@ function SignUpFormCard({ form, isSubmitting, onSubmit }: Props) {
                       <FormControl>
                         <Input
                           {...field}
+                          ref={firstNameInputRef}
                           label='First Name *'
                           type='text'
                           onBlur={field.onBlur}

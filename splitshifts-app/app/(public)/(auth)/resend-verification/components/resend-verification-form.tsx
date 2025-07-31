@@ -2,7 +2,7 @@
 
 // ---Core Framework---------------------------------------------------
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 // ---Actions-----------------------------------------------------------
@@ -27,6 +27,7 @@ interface ResendFormProps {
   onSubmit: (e: React.FormEvent) => Promise<void>;
   status: 'idle' | 'loading' | 'success' | 'error';
   message: string;
+  emailInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 interface SuccessCardProps {
@@ -45,6 +46,7 @@ export default function ResendVerificationForm() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const emailInputRef = useRef<HTMLInputElement>(null);
 
   // ---Effects----------------------------------------------------------
   /**
@@ -56,6 +58,18 @@ export default function ResendVerificationForm() {
       setEmail(emailParam);
     }
   }, [searchParams]);
+
+  /**
+   * Auto-focus the email input when component mounts for better UX
+   */
+  useEffect(() => {
+    if (status !== 'success' && emailInputRef.current) {
+      const raf = requestAnimationFrame(() => {
+        emailInputRef.current?.focus();
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [status]);
 
   // ---Event Handlers--------------------------------------------------
   /**
@@ -119,6 +133,7 @@ export default function ResendVerificationForm() {
           onSubmit={handleSubmit}
           status={status}
           message={message}
+          emailInputRef={emailInputRef}
         />
       )}
     </>
@@ -191,7 +206,8 @@ function ResendVerificationFormCard({
   setEmail, 
   onSubmit, 
   status, 
-  message 
+  message,
+  emailInputRef
 }: ResendFormProps) {
   const isLoading = status === 'loading';
 
@@ -219,6 +235,7 @@ function ResendVerificationFormCard({
               required
               error={status === 'error'}
               errorMessage={status === 'error' ? message : ''}
+              ref={emailInputRef}
             />
 
             <div className="flex flex-col gap-4">

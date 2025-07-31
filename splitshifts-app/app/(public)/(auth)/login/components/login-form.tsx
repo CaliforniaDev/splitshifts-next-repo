@@ -63,6 +63,7 @@ export default function LoginForm() {
   // ---State Management-------------------------------------------------
   const [step, setStep] = useState(Step.INITIAL);
   const otpInputRef = useRef<HTMLInputElement>(null);
+  const emailInputRef = useRef<HTMLInputElement>(null);
 
   // ---Form Hooks-------------------------------------------------------
   const form = useLoginForm();
@@ -80,6 +81,18 @@ export default function LoginForm() {
     : '/password-reset';
 
   // ---Effects----------------------------------------------------------
+  /**
+   * Auto-focus the email input when component mounts for better UX
+   */
+  useEffect(() => {
+    if (step === Step.INITIAL && emailInputRef.current) {
+      const raf = requestAnimationFrame(() => {
+        emailInputRef.current?.focus();
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [step]);
+
   /**
    * Auto-focus the OTP input when transitioning to the OTP step.
    * Uses requestAnimationFrame to ensure the input is rendered first.
@@ -161,6 +174,7 @@ export default function LoginForm() {
           isSubmitting={isSubmitting}
           handleSubmit={handleSubmit}
           resetPasswordHref={resetPasswordHref}
+          emailInputRef={emailInputRef}
         />
       )}
       {step === Step.REQUIRE_OTP && (
@@ -191,6 +205,7 @@ interface LoginCardProps {
   isSubmitting: boolean;
   handleSubmit: (data: LoginFormData) => Promise<void>;
   resetPasswordHref: string;
+  emailInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 function LoginCard({
@@ -198,6 +213,7 @@ function LoginCard({
   isSubmitting,
   handleSubmit,
   resetPasswordHref,
+  emailInputRef,
 }: LoginCardProps) {
   return (
     <Card className='w-full border-none shadow-elevation-0'>
@@ -222,6 +238,7 @@ function LoginCard({
                     <FormControl>
                       <Input
                         {...field}
+                        ref={emailInputRef}
                         label='Email *'
                         type='email'
                         onBlur={field.onBlur}
