@@ -29,7 +29,7 @@ const getCurrentUser = async (emailAddress: string) => {
 
 export async function resetPassword(emailAddress: string) {
   const session = await auth();
-  if (!!session?.user?.id) {
+  if (session?.user?.id) {
     return {
       error: true,
       message: 'You are already logged in.',

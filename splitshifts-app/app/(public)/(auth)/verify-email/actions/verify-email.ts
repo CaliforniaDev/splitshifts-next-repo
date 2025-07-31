@@ -15,7 +15,7 @@ import { emailVerificationTokenSchema } from '@/db/emailVerificationTokenSchema'
  */
 export async function verifyEmail(token: string) {
   const session = await auth();
-  if (!!session?.user?.id) {
+  if (session?.user?.id) {
     return {
       error: true,
       message: 'You are already logged in.',

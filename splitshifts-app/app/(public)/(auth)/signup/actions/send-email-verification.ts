@@ -37,7 +37,7 @@ const getUserByEmail = async (emailAddress: string) => {
  */
 export async function sendEmailVerification(emailAddress: string) {
   const session = await auth();
-  if (!!session?.user?.id) {
+  if (session?.user?.id) {
     return {
       error: true,
       message: 'You are already logged in.',
