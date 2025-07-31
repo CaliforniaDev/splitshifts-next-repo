@@ -12,6 +12,7 @@ import { useLoginForm, useOtpForm } from '../hooks/use-login-form';
 // ---Types-------------------------------------------------------------
 import type { LoginFormData } from '../types/login-form-data';
 import type { OtpFormData } from '../types/login-form-data';
+import type { LoginErrorType } from '../types/login-form-data';
 
 // ---Actions-----------------------------------------------------------
 import {
@@ -44,6 +45,8 @@ import {
   InputOTPSlot,
 } from '@/app/components/ui/inputs/otp-input';
 import { toast } from '@/app/components/ui/toast';
+import WarningIcon from '@/app/components/ui/icons/warning-icon';
+import ChevronRightIcon from '@/app/components/ui/icons/chevron-right-icon';
 
 // ---Constants--------------------------------------------------------
 enum Step {
@@ -60,6 +63,7 @@ export default function LoginForm() {
   // ---State Management-------------------------------------------------
   const [step, setStep] = useState(Step.INITIAL);
   const otpInputRef = useRef<HTMLInputElement>(null);
+  const emailInputRef = useRef<HTMLInputElement>(null);
 
   // ---Form Hooks-------------------------------------------------------
   const form = useLoginForm();
@@ -77,6 +81,18 @@ export default function LoginForm() {
     : '/password-reset';
 
   // ---Effects----------------------------------------------------------
+  /**
+   * Auto-focus the email input when component mounts for better UX
+   */
+  useEffect(() => {
+    if (step === Step.INITIAL && emailInputRef.current) {
+      const raf = requestAnimationFrame(() => {
+        emailInputRef.current?.focus();
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [step]);
+
   /**
    * Auto-focus the OTP input when transitioning to the OTP step.
    * Uses requestAnimationFrame to ensure the input is rendered first.
@@ -104,6 +120,7 @@ export default function LoginForm() {
     if (preLoginCheckResponse.error) {
       form.setError('root', {
         message: preLoginCheckResponse.message,
+        type: preLoginCheckResponse.errorType,
       });
       return;
     }
@@ -119,6 +136,7 @@ export default function LoginForm() {
       if (response?.error) {
         form.setError('root', {
           message: response.message,
+          type: response.errorType,
         });
       } else {
         router.push('/dashboard');
@@ -156,6 +174,7 @@ export default function LoginForm() {
           isSubmitting={isSubmitting}
           handleSubmit={handleSubmit}
           resetPasswordHref={resetPasswordHref}
+          emailInputRef={emailInputRef}
         />
       )}
       {step === Step.REQUIRE_OTP && (
@@ -186,6 +205,7 @@ interface LoginCardProps {
   isSubmitting: boolean;
   handleSubmit: (data: LoginFormData) => Promise<void>;
   resetPasswordHref: string;
+  emailInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 function LoginCard({
@@ -193,6 +213,7 @@ function LoginCard({
   isSubmitting,
   handleSubmit,
   resetPasswordHref,
+  emailInputRef,
 }: LoginCardProps) {
   return (
     <Card className='w-full border-none shadow-elevation-0'>
@@ -217,6 +238,7 @@ function LoginCard({
                     <FormControl>
                       <Input
                         {...field}
+                        ref={emailInputRef}
                         label='Email *'
                         type='email'
                         onBlur={field.onBlur}
@@ -246,7 +268,11 @@ function LoginCard({
                 )}
               />
               {!!form.formState.errors.root?.message && (
-                <FormMessage>{form.formState.errors.root.message}</FormMessage>
+                <LoginErrorDisplay
+                  message={form.formState.errors.root.message}
+                  errorType={form.formState.errors.root.type as any}
+                  userEmail={form.getValues('email')}
+                />
               )}
               <div className='flex flex-col gap-4'>
                 <Button
@@ -294,7 +320,12 @@ interface OtpCardProps {
   ref: React.RefObject<HTMLInputElement | null>;
 }
 
-function OtpCard({ otpForm, handleOTPSubmit, onBackToLogin, ref }: OtpCardProps) {
+function OtpCard({
+  otpForm,
+  handleOTPSubmit,
+  onBackToLogin,
+  ref,
+}: OtpCardProps) {
   const isOtpSubmitting = otpForm.formState.isSubmitting;
   const otpValue = useWatch({ control: otpForm.control, name: 'otp' });
 
@@ -355,11 +386,7 @@ function OtpCard({ otpForm, handleOTPSubmit, onBackToLogin, ref }: OtpCardProps)
             >
               Verify OTP
             </Button>
-            <Button 
-              variant='outlined'
-              onClick={onBackToLogin}
-              type='button'
-            >
+            <Button variant='outlined' onClick={onBackToLogin} type='button'>
               Back to Login
             </Button>
           </form>
@@ -367,4 +394,55 @@ function OtpCard({ otpForm, handleOTPSubmit, onBackToLogin, ref }: OtpCardProps)
       </CardContent>
     </Card>
   );
+}
+
+/**
+ * LoginErrorDisplay Component
+ *
+ * Renders error messages with contextual actions based on error type.
+ * Provides structured error handling instead of string pattern matching.
+ */
+interface LoginErrorDisplayProps {
+  message: string;
+  errorType?: LoginErrorType;
+  userEmail?: string;
+}
+
+function LoginErrorDisplay({
+  message,
+  errorType,
+  userEmail,
+}: LoginErrorDisplayProps) {
+  if (errorType === 'EMAIL_NOT_VERIFIED') {
+    const resendHref = userEmail
+      ? `/resend-verification?email=${encodeURIComponent(userEmail)}`
+      : '/resend-verification';
+
+    return (
+      <div className='rounded-lg border border-error bg-error-container p-6'>
+        <div className='flex items-start space-x-3'>
+          <div className='flex-shrink-0'>
+            <WarningIcon className='h-5 w-5 text-error' />
+          </div>
+          <div className='flex-1'>
+            <FormMessage className='text-on-error-container'>
+              {message}
+            </FormMessage>
+            <div className='mt-2'>
+              <Link
+                href={resendHref}
+                className='inline-flex items-center text-sm font-medium text-error underline hover:text-on-error'
+              >
+                Resend verification email
+                <ChevronRightIcon className='ml-1 h-4 w-4' />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Default error display for other error types
+  return <FormMessage>{message}</FormMessage>;
 }

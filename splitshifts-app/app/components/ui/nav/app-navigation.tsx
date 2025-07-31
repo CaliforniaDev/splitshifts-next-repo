@@ -15,7 +15,14 @@ export default function AppNavigation() {
   const pathname = usePathname();
   
   // Define auth routes where navigation should be hidden
-  const authRoutes = ['/login', '/signup', '/password-reset', '/update-password'];
+  const authRoutes = [
+    '/login', 
+    '/signup', 
+    '/password-reset', 
+    '/update-password',
+    '/verify-email',
+    '/resend-verification'
+  ];
   const isAuthPage = authRoutes.some(route => pathname.startsWith(route));
 
   if (isAuthPage) {

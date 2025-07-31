@@ -16,6 +16,7 @@ export const loginWithCredentials = async (
     return {
       error: true,
       message: validation.error?.issues[0]?.message ?? 'An error occurred',
+      errorType: 'GENERIC_ERROR',
     };
   }
   const { email, password, token } = validation.data;
@@ -31,6 +32,7 @@ export const loginWithCredentials = async (
       return {
         error: true,
         message: response.error,
+        errorType: token ? 'INVALID_OTP' : 'INVALID_CREDENTIALS',
       };
     }
     return {
@@ -45,13 +47,14 @@ export const loginWithCredentials = async (
     return {
       error: true,
       message: errorMessage,
+      errorType: token ? 'INVALID_OTP' : 'INVALID_CREDENTIALS',
     };
   }
 };
 
 export const preLoginCheck = async (
   data: Pick<LoginFormData, 'email' | 'password'>,
-): Promise<LoginResponse & { twoFactorEnabled?: boolean }> => {
+): Promise<LoginResponse & { twoFactorEnabled?: boolean; emailVerified?: boolean }> => {
   // Fetch the user from the database
   const [user] = await db
     .select()
@@ -63,20 +66,36 @@ export const preLoginCheck = async (
     return {
       error: true,
       message: 'Incorrect email or password.',
+      errorType: 'INVALID_CREDENTIALS',
     };
   }
 
   // Compare the provided password with the stored hashed password
-
   const passwordCorrect = await compare(data.password, user.password!);
   if (!passwordCorrect) {
     return {
       error: true,
       message: 'Incorrect email or password.',
+      errorType: 'INVALID_CREDENTIALS',
     };
   }
+
+  // Check if email is verified
+  if (!user.emailVerified) {
+    return {
+      error: true,
+      message: 'Please verify your email address before logging in. Check your inbox for a verification link.',
+      errorType: 'EMAIL_NOT_VERIFIED',
+      metadata: {
+        email: user.email,
+        emailVerified: false,
+      },
+    };
+  }
+
   return {
     error: false,
     twoFactorEnabled: user.twoFactorEnabled,
+    emailVerified: user.emailVerified,
   };
 };
