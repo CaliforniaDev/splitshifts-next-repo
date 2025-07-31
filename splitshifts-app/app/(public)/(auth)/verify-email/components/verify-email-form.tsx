@@ -1,10 +1,14 @@
 'use client';
 
+// ---Core Framework---------------------------------------------------
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+
+// ---Actions-----------------------------------------------------------
 import { verifyEmail } from '../actions/verify-email';
 
+// ---UI Components-----------------------------------------------------
 import Button from '@/app/components/ui/buttons/button';
 import {
   Card,
@@ -14,12 +18,24 @@ import {
   CardTitle,
 } from '@/app/components/ui/card';
 
+/**
+ * Main email verification component that handles token verification flow:
+ * 1. Loading state: Shows spinner while verifying token
+ * 2. Success state: Displays confirmation with continue to login
+ * 3. Error state: Shows error with options to request new email or return to login
+ */
+
 export default function VerifyEmailForm() {
+  // ---State Management-------------------------------------------------
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
 
+  // ---Effects----------------------------------------------------------
+  /**
+   * Automatically verify email when component mounts using token from URL params
+   */
   useEffect(() => {
     const token = searchParams.get('token');
     
@@ -51,6 +67,7 @@ export default function VerifyEmailForm() {
     handleVerification();
   }, [searchParams]);
 
+  // ---Render-----------------------------------------------------------
   if (status === 'loading') {
     return <VerifyEmailLoadingCard />;
   }
@@ -62,6 +79,14 @@ export default function VerifyEmailForm() {
   return <VerifyEmailErrorCard message={message} />;
 }
 
+// ---Sub-Components---------------------------------------------------
+
+/**
+ * VerifyEmailLoadingCard Component
+ *
+ * Displays a loading spinner while email verification is in progress.
+ * Shows animated spinner and informative message to user.
+ */
 function VerifyEmailLoadingCard() {
   return (
     <Card className="w-full border-none shadow-elevation-0">
@@ -78,6 +103,12 @@ function VerifyEmailLoadingCard() {
   );
 }
 
+/**
+ * VerifyEmailSuccessCard Component
+ *
+ * Shows successful email verification with celebration checkmark.
+ * Includes verified email display and continue to login action.
+ */
 function VerifyEmailSuccessCard({ message, email }: { message: string; email: string }) {
   const router = useRouter();
   
@@ -128,6 +159,12 @@ function VerifyEmailSuccessCard({ message, email }: { message: string; email: st
   );
 }
 
+/**
+ * VerifyEmailErrorCard Component
+ *
+ * Displays error state when email verification fails.
+ * Provides options to request new verification email or return to login.
+ */
 function VerifyEmailErrorCard({ message }: { message: string }) {
   return (
     <Card className="w-full border-none shadow-elevation-0">
