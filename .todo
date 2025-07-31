@@ -1,8 +1,3 @@
 - update all components to MODERN standards
 - update toast component to a sonner
 - change color of button for the Disable Two-Factor Auth button
-
-- when merging to production remove the test email from the verify email actions
-
-
- S6 - 34
