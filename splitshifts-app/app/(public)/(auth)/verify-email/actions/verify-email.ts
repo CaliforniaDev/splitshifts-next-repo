@@ -86,6 +86,8 @@ export async function verifyEmail(token: string) {
   return {
     success: true,
     message: 'Email verified successfully! You can now log in.',
-    email: verificationData.userEmail,
+    metadata: {
+      email: verificationData.userEmail,
+    },
   };
 }

@@ -52,7 +52,7 @@ export default function VerifyEmailForm() {
         if (result?.success) {
           setStatus('success');
           setMessage(result.message);
-          setEmail(result.email || '');
+          setEmail(result.metadata?.email || '');
         } else {
           setStatus('error');
           setMessage(result?.message || 'An error occurred during verification.');
