@@ -18,6 +18,7 @@ SplitShifts is a web application designed to streamline the scheduling process f
 - [Scripts](#scripts)
 - [Environment Variables](#environment-variables)
 - [Database](#database)
+- [Security & Token Management](#security--token-management)
 - [Styling](#styling)
 - [Email Integration](#email-integration)
 
@@ -66,13 +67,32 @@ SplitShifts is a web application designed to streamline the scheduling process f
   - **Resend Functionality**: User-friendly resend options with proper rate limiting
   - **Email Templates**: Professional email templates for all authentication flows
 - **Database Integration**: PostgreSQL with Drizzle ORM for secure user data storage
-- **Security Features**: 
+- **Enhanced Security Features**: 
   - **Password Hashing**: Secure password storage with bcrypt
   - **Email Verification**: Mandatory email verification for account activation with secure token-based validation
-  - **Token-based Reset**: Secure password reset tokens with expiration
+  - **Centralized Token Management**: Unified token generation and validation system for consistency and security
+    - **Secure Token Generation**: Cryptographically secure 64-character hex tokens using `randomBytes(32)` with 256-bit entropy
+    - **Format Validation**: Centralized token format validation with TypeScript type guards (`isValidTokenFormat()`)
+    - **URL Validation**: Environment variable validation for `SITE_BASE_URL` with production HTTPS enforcement
+    - **Token Utilities**: Shared utilities (`generateSecureToken()`, `buildVerificationLink()`, `buildPasswordResetLink()`)
+    - **Security Documentation**: Comprehensive token format decision rationale (hex vs JWT)
+  - **Environment-Specific Error Logging**: Production-safe error logging (`logError()`) that protects sensitive information
+  - **Professional Email Templates**: Consistent HTML email templates across verification and password reset flows
+  - **Token-based Reset**: Secure password reset tokens with 1-hour expiration for enhanced security
   - **Route Protection**: Authentication middleware for protected routes with email verification checks
   - **Session Security**: Secure session management and CSRF protection
   - **Rate Limiting**: Protection against spam and abuse in email sending and verification processes
+- **Enhanced User Experience (UX)**:
+  - **Auto-Focus Functionality**: Consistent auto-focus across all authentication forms for better accessibility
+  - **Animated Success States**: Professional celebration animations with reusable AnimatedCheckIcon component
+  - **Visual Consistency**: Centered layouts and consistent styling across all authentication flows
+  - **Professional Email Templates**: HTML-styled emails with consistent branding and messaging
+  - **Responsive Design**: Mobile-first responsive components with Tailwind CSS
+- **Modern Animation System**:
+  - **Centralized Animations**: Custom keyframes and animations in Tailwind config for maintainability
+  - **Celebration Effects**: Multi-layered animations (ping, pulse, bounce, draw) for success states
+  - **Performance Optimized**: CSS-based animations with proper animation delays and durations
+  - **Reusable Components**: Extracted AnimatedCheckIcon with size variants (small/medium/large)
 - **TypeScript Support**: Full TypeScript implementation for type safety and better developer experience
 
 ### Planned Features
@@ -205,13 +225,162 @@ Refer to the comments in each file for more detailed information.
 
 This project uses `dotenv` to manage environment variables. Ensure you have a `.env` file with the required variables.
 
+### Required Environment Variables
+
+```env
+# Database Configuration
+DATABASE_URL="your-postgres-connection-string"
+
+# Authentication
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-nextauth-secret"
+
+# Email Configuration
+RESEND_API_KEY="your-resend-api-key"
+EMAIL_FROM="noreply@yourdomain.com"
+
+# Site Configuration (REQUIRED for email links)
+SITE_BASE_URL="http://localhost:3000"    # Development: HTTP/HTTPS allowed
+# SITE_BASE_URL="https://yourdomain.com" # Production: HTTPS required for security
+```
+
+### Environment Variable Validation
+
+The application includes built-in validation for critical environment variables:
+
+- **`SITE_BASE_URL`**: Automatically validated to ensure it's a properly formatted URL
+  - **Development**: Allows both HTTP and HTTPS for local development flexibility
+  - **Production**: Enforces HTTPS-only for security (prevents man-in-the-middle attacks)
+- **Email Configuration**: Validated during email sending to prevent configuration errors
+- **Token Security**: Environment-specific logging protects sensitive information in production
+
+**Note**: Missing or malformed `SITE_BASE_URL` will cause email verification and password reset links to fail with clear error messages. Production deployments must use HTTPS URLs.
+
+For comprehensive security information, see [SECURITY.md](./SECURITY.md).
+
 ## Database
 
 The project integrates with Neon using `@neondatabase/serverless` and `drizzle-orm` for database management.
 
+## Security & Token Management
+
+The application implements a robust security system with centralized token management:
+
+### Token System
+
+All authentication tokens (email verification, password reset) use a standardized secure format:
+
+```typescript
+import { generateSecureToken, isValidTokenFormat } from '@/app/lib/utils';
+
+// Generate a secure token
+const token = generateSecureToken(); // Returns 64-char hex string
+
+// Validate token format
+if (isValidTokenFormat(token)) {
+  // Token is valid format
+}
+```
+
+### URL Generation
+
+Email links are generated with built-in validation:
+
+```typescript
+import { buildVerificationLink, buildPasswordResetLink } from '@/app/lib/utils';
+
+// These functions automatically validate SITE_BASE_URL
+const verificationLink = buildVerificationLink(token);
+const resetLink = buildPasswordResetLink(token);
+```
+
+### Error Logging
+
+Production-safe error logging that protects sensitive information:
+
+```typescript
+import { logError } from '@/app/lib/utils';
+
+try {
+  // Some operation
+} catch (error) {
+  // Development: logs full error details
+  // Production: logs generic message only
+  logError('Operation failed', error);
+}
+```
+
+### Configuration Constants
+
+Token configuration is centralized for consistency:
+
+```typescript
+import { TOKEN_CONFIG } from '@/app/lib/utils';
+
+// Available constants:
+// TOKEN_CONFIG.BYTE_LENGTH (32) - 256-bit entropy
+// TOKEN_CONFIG.HEX_LENGTH (64) - Resulting hex string length
+// TOKEN_CONFIG.VALIDATION_PATTERN (/^[a-fA-F0-9]{64}$/) - Format validation
+```
+
+### Security Design Decision: Hex Tokens vs JWT
+
+We use simple hex tokens (256-bit entropy) instead of JWT for email verification and password reset because:
+
+- **Revocable**: Database-managed tokens can be immediately invalidated
+- **Simple**: Minimal complexity reduces security vulnerabilities  
+- **Stateful**: Better control over token lifecycle
+- **Required Database Access**: Email verification requires database updates anyway
+
+This approach provides excellent security while maintaining simplicity and revocability.
+
 ## Styling
 
 The project uses `tailwindcss` for styling, along with plugins like `tailwindcss-animate` and `tw-animate-css` for animations.
+
+### Custom Animation System
+
+The application features a centralized animation system built on Tailwind CSS:
+
+#### Custom Keyframes
+```css
+/* Located in tailwind.config.ts */
+keyframes: {
+  'fade-in-up': {
+    '0%': { opacity: '0', transform: 'translateY(10px)' },
+    '100%': { opacity: '1', transform: 'translateY(0)' }
+  },
+  'draw': {
+    '0%': { strokeDashoffset: '20' },
+    '100%': { strokeDashoffset: '0' }
+  }
+}
+```
+
+#### Animation Classes
+```css
+animation: {
+  'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
+  'draw': 'draw 0.8s ease-in-out forwards'
+}
+```
+
+#### Usage Examples
+```tsx
+// Staggered animations with delays
+<div className="animate-fade-in-up [animation-delay:0.3s] opacity-0">
+  Content appears with smooth transition
+</div>
+
+// SVG path drawing animation
+<path className="animate-draw [stroke-dasharray:20]" />
+```
+
+### Component Library
+
+- **AnimatedCheckIcon**: Reusable success state component with celebration effects
+- **Size Variants**: Small (12x12), Medium (16x16), Large (20x20) configurations
+- **Layered Animations**: Combines ping, pulse, bounce, and draw animations for rich feedback
 
 ## Email Integration
 
@@ -232,27 +401,29 @@ The project uses `nodemailer` in combination with Resend for sending transaction
 
 3. Example usage:
    ```javascript
-   import nodemailer from 'nodemailer';
-   import { Resend } from '@resend/client';
+   import { mailer } from '@/app/lib/email';
+   import { buildVerificationLink, generateSecureToken } from '@/app/lib/utils';
 
-   const resend = new Resend(process.env.RESEND_API_KEY);
+   // Generate secure verification token
+   const verificationToken = generateSecureToken();
+   
+   // Build validated verification link
+   const verificationLink = buildVerificationLink(verificationToken);
 
-   const transporter = nodemailer.createTransporter({
-   const transporter = nodemailer.createTransport({
-     service: 'Resend',
-     auth: {
-       api_key: process.env.RESEND_API_KEY,
-     },
-   });
    const mailOptions = {
      from: process.env.EMAIL_FROM,
      to: 'recipient@example.com',
-     subject: 'Test Email',
-     text: 'This is a test email sent using Resend and Nodemailer.',
+     subject: 'Email Verification - SplitShifts',
+     html: `
+       <h2>Verify Your Email</h2>
+       <p>Click the link below to verify your email address:</p>
+       <a href="${verificationLink}">Verify Email</a>
+       <p>This link will expire in 24 hours.</p>
+     `,
    };
 
    try {
-     const info = await transporter.sendMail(mailOptions);
+     const info = await mailer.sendMail(mailOptions);
      // Handle successful email send
      return { success: true, messageId: info.messageId };
    } catch (error) {

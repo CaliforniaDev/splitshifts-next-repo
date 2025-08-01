@@ -3,6 +3,27 @@
 ## [Unreleased]
 
 ### Added
+- **Security & Reliability Improvements**:
+  - **Centralized Token Management**: Unified token generation and validation system
+    - **`TOKEN_CONFIG`**: Centralized constants for token byte length, hex length, and validation patterns
+    - **`generateSecureToken()`**: Standardized cryptographically secure token generation using `randomBytes(32).toString('hex')`
+    - **`isValidTokenFormat()`**: Centralized token format validation with TypeScript type guards
+    - **Consistency Enforcement**: Ensures token generation and validation stay synchronized across the codebase
+  - **Environment Variable Validation**: Built-in validation for critical configuration
+    - **`getValidatedSiteBaseUrl()`**: Validates `SITE_BASE_URL` format and prevents broken email links
+    - **Environment-Specific Security**: Production enforces HTTPS-only, development allows HTTP/HTTPS
+    - **URL Normalization**: Removes trailing slashes for consistent URL construction
+    - **`buildVerificationLink()` & `buildPasswordResetLink()`**: Secure URL builders with validation
+    - **Clear Error Messages**: Helpful error messages for developers when environment variables are misconfigured
+  - **Enhanced Error Logging**: Production-safe error logging system
+    - **`logError()`**: Centralized error logging utility with environment-specific behavior
+    - **Development Mode**: Detailed error logging with full error objects for debugging
+    - **Production Mode**: Generic error messages that don't expose sensitive information
+    - **Eliminated Code Duplication**: Replaced multiple instances of environment-specific logging patterns
+  - **Code Organization Improvements**: Better maintainability and consistency
+    - **Centralized Auth Routes**: `AUTH_ROUTES` constants and `isAuthRoute()` helper function
+    - **Shared Constants**: Moved hardcoded route arrays to shared configuration files
+    - **Import Organization**: Improved import structure and dependency management
 - **Email Verification System**: Complete email verification flow for user account validation
   - **Email Verification Form**: Token-based email verification with loading states and user feedback
   - **Resend Verification**: Dedicated component for resending verification emails with rate limiting awareness
