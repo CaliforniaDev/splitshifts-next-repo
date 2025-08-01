@@ -95,7 +95,7 @@ function VerifyEmailLoadingCard() {
     <Card className="w-full border-none shadow-elevation-0">
       <CardHeader className="text-center">
         <div className="mb-4">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-primary"></div>
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-surface-variant border-t-primary"></div>
         </div>
         <CardTitle>Verifying Email</CardTitle>
         <CardDescription className="typescale-body-large">
