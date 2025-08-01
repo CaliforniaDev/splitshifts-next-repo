@@ -14,6 +14,7 @@ import { logError } from '@/app/lib/utils';
 // ---UI Components-----------------------------------------------------
 import Button from '@/app/components/ui/buttons/button';
 import Input from '@/app/components/ui/inputs/input';
+import AnimatedCheckIcon from '@/app/components/ui/icons/animated-check-icon';
 import {
   Card,
   CardContent,
@@ -149,7 +150,7 @@ export default function ResendVerificationForm() {
  * ResendVerificationSuccessCard Component
  *
  * Renders the success state after verification email is sent.
- * Includes options to return to login or send another email.
+ * Includes animated checkmark celebration and options to continue.
  */
 function ResendVerificationSuccessCard({ 
   message, 
@@ -158,29 +159,15 @@ function ResendVerificationSuccessCard({
   return (
     <Card className="w-full border-none shadow-elevation-0">
       <CardHeader aria-live="polite" role="status">
-        <div className="mb-4">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-            <svg
-              className="h-6 w-6 text-green-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-        </div>
-        <CardTitle className="text-center">Email Sent!</CardTitle>
-        <CardDescription className="typescale-body-large text-center">
+        <AnimatedCheckIcon size="medium" className="mb-4" />
+        <CardTitle className="text-center animate-fade-in-up [animation-delay:0.3s] opacity-0">
+          Email Sent!
+        </CardTitle>
+        <CardDescription className="typescale-body-large text-center animate-fade-in-up [animation-delay:0.4s] opacity-0">
           {message}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+      <CardContent className="flex flex-col gap-4 animate-fade-in-up [animation-delay:0.5s] opacity-0">
         <Link href="/login">
           <Button variant="filled" className="w-full">
             Back to Login

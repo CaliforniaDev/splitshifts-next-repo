@@ -116,9 +116,29 @@ const config: Config = {
           '0%,70%,100%': { opacity: '1' },
           '20%,50%': { opacity: '0' },
         },
+        'fade-in-up': {
+          '0%': { 
+            opacity: '0',
+            transform: 'translateY(10px)'
+          },
+          '100%': { 
+            opacity: '1',
+            transform: 'translateY(0)'
+          },
+        },
+        'draw': {
+          '0%': { 
+            strokeDashoffset: '20'
+          },
+          '100%': { 
+            strokeDashoffset: '0'
+          },
+        },
       },
       animation: {
         'caret-blink': 'caret-blink 1.25s ease-out infinite',
+        'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
+        'draw': 'draw 0.8s ease-in-out forwards',
       },
     },
   },

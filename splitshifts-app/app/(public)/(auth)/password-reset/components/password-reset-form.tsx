@@ -25,6 +25,7 @@ import {
 } from '@/app/components/ui/form';
 import Input from '@/app/components/ui/inputs/input';
 import Button from '@/app/components/ui/buttons/button';
+import AnimatedCheckIcon from '@/app/components/ui/icons/animated-check-icon';
 import { maskEmail } from '@/app/lib/utils';
 
 export default function PasswordResetPageForm() {
@@ -71,12 +72,13 @@ function ResetPasswordSuccessCard({ form }: Pick<Props, 'form'>) {
   return (
     <Card className='w-full border-none shadow-elevation-0'>
       <CardHeader>
-        <CardTitle>Password Reset Link Sent</CardTitle>
-        <CardDescription>
+        <AnimatedCheckIcon size="medium" className="mb-4" />
+        <CardTitle className="text-center">Password Reset Link Sent</CardTitle>
+        <CardDescription className="text-center">
           Check your email for the password reset link.
         </CardDescription>
       </CardHeader>
-      <CardContent role='status' aria-live='polite'>
+      <CardContent role='status' aria-live='polite' className="text-center">
         If you have an account with us, you will receive a password reset link
         via email at{' '}
         <span className='font-semibold text-on-surface-variant'>
