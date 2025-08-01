@@ -4,4 +4,5 @@
 - ✅ send-password-reset-link ui/ux needs to be updated to match the send email verifications
 - fix codebase on login so that each time user is logged into the database for last time they were logged in
 - add fade in animations to all form card contents
-- ✅ fix SITE_BASE_URL validation error in production deployment
+
+- add button to the success card for Password Reset Link Sent
