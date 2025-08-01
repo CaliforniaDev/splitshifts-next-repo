@@ -5,6 +5,7 @@ import db from '@/db/drizzle';
 import { eq, and, gt } from 'drizzle-orm';
 import { users } from '@/db/usersSchema';
 import { emailVerificationTokenSchema } from '@/db/emailVerificationTokenSchema';
+import { isValidTokenFormat } from '@/app/lib/utils';
 
 /**
  * Verifies a user's email address using the provided token.
@@ -22,11 +23,8 @@ export async function verifyEmail(token: string) {
     };
   }
 
-  // Validate token format: currently expects a 64-character hexadecimal string,
-  // matching the output of randomBytes(32).toString('hex') in send-email-verification.ts.
-  // If the token generation changes, update this validation accordingly.
-  const isValidToken = typeof token === 'string' && /^[a-fA-F0-9]{64}$/.test(token);
-  if (!isValidToken) {
+  // Validate token format using centralized utility
+  if (!isValidTokenFormat(token)) {
     return {
       error: true,
       message: 'Invalid verification token.',

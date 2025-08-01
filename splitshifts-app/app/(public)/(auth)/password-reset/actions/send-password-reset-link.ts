@@ -5,10 +5,9 @@ import { auth } from '@/auth';
 import db from '@/db/drizzle';
 import { eq } from 'drizzle-orm';
 import { users } from '@/db/usersSchema';
-import { randomBytes } from 'crypto';
 import { passwordResetTokenSchema } from '@/db/passwordResetTokenSchema';
 import { mailer } from '@/app/lib/email';
-import { buildPasswordResetLink } from '@/app/lib/utils';
+import { buildPasswordResetLink, generateSecureToken } from '@/app/lib/utils';
 
 /**
  * Retrieves the user from the database based on their email address.
@@ -42,7 +41,12 @@ export async function resetPassword(emailAddress: string) {
   if (!user) {
     return;
   }
-  const passwordResetToken = randomBytes(32).toString('hex');
+  
+  // Generate a cryptographically secure password reset token
+  // Uses the same secure token generation as email verification (256-bit entropy)
+  // Password reset tokens have shorter expiration (1 hour vs 24 hours) for enhanced security
+  // as they provide direct access to account credential changes
+  const passwordResetToken = generateSecureToken();
   const onHour = 3600000; // 1 hour in milliseconds
   const tokenExpiration = new Date(Date.now() + onHour); // Current time + 1 hour
   await db

@@ -6,10 +6,14 @@ import { passwordMatchSchema } from '@/app/(public)/(auth)/validation/auth-schem
 import { passwordResetTokenSchema } from '@/db/passwordResetTokenSchema';
 import { hash } from 'bcryptjs';
 import { users } from '@/db/usersSchema';
+import { isValidTokenFormat } from '@/app/lib/utils';
 
 // Checks if a token exists and is not expired
 export const validateResetToken = async (token: string): Promise<boolean> => {
-  if (!token) return false;
+  // First validate the token format
+  if (!isValidTokenFormat(token)) {
+    return false;
+  }
 
   const [passwordResetToken] = await db
     .select()

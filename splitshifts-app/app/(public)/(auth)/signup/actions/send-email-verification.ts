@@ -4,10 +4,9 @@ import { auth } from '@/auth';
 import db from '@/db/drizzle';
 import { eq, lt } from 'drizzle-orm';
 import { users } from '@/db/usersSchema';
-import { randomBytes } from 'crypto';
 import { emailVerificationTokenSchema } from '@/db/emailVerificationTokenSchema';
 import { mailer } from '@/app/lib/email';
-import { logError, buildVerificationLink } from '@/app/lib/utils';
+import { logError, buildVerificationLink, generateSecureToken } from '@/app/lib/utils';
 
 /**
  * Retrieves the user from the database based on their email address.
@@ -60,7 +59,20 @@ export async function sendEmailVerification(emailAddress: string) {
     };
   }
 
-  const verificationToken = randomBytes(32).toString('hex');
+  // Generate a cryptographically secure verification token
+  // Uses randomBytes(32) resulting in a 64-character hex string with 256 bits of entropy
+  // This entropy level is cryptographically strong and sufficient for email verification tokens
+  // 
+  // Token format choice: Simple hex string vs JWT
+  // - Hex tokens: Lightweight, stateful (revokable), require database validation
+  // - JWT tokens: Self-contained, larger size, harder to revoke, embedded expiration
+  // 
+  // For email verification, we prefer hex tokens because:
+  // 1. We need database lookup anyway to update user verification status
+  // 2. Tokens should be revokable (user changes email, etc.)
+  // 3. Simpler implementation reduces attack surface
+  // 4. 256-bit entropy provides excellent security
+  const verificationToken = generateSecureToken();
   const twentyFourHours = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
   const tokenExpiration = new Date(Date.now() + twentyFourHours);
 
