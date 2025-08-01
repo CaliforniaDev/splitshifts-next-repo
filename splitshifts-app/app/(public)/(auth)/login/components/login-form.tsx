@@ -192,6 +192,19 @@ export default function LoginForm() {
   );
 }
 
+// ---Helper Functions-------------------------------------------------
+
+/**
+ * Helper to safely extract LoginErrorType from unknown error type.
+ * Simplifies type casting and improves readability of error handling.
+ * 
+ * @param type - The unknown error type from form state
+ * @returns LoginErrorType if valid string type, undefined otherwise
+ */
+function getLoginErrorType(type: unknown): LoginErrorType | undefined {
+  return typeof type === 'string' ? (type as LoginErrorType) : undefined;
+}
+
 // ---Sub-Components---------------------------------------------------
 
 /**
@@ -270,11 +283,7 @@ function LoginCard({
               {!!form.formState.errors.root?.message && (
                 <LoginErrorDisplay
                   message={form.formState.errors.root.message}
-                  errorType={
-                    (typeof form.formState.errors.root.type === 'string'
-                      ? (form.formState.errors.root.type as LoginErrorType)
-                      : undefined)
-                  }
+                  errorType={getLoginErrorType(form.formState.errors.root?.type)}
                   userEmail={form.getValues('email')}
                 />
               )}
