@@ -98,6 +98,15 @@ export function getValidatedSiteBaseUrl(): string {
   const siteBaseUrl = process.env.SITE_BASE_URL;
   
   if (!siteBaseUrl) {
+    // In production, try to infer from Vercel environment variables
+    if (process.env.NODE_ENV === 'production') {
+      const vercelUrl = process.env.VERCEL_URL;
+      if (vercelUrl) {
+        const inferredUrl = `https://${vercelUrl}`;
+        console.warn(`SITE_BASE_URL not set, using inferred URL: ${inferredUrl}`);
+        return inferredUrl;
+      }
+    }
     throw new Error('SITE_BASE_URL environment variable is missing.');
   }
   

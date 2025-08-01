@@ -63,7 +63,18 @@ export async function resetPassword(emailAddress: string) {
         tokenExpiration,
       },
     });
-  const resetLink = buildPasswordResetLink(passwordResetToken);
+
+  // Build password reset link with error handling
+  let resetLink: string;
+  try {
+    resetLink = buildPasswordResetLink(passwordResetToken);
+  } catch (urlError) {
+    console.error('Failed to build password reset link:', urlError);
+    return {
+      error: true,
+      message: 'Failed to generate password reset link. Please contact support.',
+    };
+  }
 
   // Development mode: Log password reset link to console
   if (process.env.NODE_ENV === 'development') {

@@ -98,7 +98,17 @@ export async function sendEmailVerification(emailAddress: string) {
       },
     });
 
-  const verificationLink = buildVerificationLink(verificationToken);
+  // Build verification link with error handling
+  let verificationLink: string;
+  try {
+    verificationLink = buildVerificationLink(verificationToken);
+  } catch (urlError) {
+    console.error('Failed to build verification link:', urlError);
+    return {
+      error: true,
+      message: 'Failed to generate verification link. Please contact support.',
+    };
+  }
 
   // Development mode: Log verification link to console
   if (process.env.NODE_ENV === 'development') {
