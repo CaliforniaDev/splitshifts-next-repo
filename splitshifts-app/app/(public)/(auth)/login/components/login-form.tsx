@@ -12,6 +12,7 @@ import { useLoginForm, useOtpForm } from '../hooks/use-login-form';
 // ---Types-------------------------------------------------------------
 import type { LoginFormData } from '../types/login-form-data';
 import type { OtpFormData } from '../types/login-form-data';
+import type { LoginErrorType } from '../types/login-form-data';
 
 // ---Actions-----------------------------------------------------------
 import {
@@ -44,6 +45,8 @@ import {
   InputOTPSlot,
 } from '@/app/components/ui/inputs/otp-input';
 import { toast } from '@/app/components/ui/toast';
+import WarningIcon from '@/app/components/ui/icons/warning-icon';
+import ChevronRightIcon from '@/app/components/ui/icons/chevron-right-icon';
 
 // ---Constants--------------------------------------------------------
 enum Step {
@@ -60,11 +63,12 @@ export default function LoginForm() {
   // ---State Management-------------------------------------------------
   const [step, setStep] = useState(Step.INITIAL);
   const otpInputRef = useRef<HTMLInputElement>(null);
-  
+  const emailInputRef = useRef<HTMLInputElement>(null);
+
   // ---Form Hooks-------------------------------------------------------
   const form = useLoginForm();
   const otpForm = useOtpForm();
-  
+
   // ---Router & Navigation----------------------------------------------
   const router = useRouter();
   const isSubmitting = form.formState.isSubmitting;
@@ -77,6 +81,18 @@ export default function LoginForm() {
     : '/password-reset';
 
   // ---Effects----------------------------------------------------------
+  /**
+   * Auto-focus the email input when component mounts for better UX
+   */
+  useEffect(() => {
+    if (step === Step.INITIAL && emailInputRef.current) {
+      const raf = requestAnimationFrame(() => {
+        emailInputRef.current?.focus();
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [step]);
+
   /**
    * Auto-focus the OTP input when transitioning to the OTP step.
    * Uses requestAnimationFrame to ensure the input is rendered first.
@@ -100,14 +116,15 @@ export default function LoginForm() {
       email: data.email,
       password: data.password,
     });
-    
+
     if (preLoginCheckResponse.error) {
       form.setError('root', {
         message: preLoginCheckResponse.message,
+        type: preLoginCheckResponse.errorType,
       });
       return;
     }
-    
+
     if (preLoginCheckResponse.twoFactorEnabled) {
       setStep(Step.REQUIRE_OTP);
     } else {
@@ -115,10 +132,11 @@ export default function LoginForm() {
         email: data.email,
         password: data.password,
       });
-      
+
       if (response?.error) {
         form.setError('root', {
           message: response.message,
+          type: response.errorType,
         });
       } else {
         router.push('/dashboard');
@@ -156,12 +174,17 @@ export default function LoginForm() {
           isSubmitting={isSubmitting}
           handleSubmit={handleSubmit}
           resetPasswordHref={resetPasswordHref}
+          emailInputRef={emailInputRef}
         />
       )}
       {step === Step.REQUIRE_OTP && (
         <OtpCard
           otpForm={otpForm}
           handleOTPSubmit={handleOTPSubmit}
+          onBackToLogin={() => {
+            otpForm.reset();
+            setStep(Step.INITIAL);
+          }}
           ref={otpInputRef}
         />
       )}
@@ -169,11 +192,24 @@ export default function LoginForm() {
   );
 }
 
+// ---Helper Functions-------------------------------------------------
+
+/**
+ * Helper to safely extract LoginErrorType from unknown error type.
+ * Simplifies type casting and improves readability of error handling.
+ * 
+ * @param type - The unknown error type from form state
+ * @returns LoginErrorType if valid string type, undefined otherwise
+ */
+function getLoginErrorType(type: unknown): LoginErrorType | undefined {
+  return typeof type === 'string' ? (type as LoginErrorType) : undefined;
+}
+
 // ---Sub-Components---------------------------------------------------
 
 /**
  * LoginCard Component
- * 
+ *
  * Renders the initial login form with email and password fields.
  * Includes form validation, error handling, and navigation links.
  */
@@ -182,6 +218,7 @@ interface LoginCardProps {
   isSubmitting: boolean;
   handleSubmit: (data: LoginFormData) => Promise<void>;
   resetPasswordHref: string;
+  emailInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 function LoginCard({
@@ -189,9 +226,10 @@ function LoginCard({
   isSubmitting,
   handleSubmit,
   resetPasswordHref,
+  emailInputRef,
 }: LoginCardProps) {
   return (
-    <Card className='w-[720px] shadow-elevation-0'>
+    <Card className='w-full border-none shadow-elevation-0'>
       <CardHeader>
         <CardTitle>Login to your account</CardTitle>
         <CardDescription className='typescale-body-large'>
@@ -213,6 +251,7 @@ function LoginCard({
                     <FormControl>
                       <Input
                         {...field}
+                        ref={emailInputRef}
                         label='Email *'
                         type='email'
                         onBlur={field.onBlur}
@@ -242,7 +281,11 @@ function LoginCard({
                 )}
               />
               {!!form.formState.errors.root?.message && (
-                <FormMessage>{form.formState.errors.root.message}</FormMessage>
+                <LoginErrorDisplay
+                  message={form.formState.errors.root.message}
+                  errorType={getLoginErrorType(form.formState.errors.root?.type)}
+                  userEmail={form.getValues('email')}
+                />
               )}
               <div className='flex flex-col gap-4'>
                 <Button
@@ -279,22 +322,28 @@ function LoginCard({
 
 /**
  * OtpCard Component
- * 
+ *
  * Renders the OTP verification form for two-factor authentication.
  * Uses InputOTP component for 6-digit code entry with validation.
  */
 interface OtpCardProps {
   otpForm: ReturnType<typeof useOtpForm>;
   handleOTPSubmit: (data: OtpFormData) => Promise<void>;
+  onBackToLogin: () => void;
   ref: React.RefObject<HTMLInputElement | null>;
 }
 
-function OtpCard({ otpForm, handleOTPSubmit, ref }: OtpCardProps) {
+function OtpCard({
+  otpForm,
+  handleOTPSubmit,
+  onBackToLogin,
+  ref,
+}: OtpCardProps) {
   const isOtpSubmitting = otpForm.formState.isSubmitting;
   const otpValue = useWatch({ control: otpForm.control, name: 'otp' });
 
   return (
-    <Card className='w-[720px] shadow-elevation-0'>
+    <Card className='w-full border-none shadow-elevation-0'>
       <CardHeader>
         <CardTitle>One-Time Passcode</CardTitle>
         <CardDescription className='typescale-body-large'>
@@ -303,7 +352,10 @@ function OtpCard({ otpForm, handleOTPSubmit, ref }: OtpCardProps) {
       </CardHeader>
       <CardContent>
         <Form {...otpForm}>
-          <form className='flex flex-col gap-2' onSubmit={otpForm.handleSubmit(handleOTPSubmit)}>
+          <form
+            className='flex flex-col gap-2'
+            onSubmit={otpForm.handleSubmit(handleOTPSubmit)}
+          >
             <p className='text-muted-foreground text-xs'>
               Please enter the one-time passcode from the Google Authenticator
               app.
@@ -314,10 +366,10 @@ function OtpCard({ otpForm, handleOTPSubmit, ref }: OtpCardProps) {
               render={({ field, fieldState }) => (
                 <FormItem>
                   <FormControl>
-                    <InputOTP 
-                      ref={ref} 
-                      maxLength={6} 
-                      value={field.value} 
+                    <InputOTP
+                      ref={ref}
+                      maxLength={6}
+                      value={field.value}
                       onChange={field.onChange}
                     >
                       <InputOTPGroup>
@@ -339,17 +391,71 @@ function OtpCard({ otpForm, handleOTPSubmit, ref }: OtpCardProps) {
                 </FormItem>
               )}
             />
-            <Button 
+            <Button
               loading={isOtpSubmitting}
               loadingText='Verifying OTP...'
-              type='submit' 
+              type='submit'
               disabled={otpValue?.length !== 6}
             >
               Verify OTP
+            </Button>
+            <Button variant='outlined' onClick={onBackToLogin} type='button'>
+              Back to Login
             </Button>
           </form>
         </Form>
       </CardContent>
     </Card>
   );
+}
+
+/**
+ * LoginErrorDisplay Component
+ *
+ * Renders error messages with contextual actions based on error type.
+ * Provides structured error handling instead of string pattern matching.
+ */
+interface LoginErrorDisplayProps {
+  message: string;
+  errorType?: LoginErrorType;
+  userEmail?: string;
+}
+
+function LoginErrorDisplay({
+  message,
+  errorType,
+  userEmail,
+}: LoginErrorDisplayProps) {
+  if (errorType === 'EMAIL_NOT_VERIFIED') {
+    const resendHref = userEmail
+      ? `/resend-verification?email=${encodeURIComponent(userEmail)}`
+      : '/resend-verification';
+
+    return (
+      <div className='rounded-lg border border-error bg-error-container p-6'>
+        <div className='flex items-start space-x-3'>
+          <div className='flex-shrink-0'>
+            <WarningIcon className='h-5 w-5 text-error' />
+          </div>
+          <div className='flex-1'>
+            <FormMessage className='text-on-error-container'>
+              {message}
+            </FormMessage>
+            <div className='mt-2'>
+              <Link
+                href={resendHref}
+                className='inline-flex items-center text-sm font-medium text-error underline hover:text-on-error'
+              >
+                Resend verification email
+                <ChevronRightIcon className='ml-1 h-4 w-4' />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Default error display for other error types
+  return <FormMessage>{message}</FormMessage>;
 }

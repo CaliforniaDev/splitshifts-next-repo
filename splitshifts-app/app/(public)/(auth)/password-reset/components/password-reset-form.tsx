@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 
 import { usePasswordResetForm } from '../hooks/useResetForm';
 import { resetPassword } from '../actions/send-password-reset-link';
@@ -24,12 +25,24 @@ import {
 } from '@/app/components/ui/form';
 import Input from '@/app/components/ui/inputs/input';
 import Button from '@/app/components/ui/buttons/button';
+import AnimatedCheckIcon from '@/app/components/ui/icons/animated-check-icon';
 import { maskEmail } from '@/app/lib/utils';
 
 export default function PasswordResetPageForm() {
   const form = usePasswordResetForm();
   const { formState } = form;
   const { isSubmitting, isSubmitSuccessful } = formState;
+  const emailInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus the email input when component mounts for better UX
+  useEffect(() => {
+    if (!isSubmitSuccessful && emailInputRef.current) {
+      const raf = requestAnimationFrame(() => {
+        emailInputRef.current?.focus();
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [isSubmitSuccessful]);
 
   const handleSubmit = async (data: PasswordResetFormData) => {
     await resetPassword(data.email);
@@ -41,6 +54,7 @@ export default function PasswordResetPageForm() {
       form={form}
       isSubmitting={isSubmitting}
       handleSubmit={handleSubmit}
+      emailInputRef={emailInputRef}
     />
   );
 }
@@ -49,20 +63,22 @@ interface Props {
   form: ReturnType<typeof usePasswordResetForm>;
   handleSubmit: (data: PasswordResetFormData) => Promise<void>;
   isSubmitting: boolean;
+  emailInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 function ResetPasswordSuccessCard({ form }: Pick<Props, 'form'>) {
   const email = form.getValues('email');
   const maskedEmail = maskEmail(email);
   return (
-    <Card className='w-[720px] shadow-elevation-0'>
+    <Card className='w-full border-none shadow-elevation-0'>
       <CardHeader>
-        <CardTitle>Password Reset Link Sent</CardTitle>
-        <CardDescription>
+        <AnimatedCheckIcon size="medium" className="mb-4" />
+        <CardTitle className="text-center">Password Reset Link Sent</CardTitle>
+        <CardDescription className="text-center">
           Check your email for the password reset link.
         </CardDescription>
       </CardHeader>
-      <CardContent role='status' aria-live='polite'>
+      <CardContent role='status' aria-live='polite' className="text-center">
         If you have an account with us, you will receive a password reset link
         via email at{' '}
         <span className='font-semibold text-on-surface-variant'>
@@ -74,9 +90,9 @@ function ResetPasswordSuccessCard({ form }: Pick<Props, 'form'>) {
   );
 }
 
-function ResetPasswordFormCard({ form, handleSubmit, isSubmitting }: Props) {
+function ResetPasswordFormCard({ form, handleSubmit, isSubmitting, emailInputRef }: Props) {
   return (
-    <Card className='w-[720px] shadow-elevation-0'>
+    <Card className='w-full border-none shadow-elevation-0'>
       <CardHeader>
         <CardTitle>Password Reset</CardTitle>
         <CardDescription>
@@ -98,6 +114,7 @@ function ResetPasswordFormCard({ form, handleSubmit, isSubmitting }: Props) {
                     <FormControl>
                       <Input
                         {...field}
+                        ref={emailInputRef}
                         label='Email *'
                         type='email'
                         onBlur={field.onBlur}

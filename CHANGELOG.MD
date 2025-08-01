@@ -3,6 +3,65 @@
 ## [Unreleased]
 
 ### Added
+- **Security & Reliability Improvements**:
+  - **Centralized Token Management**: Unified token generation and validation system
+    - **`TOKEN_CONFIG`**: Centralized constants for token byte length, hex length, and validation patterns
+    - **`generateSecureToken()`**: Standardized cryptographically secure token generation using `randomBytes(32).toString('hex')`
+    - **`isValidTokenFormat()`**: Centralized token format validation with TypeScript type guards
+    - **Consistency Enforcement**: Ensures token generation and validation stay synchronized across the codebase
+  - **Environment Variable Validation**: Built-in validation for critical configuration
+    - **`getValidatedSiteBaseUrl()`**: Validates `SITE_BASE_URL` format and prevents broken email links
+    - **Environment-Specific Security**: Production enforces HTTPS-only, development allows HTTP/HTTPS
+    - **URL Normalization**: Removes trailing slashes for consistent URL construction
+    - **`buildVerificationLink()` & `buildPasswordResetLink()`**: Secure URL builders with validation
+    - **Clear Error Messages**: Helpful error messages for developers when environment variables are misconfigured
+  - **Enhanced Error Logging**: Production-safe error logging system
+    - **`logError()`**: Centralized error logging utility with environment-specific behavior
+    - **Development Mode**: Detailed error logging with full error objects for debugging
+    - **Production Mode**: Generic error messages that don't expose sensitive information
+    - **Eliminated Code Duplication**: Replaced multiple instances of environment-specific logging patterns
+  - **Code Organization Improvements**: Better maintainability and consistency
+    - **Centralized Auth Routes**: `AUTH_ROUTES` constants and `isAuthRoute()` helper function
+    - **Shared Constants**: Moved hardcoded route arrays to shared configuration files
+    - **Import Organization**: Improved import structure and dependency management
+- **Email Verification System**: Complete email verification flow for user account validation
+  - **Email Verification Form**: Token-based email verification with loading states and user feedback
+  - **Resend Verification**: Dedicated component for resending verification emails with rate limiting awareness
+  - **Verification Success States**: Animated success confirmation with celebration UI and clear next steps
+  - **Verification Error Handling**: Comprehensive error states with recovery options and user guidance
+  - **Email Verification Actions**: Server-side actions for sending verification emails and validating tokens
+  - **Database Integration**: Email verification status tracking with proper schema updates
+  - **Security Features**: Secure token generation, expiration handling, and rate limiting protection
+- **Enhanced User Experience (UX) Improvements**:
+  - **Auto-Focus Functionality**: Implemented consistent auto-focus across all authentication forms for better accessibility and user flow
+    - **Login Form**: Auto-focus on email input field with preserved OTP auto-focus functionality
+    - **Signup Form**: Auto-focus on first name field for immediate user engagement
+    - **Password Reset Form**: Auto-focus on email field using `useRef` for optimal performance
+    - **Resend Verification Form**: Auto-focus on email field with proper ref management
+    - **Consistent Implementation**: All forms use `requestAnimationFrame` for proper DOM timing and TypeScript-safe ref handling
+  - **Form Error Handling**: Improved error state management with proper boolean/string typing for Input components
+  - **Visual Design Consistency**: Centered success states and animations across all verification flows
+- **Component Modernization & Code Quality**:
+  - **Input Component Migration**: Replaced legacy TextField component with modern Input component across all forms
+    - **Unified Form Interface**: Consistent input styling and behavior across all authentication forms
+    - **Enhanced TypeScript Support**: Improved type safety with better ref forwarding and prop interfaces
+    - **Better Error Handling**: Standardized error message display with boolean error states and string error messages
+  - **JSDoc Documentation**: Added comprehensive documentation to verify-email components with clear usage examples
+  - **Import Organization**: Structured import sections with clear categorization (Core Framework, Actions, UI Components, Types)
+  - **Component Architecture**: Well-organized component structure with separated concerns and reusable sub-components
+  - **TypeScript Improvements**: Enhanced type safety with proper interface definitions and ref typing
+- **AuthLayout System**: Comprehensive responsive layout system for authentication pages
+  - **Three Layout Variants**: Default (50/50), Wide (60/40), and Compact (66/33) split layouts for different use cases
+  - **Mobile-First Design**: Responsive grid system that hides images on mobile and shows forms full-width
+  - **Performance Optimization**: Next.js Image component with smart sizing (`sizes` attribute) for conditional loading
+  - **Flexible Customization**: Configurable image sources, alt text, overlay options, and layout direction (reverse)
+  - **Clickable Logo Integration**: Logo component with navigation functionality back to home page
+  - **Consistent Spacing**: Proper alignment between logo and form content with design system padding
+  - **JSDoc Documentation**: Comprehensive documentation with usage examples and parameter descriptions
+- **Enhanced Button Component**: Added comprehensive JSDoc documentation with usage examples and parameter descriptions
+- **Improved Auth Form Navigation**: Fixed back button functionality in OTP forms to use state management instead of page navigation
+- **Form State Management**: Enhanced login flow with proper state preservation between login and OTP steps
+- **Security Improvements**: OTP field clearing on navigation back to maintain security best practices
 - Set up the initial project structure for the SplitShifts application.
 - Configured Next.js with TypeScript for type-safe development.
 - Integrated Tailwind CSS for utility-first styling.
@@ -14,7 +73,7 @@
 - **LinkButton Component**: Added a `LinkButton` component that renders a styled link resembling a button. It supports the same variants (`elevated`, `filled`, `tonal`, `outlined`, `text`) and sizes (`default`, `large`) as the `Button` component for consistent styling in navigation.
 - **TopNav Component**: Styled the `TopNav` component and replaced the buttons with `LinkButton` components for navigation ("Log In" and "Start for free"). The component is functional but not yet fully reusable.
 - **Hero Section**: Added a Hero section with a headline, subheadline, and a call-to-action button.
-- **TextField Component**: Implemented a reusable `TextField` component with support for labels, error messages, supporting text, and accessibility features. The component manages focus and populated states and allows custom styling through the `className` prop.
+- **Input Component**: Implemented a modern, reusable `Input` component with support for labels, error messages, ref forwarding, and accessibility features. The component manages focus and populated states and allows custom styling through the `className` prop. This replaces the legacy TextField component for better consistency and TypeScript support.
 - **README Updates**: Documented key dependencies, development tools, scripts, environment variables, database integration, and styling.
 - **Table of Contents**: Updated the README to include new sections for better navigation.
 - **Environment Variables**: Added documentation for managing environment variables using `dotenv`.
@@ -35,13 +94,58 @@
 - **Database Schema**: Defined schemas for users and password reset tokens in `usersSchema.ts` and `passwordResetTokenSchema.ts`.
 - **Hero Section**: Created a reusable `hero-section.tsx` component for the landing page.
 - **Custom Fonts**: Integrated custom fonts and typography settings using `fonts.ts` and `typography.css`.
+- **Two-Factor Authentication System**: Implemented comprehensive 2FA functionality with OTP (One-Time Password) support:
+  - **OTP Input Component**: Created a specialized OTP input component (`otp-input.tsx`) with 6-digit verification support
+  - **QR Code Generation**: Integrated QR code generation for authenticator app setup using `qrcode.react`
+  - **OTP Support**: Added Time-based One-Time Password support using `otplib` for secure 2FA verification
+  - **Two-Step Login Flow**: Enhanced login process with conditional 2FA step for users with authentication enabled
+  - **OTP Validation**: Implemented secure OTP validation schemas and form handling
+  - **Authenticator Integration**: Support for popular authenticator apps (Google Authenticator, Authy, etc.)
+  - **2FA Management Dashboard**: Built complete 2FA setup and management interface in user dashboard with enable/disable functionality
+- **Complete Authentication System**: Implemented full user authentication flow with multiple components:
+  - **Sign-Up Form**: Comprehensive user registration with first name, last name, email, password, and password confirmation validation
+  - **Login Form**: Multi-step login component supporting both password and OTP authentication
+  - **Password Reset Flow**: Complete password reset system with email verification and secure token-based reset links
+  - **Update Password Form**: Secure password update functionality with token validation and server-side verification
+  - **Logout Functionality**: Clean logout implementation with session termination
+- **Authentication Validation Schemas**: Robust form validation using Zod:
+  - **Name Schema**: Validates first and last names with character limits and allowed characters
+  - **Password Schema**: Complex password validation with minimum length and special character requirements
+  - **Password Match Schema**: Ensures password confirmation matches original password
+  - **Sign-Up Schema**: Combined validation for complete registration form
+  - **Login Schema**: Email and password validation for login attempts
+  - **Password Reset Schema**: Email validation for password reset requests
+  - **OTP Schema**: 6-digit numeric code validation for two-factor authentication
+- **Authentication Actions & Server Functions**: Server-side authentication handlers:
+  - **User Registration**: Secure user creation with password hashing and database storage
+  - **Password Reset Actions**: Token generation, email sending, and password update functionality
+  - **2FA Actions**: Enable/disable 2FA, secret generation, and QR code creation
+  - **Session Management**: Login/logout actions with NextAuth.js integration
+- **Authentication UI Components**: 
+  - **OTP Input**: Specialized 6-digit OTP input component with accessible design
+  - **Logout Button**: Reusable logout button component with proper error handling
+  - **Authentication Cards**: Consistent card-based design for all auth forms
+  - **Success/Error States**: User feedback components for authentication flows
+- **Enhanced Authentication Components**: 
+  - **TOTP Forms**: Dedicated OTP input and validation components with real-time verification
+  - **Authentication Hooks**: Custom hooks for managing form state and validation logic across all auth forms
+- **AppNavigation Component**: Implemented a smart navigation component (`app-navigation.tsx`) that conditionally renders the navbar based on the current route, automatically hiding navigation on authentication pages while preserving it on other public pages.
 
 ### Changed
 - Extracted shared Tailwind CSS styles for `Button` and `LinkButton` components into a separate file (`buttonStyles.ts`) to ensure consistency and reusability across both components.
 - **Folder Structure**: Organized the app into `(public)` and `(logged-in)` sections for better separation of concerns.
-- **Component Refactoring**: Improved the structure and readability of reusable components like `Button` and `TextField`.
+- **Component Refactoring**: Improved the structure and readability of reusable components like `Button` and `Input` (migrated from TextField for better consistency).
 - **Error Handling**: Enhanced error handling across API routes and form submissions.
+- **Navigation Logic**: Refactored navigation rendering logic to use `pathname.startsWith()` instead of `pathname.includes()` for more precise route matching and better security.
 
 ### Fixed
 - **Accessibility**: Improved accessibility features in form components and navigation elements.
 - **Peer Dependency Warnings**: Resolved peer dependency issues for `nodemailer` and other packages.
+- **Navigation on Auth Pages**: Removed navbar from authentication pages (login, signup, password-reset, update-password) while preserving it on other public pages for a cleaner authentication user experience.
+- **Route Matching Security**: Fixed potential false positives in route matching by using `startsWith()` method for more precise path detection.
+- **Two-Factor Authentication Flow**: Resolved multi-step authentication flow with proper state management and validation.
+
+### Security
+- **Secure Route Matching**: Implemented defensive programming practices in navigation component to prevent accidental navbar hiding on non-authentication pages with similar path segments.
+- **Two-Factor Authentication**: Enhanced security with TOTP-based 2FA system providing additional protection layer for user accounts.
+- **OTP Validation**: Secure 6-digit OTP validation with time-based expiration and rate limiting considerations.

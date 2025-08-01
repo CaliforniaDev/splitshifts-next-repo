@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { useSignUpForm } from '../hooks/use-signup-form';
 import { registerUser } from '../actions/register-user';
@@ -28,6 +29,17 @@ export default function SignUpForm() {
   const form = useSignUpForm();
   const isSubmitting = form.formState.isSubmitting;
   const isSubmitSuccessful = form.formState.isSubmitSuccessful;
+  const firstNameInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus the first name input when component mounts for better UX
+  useEffect(() => {
+    if (!isSubmitSuccessful && firstNameInputRef.current) {
+      const raf = requestAnimationFrame(() => {
+        firstNameInputRef.current?.focus();
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [isSubmitSuccessful]);
 
   const submitHandler = async (data: SignUpFormData) => {
     try {
@@ -69,22 +81,32 @@ export default function SignUpForm() {
       form={form}
       isSubmitting={isSubmitting}
       onSubmit={submitHandler}
+      firstNameInputRef={firstNameInputRef}
     />
   );
 }
 
 function SignUpSuccessCard() {
   return (
-    <Card className='w-[720px] border-red-50 shadow-elevation-0'>
+    <Card className='w-full border-none shadow-elevation-0'>
       <CardHeader aria-live='polite' role='status'>
         <CardTitle>Registration Successful!</CardTitle>
         <CardDescription className='typescale-body-large'>
-          You can now log in to your account!
+          Please check your email and click the verification link to activate
+          your account.
         </CardDescription>
       </CardHeader>
-      <CardContent className='flex'>
+      <CardContent className='flex flex-col gap-4'>
         <Button as='next-link' href='/login' className='w-full'>
-          Login to your account
+          Continue to Login
+        </Button>
+        <Button
+          as='next-link'
+          href='/resend-verification'
+          variant='outlined'
+          className='w-full'
+        >
+          Resend Verification Email
         </Button>
       </CardContent>
     </Card>
@@ -95,11 +117,12 @@ interface Props {
   form: UseFormReturn<SignUpFormData>;
   isSubmitting: boolean;
   onSubmit: (data: SignUpFormData) => Promise<void>;
+  firstNameInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
-function SignUpFormCard({ form, isSubmitting, onSubmit }: Props) {
+function SignUpFormCard({ form, isSubmitting, onSubmit, firstNameInputRef }: Props) {
   return (
-    <Card className='w-[720px] shadow-elevation-0'>
+    <Card className='w-full border-none shadow-elevation-0'>
       <CardHeader>
         <CardTitle>Welcome | Sign Up Today</CardTitle>
         <CardDescription className='typescale-body-large'>
@@ -119,6 +142,7 @@ function SignUpFormCard({ form, isSubmitting, onSubmit }: Props) {
                       <FormControl>
                         <Input
                           {...field}
+                          ref={firstNameInputRef}
                           label='First Name *'
                           type='text'
                           onBlur={field.onBlur}

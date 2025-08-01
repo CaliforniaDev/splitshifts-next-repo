@@ -9,9 +9,9 @@ This document provides detailed descriptions, usage examples, and styling inform
 - [LinkButton Component](#linkbutton-component)
   - [Props](#props)
   - [Example Usage](#example-usage)
-- [TextField Component](#textfield-component)
-  - [Props](#textfield-component-props)
-  - [Example Usage](#textfield-component-example-usage)
+- [Input Component](#input-component)
+  - [Props](#input-component-props)
+  - [Example Usage](#input-component-example-usage)
 - [Typography and Styling Guide](#typography-and-styling-guide)
 - [Additional Components](#additional-components)
 
@@ -156,48 +156,54 @@ import LinkButton from '@/app/components/ui/buttons/LinkButton';
 </LinkButton>
 ```
 
-## TextField Component
+## Input Component
 
-The `TextField` component is a reusable input field that supports labels, error messages, supporting text, and accessibility features. It manages focus and populated states to provide visual feedback and ensure accessibility compliance.
+The `Input` component is a modern, reusable input field that supports labels, error messages, supporting text, and accessibility features. It manages focus and populated states to provide visual feedback and ensure accessibility compliance. This component replaces the legacy TextField component for better consistency and TypeScript support.
 
-### Props {#textfield-component-props}
+### Props {#input-component-props}
 
-- **`label`** (`string`): The label for the text field.
+- **`label`** (`string`): The label for the input field.
 
-- **`value`** (`string`, optional): The current value of the text field.
-  
+- **`value`** (`string`, optional): The current value of the input field (for controlled components).
+
+- **`defaultValue`** (`string`, optional): The default value of the input field (for uncontrolled components).
+
+- **`error`** (`boolean | null`, optional): Indicates an error state.
+
+  **Default:** `false`
+
+- **`errorMessage`** (`string`, optional): Error message to display when there's an error.
+
   **Default:** `''`
 
-- **`name`** (`string`): The name attribute for the input element.
+- **`supportingText`** (`string`, optional): Optional supporting text displayed below the input field.
 
-- **`onChange`** (`function`, optional): Callback fired when the value of the text field changes.
+  **Default:** `''`
+
+- **`disabled`** (`boolean`, optional): If `true`, the input field will be disabled and non-interactive.
+
+  **Default:** `false`
+
+- **`required`** (`boolean`, optional): If `true`, the input field is marked as required.
+
+  **Default:** `false`
 
 - **`className`** (`string`, optional): Additional CSS classes to apply to the input element.
 
   **Default:** `''`
 
-- **`error`** (`boolean | string`, optional): Indicates an error state or provides an error message.
+- **`onChange`** (`function`, optional): Callback fired when the value of the input field changes.
 
-  **Default:** `false`
+- **`onBlur`** (`function`, optional): Callback fired when the input field loses focus.
 
-- **`supportingText`** (`string`, optional): Optional supporting text displayed below the text field.
+- **`ref`** (`React.Ref<HTMLInputElement>`, optional): Ref to access the input element directly.
 
-- **`required`** (`boolean`, optional): If `true`, the text field is marked as required.
+### Example Usage {#input-component-example-usage}
 
-  **Default:** `false`
-
-- **`disabled`** (`boolean`, optional): If `true`, the text field will be disabled and non-interactive.
-
-  **Default:** `false`
-
-- **`style`** (`React.CSSProperties`, optional): Inline styles to apply to the input element.
-
-### Example Usage {#textfield-component-example-usage}
-
-Here are some examples of how to use the `TextField` component in your application:
+Here are some examples of how to use the `Input` component in your application:
 
 ```jsx
-import TextField from '@/app/components/ui/text-field';
+import Input from '@/app/components/ui/inputs/input';
 
 function ExampleForm() {
   const [username, setUsername] = useState('');
@@ -215,38 +221,35 @@ function ExampleForm() {
 
   return (
     <form>
-      {/* Basic TextField */}
-      <TextField
+      {/* Basic Input */}
+      <Input
         label="Username"
-        name="username"
         value={username}
         onChange={handleUsernameChange}
         supportingText="Enter your unique username."
         required
       />
 
-      {/* TextField with Error */}
-      <TextField
+      {/* Input with Error */}
+      <Input
         label="Password"
-        name="password"
         type="password"
         onChange={(e) => console.log(e.target.value)}
-        error="Password must be at least 8 characters."
+        error={true}
+        errorMessage="Password must be at least 8 characters."
         required
       />
 
-      {/* Disabled TextField */}
-      <TextField
+      {/* Disabled Input */}
+      <Input
         label="Disabled Field"
-        name="disabled"
-        value="Cannot edit this"
+        defaultValue="Cannot edit this"
         disabled
       />
 
-      {/* Email TextField */}
-      <TextField
+      {/* Email Input */}
+      <Input
         label="Email"
-        name="email"
         type="email"
         onChange={(e) => console.log(e.target.value)}
         supportingText="We'll never share your email."
