@@ -8,6 +8,9 @@ import Link from 'next/link';
 // ---Actions-----------------------------------------------------------
 import { verifyEmail } from '../actions/verify-email';
 
+// ---Utils------------------------------------------------------------
+import { logError } from '@/app/lib/utils';
+
 // ---UI Components-----------------------------------------------------
 import Button from '@/app/components/ui/buttons/button';
 import {
@@ -60,11 +63,7 @@ export default function VerifyEmailForm() {
       } catch (error) {
         setStatus('error');
         setMessage('An unexpected error occurred. Please try again.');
-        if (process.env.NODE_ENV === 'development') {
-          console.error('Email verification error:', error);
-        } else {
-          console.error('Email verification error occurred.');
-        }
+        logError('Email verification error', error);
       }
     };
 

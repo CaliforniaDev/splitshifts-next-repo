@@ -8,6 +8,7 @@ import { users } from '@/db/usersSchema';
 import { randomBytes } from 'crypto';
 import { passwordResetTokenSchema } from '@/db/passwordResetTokenSchema';
 import { mailer } from '@/app/lib/email';
+import { buildPasswordResetLink } from '@/app/lib/utils';
 
 /**
  * Retrieves the user from the database based on their email address.
@@ -58,7 +59,7 @@ export async function resetPassword(emailAddress: string) {
         tokenExpiration,
       },
     });
-  const resetLink = `${process.env.SITE_BASE_URL}/update-password?token=${passwordResetToken}`;
+  const resetLink = buildPasswordResetLink(passwordResetToken);
 
   await mailer.sendMail({
     from: 'test@resend.dev',
@@ -134,7 +135,7 @@ Here's your password reset link. This link will expire in 1 hour:
 //       },
 //     });
 
-//   const resetLink = `${process.env.SITE_BASE_URL}/update-password?token=${passwordResetToken}`;
+//   const resetLink = buildPasswordResetLink(passwordResetToken);
 
 //   await mailer.sendMail({
 //     from: 'test@resend.dev',

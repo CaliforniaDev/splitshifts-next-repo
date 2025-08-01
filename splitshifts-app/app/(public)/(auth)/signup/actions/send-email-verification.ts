@@ -7,6 +7,7 @@ import { users } from '@/db/usersSchema';
 import { randomBytes } from 'crypto';
 import { emailVerificationTokenSchema } from '@/db/emailVerificationTokenSchema';
 import { mailer } from '@/app/lib/email';
+import { logError, buildVerificationLink } from '@/app/lib/utils';
 
 /**
  * Retrieves the user from the database based on their email address.
@@ -85,7 +86,7 @@ export async function sendEmailVerification(emailAddress: string) {
       },
     });
 
-  const verificationLink = `${process.env.SITE_BASE_URL}/verify-email?token=${encodeURIComponent(verificationToken)}`;
+  const verificationLink = buildVerificationLink(verificationToken);
 
   // Development mode: Log verification link to console
   if (process.env.NODE_ENV === 'development') {

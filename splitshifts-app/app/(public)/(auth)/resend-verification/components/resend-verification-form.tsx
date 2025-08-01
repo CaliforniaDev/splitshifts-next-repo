@@ -8,6 +8,9 @@ import { useSearchParams } from 'next/navigation';
 // ---Actions-----------------------------------------------------------
 import { sendEmailVerification } from '../../signup/actions/send-email-verification';
 
+// ---Utils------------------------------------------------------------
+import { logError } from '@/app/lib/utils';
+
 // ---UI Components-----------------------------------------------------
 import Button from '@/app/components/ui/buttons/button';
 import Input from '@/app/components/ui/inputs/input';
@@ -104,11 +107,7 @@ export default function ResendVerificationForm() {
     } catch (error) {
       setStatus('error');
       setMessage('An unexpected error occurred. Please try again.');
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Resend verification error:', error);
-      } else {
-        console.error('Resend verification error occurred.');
-      }
+      logError('Resend verification error', error);
     }
   };
 

@@ -22,7 +22,9 @@ export async function verifyEmail(token: string) {
     };
   }
 
-  // Validate token format: must be a 64-character hexadecimal string
+  // Validate token format: currently expects a 64-character hexadecimal string,
+  // matching the output of randomBytes(32).toString('hex') in send-email-verification.ts.
+  // If the token generation changes, update this validation accordingly.
   const isValidToken = typeof token === 'string' && /^[a-fA-F0-9]{64}$/.test(token);
   if (!isValidToken) {
     return {

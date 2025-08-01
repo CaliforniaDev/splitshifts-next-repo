@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { LandingNav } from '@/app/components/ui/nav/landing';
+import { isAuthRoute } from '@/app/constants/auth-routes';
 
 /**
  * AppNavigation - Conditionally renders navigation based on the current route
@@ -14,16 +15,8 @@ import { LandingNav } from '@/app/components/ui/nav/landing';
 export default function AppNavigation() {
   const pathname = usePathname();
   
-  // Define auth routes where navigation should be hidden
-  const authRoutes = [
-    '/login', 
-    '/signup', 
-    '/password-reset', 
-    '/update-password',
-    '/verify-email',
-    '/resend-verification'
-  ];
-  const isAuthPage = authRoutes.some(route => pathname.startsWith(route));
+  // Check if current route is an authentication page
+  const isAuthPage = isAuthRoute(pathname);
 
   if (isAuthPage) {
     // Hide navigation on auth pages
