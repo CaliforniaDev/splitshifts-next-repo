@@ -128,3 +128,4 @@ git switch-to-dev
 git stash pop
 ```
 
+test direct commit
