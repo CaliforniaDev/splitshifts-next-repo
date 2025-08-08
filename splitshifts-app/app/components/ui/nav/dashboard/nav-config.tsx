@@ -42,7 +42,7 @@ export const dashboardNavigation: NavItem[] = [
   {
     name: 'Change Password',
     href: '/change-password',
-    icon: 'settings'
+    icon: 'key'
   },
   {
     name: 'Settings',
