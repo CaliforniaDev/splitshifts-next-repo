@@ -1,6 +1,13 @@
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/app/lib/utils';
+import { listItemLinkVariants } from './list-variants';
 
+/**
+ * Navigation List Container
+ * 
+ * Semantic navigation wrapper with proper ARIA roles and spacing
+ */
 export function List({
   children,
   className,
@@ -15,6 +22,11 @@ export function List({
   );
 }
 
+/**
+ * Navigation List Item Container
+ * 
+ * Clean list item wrapper - all styling handled by child Link component
+ */
 export function ListItem({
   children,
   className,
@@ -22,11 +34,7 @@ export function ListItem({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <li className={cn('flex h-14 items-center justify-center rounded-full p-4', className)}>
-      {children}
-    </li>
-  );
+  return <li className={className}>{children}</li>;
 }
 
 interface ListLinkProps {
@@ -36,12 +44,30 @@ interface ListLinkProps {
   className?: string;
 }
 
+/**
+ * Navigation List Item Link
+ * 
+ * Accessible navigation link with:
+ * - Automatic active state detection via pathname matching
+ * - Dynamic styling via CVA variants 
+ * - Keyboard navigation support
+ * - Screen reader friendly with aria-current
+ * - Icon + label layout
+ */
 export function ListItemLink({ href, icon, label, className }: ListLinkProps) {
+  const pathname = usePathname();
+  const isActive = pathname === href;
+
   return (
     <ListItem className={className}>
       <Link
         href={href}
-        className='flex h-full w-full items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-surface-container'
+        aria-current={isActive ? 'page' : undefined}
+        aria-label={`Navigate to ${label}`}
+        className={listItemLinkVariants({
+          active: isActive,
+          overlay: isActive ? 'active' : 'default'
+        })}
       >
         {icon}
         <span>{label}</span>
