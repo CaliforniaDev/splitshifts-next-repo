@@ -2,59 +2,92 @@ import { cva } from 'class-variance-authority';
 
 /**
  * Navigation List Item Link Variants
- *
- * A comprehensive CVA configuration for dashboard navigation links with:
- * - Active/inactive states with different background colors
- * - Hover overlays (8% opacity)
- * - Focus overlays (10% opacity)
- * - Material Design 3 compliant styling
- * - Proper accessibility with focus-visible outlines
+ * 
+ * Clean, maintainable CVA configuration with:
+ * - Multi-layer animation system (::before, content, ::after)
+ * - Material Design 3 compliant interactions
+ * - Extreme visual feedback effects
  */
-export const listItemLinkVariants = cva(
-  // Base styles applied to all navigation links
-  'relative flex overflow-hidden h-14 w-full items-center gap-3 rounded-full px-3 py-2 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-outline focus-visible:outline-offset-2 ',
-  {
-    variants: {
-      // Active state - determines if navigation item is currently selected
-      active: {
-        true: 'bg-secondary-container text-on-secondary-container', // Active: filled background
-        false: 'text-on-surface-variant', // Inactive: no background, muted text
-      },
 
-      // Overlay system - controls ::before pseudo-element for hover/focus effects
-      overlay: {
-        // Default overlay for inactive items - hidden by default, shows on interaction
-        default:
-          'before:absolute before:inset-0 before:rounded-full before:transition-opacity before:duration-200 before:opacity-0 hover:before:opacity-100 focus-visible:before:opacity-100',
+// Shared class fragments for maintainability
+const baseClasses = [
+  // Layout & Structure
+  'relative flex overflow-hidden h-14 w-full items-center gap-3 rounded-full px-3 py-2',
+  
+  // Base Transitions
+  'transition-all duration-200',
+  
+  // Accessibility
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-outline focus-visible:outline-offset-2',
+  
+  // SVG Animation Setup
+  '[&_svg]:transition-all [&_svg]:duration-200 [&_svg]:ease-[cubic-bezier(0.2,0,0,1)]',
+  
+  // Z-index Layering
+  '[&>*]:relative [&>*]:z-10'
+].join(' ');
 
-        // Active overlay for selected items - always visible for consistent styling
-        active:
-          'before:absolute before:inset-0 before:rounded-full before:transition-opacity before:duration-200 before:opacity-100',
-      },
+const overlayBase = [
+  'after:absolute after:inset-0 after:rounded-full',
+  'after:transition-opacity after:duration-150 after:ease-[cubic-bezier(0.2,0,0,1)]',
+  'after:z-20'
+].join(' ');
+
+const backgroundAnimation = [
+  'before:absolute before:inset-0 before:rounded-full',
+  'before:bg-secondary-container before:scale-x-0', 
+  'before:animate-expand-from-center before:origin-center'
+].join(' ');
+
+const iconEffects = [
+  // Hover: thicker + bigger
+  '[&_svg]:hover:stroke-[6.5] [&_svg]:hover:scale-105',
+  // Focus: same as hover
+  '[&_svg]:focus-visible:stroke-[6.5]',
+  // Press: thinner + smaller  
+  '[&_svg]:active:stroke-[0.3] [&_svg]:active:scale-95'
+].join(' ');
+
+const textEffects = [
+  'hover:font-semibold focus-visible:font-semibold'
+].join(' ');
+
+export const listItemLinkVariants = cva(baseClasses, {
+  variants: {
+    active: {
+      true: `text-on-secondary-container font-semibold ${backgroundAnimation}`,
+      false: 'text-on-surface-variant'
     },
+    
+    overlay: {
+      default: `${overlayBase} after:opacity-0 hover:after:opacity-100 focus-visible:after:opacity-100 active:after:opacity-100`,
+      active: `${overlayBase} after:opacity-100`
+    }
+  },
 
-    // Compound variants - combine active state + overlay type for specific styling
-    compoundVariants: [
-      {
-        // Inactive items: show on-surface overlay on hover/focus
-        active: false,
-        overlay: 'default',
-        class:
-          'hover:before:bg-on-surface/8 focus-visible:before:bg-on-surface/10',
-      },
-      {
-        // Active items: show on-secondary-container overlay on hover/focus
-        active: true,
-        overlay: 'active',
-        class:
-          'hover:before:bg-on-secondary-container/8 focus-visible:before:bg-on-secondary-container/10',
-      },
-    ],
-
-    // Default values when no props are passed
-    defaultVariants: {
+  compoundVariants: [
+    {
       active: false,
       overlay: 'default',
+      class: `
+        hover:after:bg-on-surface/8 focus-visible:after:bg-on-surface/10 active:after:bg-on-surface/10
+        hover:text-on-surface focus-visible:text-on-surface active:font-normal
+        ${textEffects} ${iconEffects}
+      `.replace(/\s+/g, ' ').trim()
     },
-  },
-);
+    {
+      active: true,
+      overlay: 'active', 
+      class: `
+        hover:after:bg-on-secondary-container/8 focus-visible:after:bg-on-secondary-container/10 active:after:bg-on-secondary-container/10
+        active:font-semibold
+        ${textEffects} ${iconEffects}
+      `.replace(/\s+/g, ' ').trim()
+    }
+  ],
+
+  defaultVariants: {
+    active: false,
+    overlay: 'default'
+  }
+});

@@ -40,13 +40,13 @@ export default function NavDrawer() {
   
   return (
     <aside 
-      className='h-screen w-64 bg-surface-container-low text-on-surface-variant'
+      className='h-screen w-64 bg-surface-container text-on-surface-variant'
       role='complementary'
       aria-label='Dashboard navigation'
     >
-      <div className='flex h-full flex-col space-y-4 px-3 py-[38px]'>
+      <div className='flex h-full flex-col space-y-4 px-5 py-[38px]'>
         {/* Logo Header */}
-        <header className='flex h-14 px-4 text-xl font-semibold'>
+        <header className='flex h-14 px-1 text-xl font-semibold'>
           <Logo width={38} height={38} textClassName='text-xl' />
         </header>
 
