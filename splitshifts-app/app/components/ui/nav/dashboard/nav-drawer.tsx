@@ -11,9 +11,6 @@
 
 'use client';
 
-// Core Next.js imports
-import Link from 'next/link';
-
 // Third-party imports
 import { usePathname } from 'next/navigation';
 import { LogOut as LogoutIcon } from 'lucide-react';
@@ -50,9 +47,7 @@ export default function NavDrawer() {
       <div className='flex h-full flex-col space-y-4 px-5 py-[38px]'>
         {/* Logo Header */}
         <header className='flex h-14 px-1 text-xl font-semibold'>
-          <Link href="/" className="inline-block">
-            <Logo width={38} height={38} textClassName='text-xl' />
-          </Link>
+          <Logo width={38} height={38} textClassName='text-xl' />
         </header>
 
         {/* Main Navigation */}
