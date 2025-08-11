@@ -41,6 +41,7 @@ interface ListLinkProps {
   href: string;
   icon: React.ReactNode;
   label: string;
+  isActive?: boolean;
   className?: string;
 }
 
@@ -48,25 +49,26 @@ interface ListLinkProps {
  * Navigation List Item Link
  * 
  * Accessible navigation link with:
- * - Automatic active state detection via pathname matching
+ * - Active state passed from parent (for flexible matching logic)
  * - Dynamic styling via CVA variants 
  * - Keyboard navigation support
  * - Screen reader friendly with aria-current
  * - Icon + label layout
  */
-export function ListItemLink({ href, icon, label, className }: ListLinkProps) {
+export function ListItemLink({ href, icon, label, isActive, className }: ListLinkProps) {
   const pathname = usePathname();
-  const isActive = pathname === href;
+  // Use provided isActive prop, fallback to exact pathname matching
+  const active = isActive !== undefined ? isActive : pathname === href;
 
   return (
     <ListItem className={className}>
       <Link
         href={href}
-        aria-current={isActive ? 'page' : undefined}
+        aria-current={active ? 'page' : undefined}
         aria-label={`Navigate to ${label}`}
         className={listItemLinkVariants({
-          active: isActive,
-          overlay: isActive ? 'active' : 'default'
+          active: active,
+          overlay: active ? 'active' : 'default'
         })}
       >
         {icon}

@@ -21,7 +21,7 @@ import { List, ListItemLink } from './nav-list';
 import { DashboardIcon } from '@/app/components/ui/icons/dashboard/dashboard-icon-picker';
 
 // Configuration and actions
-import { dashboardNavigation } from './nav-config';
+import { dashboardNavigation, isNavItemActive } from './nav-config';
 import { logOut } from '@/app/(public)/(auth)/actions/logout';
 
 export default function NavDrawer() {
@@ -58,13 +58,14 @@ export default function NavDrawer() {
           {/* Navigation Links */}
           <List>
             {dashboardNavigation.map(item => {
-              const isActive = pathname === item.href;
+              const isActive = isNavItemActive(pathname, item);
               
               return (
                 <ListItemLink
                   key={item.name}
                   href={item.href}
                   label={item.name}
+                  isActive={isActive}
                   icon={
                     <DashboardIcon
                       name={item.icon}
