@@ -14,6 +14,9 @@ const baseClasses = [
   // Layout & Structure
   'relative flex overflow-hidden h-14 w-full items-center gap-3 rounded-full px-3 py-2',
   
+  // Typography - Using label-large typescale per Material Design 3 Navigation Rail (expanded) spec
+  'typescale-label-large',
+  
   // Base Transitions
   'transition-all duration-200',
   
@@ -49,13 +52,14 @@ const iconEffects = [
 ].join(' ');
 
 const textEffects = [
-  'hover:font-semibold focus-visible:font-semibold'
+  // Material Design 3 Navigation Rail approach - prominent on interactive states
+  'hover:typescale-label-large-prominent focus-visible:typescale-label-large-prominent active:typescale-label-large-prominent'
 ].join(' ');
 
 export const listItemLinkVariants = cva(baseClasses, {
   variants: {
     active: {
-      true: `text-on-secondary-container font-semibold ${backgroundAnimation}`,
+      true: `text-on-secondary-container typescale-label-large-prominent ${backgroundAnimation}`,
       false: 'text-on-surface-variant'
     },
     
@@ -71,7 +75,7 @@ export const listItemLinkVariants = cva(baseClasses, {
       overlay: 'default',
       class: `
         hover:after:bg-on-surface/8 focus-visible:after:bg-on-surface/10 active:after:bg-on-surface/10
-        hover:text-on-surface focus-visible:text-on-surface active:font-normal
+        hover:text-on-surface focus-visible:text-on-surface
         ${textEffects} ${iconEffects}
       `.replace(/\s+/g, ' ').trim()
     },
@@ -80,7 +84,6 @@ export const listItemLinkVariants = cva(baseClasses, {
       overlay: 'active', 
       class: `
         hover:after:bg-on-secondary-container/8 focus-visible:after:bg-on-secondary-container/10 active:after:bg-on-secondary-container/10
-        active:font-semibold
         ${textEffects} ${iconEffects}
       `.replace(/\s+/g, ' ').trim()
     }
