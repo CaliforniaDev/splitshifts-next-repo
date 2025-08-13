@@ -55,7 +55,7 @@ const iconEffects = [
 ].join(' ');
 
 const textEffects = [
-  'hover:typescale-label-large-prominent focus-visible:typescale-label-large-prominent active:typescale-label-large-prominent',
+  'hover:typescale-label-large-prominent focus-visible:typescale-label-large-prominent active:typescale-label-large',
 ].join(' ');
 
 export const listItemLinkVariants = cva(baseClasses, {
@@ -75,11 +75,11 @@ export const listItemLinkVariants = cva(baseClasses, {
     {
       active: false,
       overlay: 'default',
-      class: cn(`
+      class: `
         hover:after:bg-on-surface/8 focus-visible:after:bg-on-surface/10 active:after:bg-on-surface/10
         hover:text-on-surface focus-visible:text-on-surface
         ${textEffects} ${iconEffects}
-      `),
+      `,
     },
     {
       active: true,
