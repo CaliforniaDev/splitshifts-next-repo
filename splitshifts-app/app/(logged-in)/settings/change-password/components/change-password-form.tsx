@@ -1,4 +1,4 @@
-// File: app/(logged-in)/change-password/page.tsx
+// File: app/(logged-in)/settings/change-password/components/change-password-form.tsx
 'use client';
 
 import { changePassword } from '../actions/change-password';
