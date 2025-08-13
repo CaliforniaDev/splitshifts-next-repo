@@ -75,11 +75,11 @@ export const listItemLinkVariants = cva(baseClasses, {
     {
       active: false,
       overlay: 'default',
-      class: `
+      class: cn(`
         hover:after:bg-on-surface/8 focus-visible:after:bg-on-surface/10 active:after:bg-on-surface/10
         hover:text-on-surface focus-visible:text-on-surface
         ${textEffects} ${iconEffects}
-      `,
+      `),
     },
     {
       active: true,
