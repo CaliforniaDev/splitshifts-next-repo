@@ -5,13 +5,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, ArrowLeft } from 'lucide-react';
-
-const settingsPaths = {
-  '/settings': 'Settings',
-  '/settings/account': 'Account',
-  '/settings/change-password': 'Change Password',
-  '/settings/security': 'Security'
-} as const;
+import { getPageTitle } from '../../lib/settings-utils';
 
 export default function SettingsLayout({
   children,
@@ -41,7 +35,7 @@ export default function SettingsLayout({
               
               {/* Current Page */}
               <span className="text-on-surface font-medium">
-                {settingsPaths[pathname as keyof typeof settingsPaths]}
+                {getPageTitle(pathname)}
               </span>
             </nav>
           </div>
