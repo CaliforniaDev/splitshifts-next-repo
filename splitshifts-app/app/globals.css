@@ -17,10 +17,7 @@
   }
 }
 
-body {
-  background: linear-gradient(180deg, #f7f9ff 15%, #D7DADF 100%);
-  background-repeat: no-repeat;
-}
+
 
 @layer utilities {
   .text-balance {

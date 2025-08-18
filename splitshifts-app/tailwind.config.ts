@@ -107,6 +107,8 @@ const config: Config = {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'landing-gradient':
+          'linear-gradient(180deg, #f7f9ff 15%, #D7DADF 100%)',
       },
       transitionProperty: {
         textfield: 'border, background-color, color, padding',
