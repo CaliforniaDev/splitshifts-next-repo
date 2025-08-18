@@ -1,6 +1,6 @@
 /**
  * Dashboard Navigation Drawer
- * 
+ *
  * Main navigation component for the dashboard with:
  * - Logo header
  * - Dynamic navigation items with active states
@@ -26,7 +26,7 @@ import { logOut } from '@/app/(public)/(auth)/actions/logout';
 
 export default function NavDrawer() {
   const pathname = usePathname();
-  
+
   /**
    * Handle user logout with error handling
    */
@@ -37,10 +37,10 @@ export default function NavDrawer() {
       console.error('Failed to log out:', error);
     }
   };
-  
+
   return (
-    <aside 
-      className='h-screen w-64 bg-surface-container text-on-surface-variant'
+    <aside
+      className='fixed left-0 top-0 z-50 h-screen w-64 rounded-r-2xl bg-surface-container text-on-surface-variant'
       role='complementary'
       aria-label='Dashboard navigation'
     >
@@ -51,7 +51,7 @@ export default function NavDrawer() {
         </header>
 
         {/* Main Navigation */}
-        <nav 
+        <nav
           className='flex h-full flex-col justify-between space-y-2'
           aria-label='Main navigation'
         >
@@ -59,7 +59,7 @@ export default function NavDrawer() {
           <List>
             {dashboardNavigation.map(item => {
               const isActive = isNavItemActive(pathname, item);
-              
+
               return (
                 <ListItemLink
                   key={item.name}
@@ -76,7 +76,7 @@ export default function NavDrawer() {
               );
             })}
           </List>
-          
+
           {/* Logout Section */}
           <div>
             <button
