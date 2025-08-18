@@ -2,7 +2,7 @@ import Button from '@/app/components/ui/buttons/button';
 
 export default function NavActions() {
   return (
-    <div className='flex w-1/3 gap-4' aria-label='Primary call-to-action links'>
+    <div className='flex gap-4 flex-shrink-0' aria-label='Primary call-to-action links'>
       <Button
         as='next-link'
         href='/login'
