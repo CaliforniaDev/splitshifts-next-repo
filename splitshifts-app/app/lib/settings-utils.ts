@@ -10,6 +10,10 @@ export const settingsPaths = {
   '/settings/security': 'Security'
 } as const;
 
+// Regex patterns for text transformation - computed once at module level
+const HYPHENS_PATTERN = /-/g;           // Replace all hyphens with spaces
+const WORD_BOUNDARIES_PATTERN = /\b\w/g; // Match first letter of each word for capitalization
+
 /**
  * Generate a human-readable page title from pathname
  * First checks predefined paths, then generates from pathname as fallback
@@ -25,11 +29,7 @@ export const getPageTitle = (pathname: string): string => {
   // Generate title from pathname as fallback
   const pageName = pathname.split('/').pop() || '';
   
-  // Regex patterns for text transformation
-  const hyphensPattern = /-/g;           // Replace all hyphens with spaces
-  const wordBoundariesPattern = /\b\w/g; // Match first letter of each word for capitalization
-  
   return pageName
-    .replace(hyphensPattern, ' ')
-    .replace(wordBoundariesPattern, letter => letter.toUpperCase()) || 'Settings';
+    .replace(HYPHENS_PATTERN, ' ')
+    .replace(WORD_BOUNDARIES_PATTERN, letter => letter.toUpperCase()) || 'Settings';
 };
