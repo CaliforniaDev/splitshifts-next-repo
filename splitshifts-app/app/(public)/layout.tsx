@@ -17,7 +17,7 @@ export default async function PublicLayout({
   return (
     <div className='min-h-screen bg-landing-gradient bg-no-repeat'>
       <AppNavigation />
-      <main className='flex flex-col items-center p-24 text-on-surface'>
+      <main className='flex flex-col items-center text-on-surface'>
         {children}
       </main>
     </div>

@@ -1,4 +1,8 @@
 import Hero from '@/app/components/sections/hero-section';
 export default function Home() {
-  return <Hero />;
+  return (
+    <div className='p-24'>
+      <Hero />
+    </div>
+  );
 }
