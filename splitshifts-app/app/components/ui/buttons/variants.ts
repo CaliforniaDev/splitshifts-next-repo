@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+import { clsx } from 'clsx';
 
 /**
  * Button Component Variants
@@ -9,17 +10,15 @@ import { cva } from 'class-variance-authority';
  * - Typography scaling
  */
 
-// Shared class fragments for maintainability
-const baseClasses = [
+// Base class definitions - computed once at module level
+const baseClasses = clsx([
   // Layout & Structure
   'relative overflow-hidden whitespace-nowrap rounded-[10px]',
-  
   // Hover Overlay System
   'before:absolute before:inset-0 before:transition-all before:duration-200',
-  
   // Accessibility
-  'focus:outline-none'
-].join(' ');
+  'focus:outline-none',
+]);
 
 // Common hover overlay (8% opacity on all variants)
 const hoverOverlay = 'before:opacity-0 hover:before:opacity-8';
