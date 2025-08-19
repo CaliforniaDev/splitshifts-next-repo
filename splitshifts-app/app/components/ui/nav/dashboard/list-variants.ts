@@ -10,8 +10,8 @@ import { clsx } from 'clsx';
  * - Extreme visual feedback effects
  */
 
-// Shared class fragments for maintainability
-const baseClasses = clsx([
+// Shared class fragments for maintainability - arrays defined first
+const baseClassesArray = [
   // Layout & Structure
   'relative flex overflow-hidden h-14 w-full items-center gap-3 rounded-full px-3 py-2',
 
@@ -29,32 +29,51 @@ const baseClasses = clsx([
 
   // Z-index Layering
   '[&>*]:relative [&>*]:z-10',
-]);
+];
 
-const overlayBase = clsx([
+const overlayBaseArray = [
   'after:absolute after:inset-0 after:rounded-full',
   'after:transition-opacity after:duration-150 after:ease-[cubic-bezier(0.2,0,0,1)]',
   'after:z-20',
-]);
+];
 
-const backgroundAnimation = clsx([
+const backgroundAnimationArray = [
   'before:absolute before:inset-0 before:rounded-full',
   'before:bg-secondary-container before:scale-x-0',
   'before:animate-expand-from-center before:origin-center',
-]);
+];
 
-const iconEffects = clsx([
+const iconEffectsArray = [
   // Hover: thicker + bigger
   '[&_svg]:hover:stroke-[6.5] [&_svg]:hover:scale-105',
   // Focus: same as hover
   '[&_svg]:focus-visible:stroke-[6.5]',
   // Press: thinner + smaller
   '[&_svg]:active:stroke-[0.3] [&_svg]:active:scale-95',
-]);
+];
 
-const textEffects = clsx([
+const textEffectsArray = [
   'hover:typescale-label-large-prominent focus-visible:typescale-label-large-prominent active:typescale-label-large',
-]);
+];
+
+// Computed class strings - executed once at module level
+const baseClasses = clsx(baseClassesArray);
+const overlayBase = clsx(overlayBaseArray);
+const backgroundAnimation = clsx(backgroundAnimationArray);
+const iconEffects = clsx(iconEffectsArray);
+const textEffects = clsx(textEffectsArray);
+
+// Compound variant class strings - computed once at module level
+const inactiveCompoundClasses = clsx(`
+  hover:after:bg-on-surface/8 focus-visible:after:bg-on-surface/10 active:after:bg-on-surface/10
+  hover:text-on-surface focus-visible:text-on-surface
+  ${textEffects} ${iconEffects}
+`);
+
+const activeCompoundClasses = clsx(`
+  hover:after:bg-on-secondary-container/8 focus-visible:after:bg-on-secondary-container/10 active:after:bg-on-secondary-container/10
+  ${textEffects} ${iconEffects}
+`);
 
 export const listItemLinkVariants = cva(baseClasses, {
   variants: {
@@ -73,19 +92,12 @@ export const listItemLinkVariants = cva(baseClasses, {
     {
       active: false,
       overlay: 'default',
-      class: clsx(`
-        hover:after:bg-on-surface/8 focus-visible:after:bg-on-surface/10 active:after:bg-on-surface/10
-        hover:text-on-surface focus-visible:text-on-surface
-        ${textEffects} ${iconEffects}
-      `),
+      class: inactiveCompoundClasses,
     },
     {
       active: true,
       overlay: 'active',
-      class: clsx(`
-        hover:after:bg-on-secondary-container/8 focus-visible:after:bg-on-secondary-container/10 active:after:bg-on-secondary-container/10
-        ${textEffects} ${iconEffects}
-      `),
+      class: activeCompoundClasses,
     },
   ],
 
