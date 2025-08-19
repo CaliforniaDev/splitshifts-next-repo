@@ -6,7 +6,6 @@ import { clsx } from 'clsx';
  *
  * Clean, maintainable CVA configuration with:
  * - Multi-layer animation system (::before, content, ::after)
- * - Material Design 3 compliant interactions
  * - Extreme visual feedback effects
  */
 
@@ -38,13 +37,19 @@ const backgroundAnimation = clsx([
   'before:animate-expand-from-center before:origin-center',
 ]);
 
+// Design token constants for consistent theming
+const SVG_ICON_ACTIVE_STROKE_WIDTH = 6.5;
+const SVG_ICON_PRESSED_STROKE_WIDTH = 0.3;
+const SVG_ICON_HOVER_SCALE = 1.05;
+const SVG_ICON_PRESSED_SCALE = 0.95;
+
 const iconEffects = clsx([
   // Hover: thicker + bigger
-  '[&_svg]:hover:stroke-[6.5] [&_svg]:hover:scale-105',
+  `[&_svg]:hover:stroke-[${SVG_ICON_ACTIVE_STROKE_WIDTH}] [&_svg]:hover:scale-[${SVG_ICON_HOVER_SCALE}]`,
   // Focus: same as hover
-  '[&_svg]:focus-visible:stroke-[6.5]',
+  `[&_svg]:focus-visible:stroke-[${SVG_ICON_ACTIVE_STROKE_WIDTH}]`,
   // Press: thinner + smaller
-  '[&_svg]:active:stroke-[0.3] [&_svg]:active:scale-95',
+  `[&_svg]:active:stroke-[${SVG_ICON_PRESSED_STROKE_WIDTH}] [&_svg]:active:scale-[${SVG_ICON_PRESSED_SCALE}]`,
 ]);
 
 // Text effects for all states
