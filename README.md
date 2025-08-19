@@ -21,6 +21,7 @@ SplitShifts is a web application designed to streamline the scheduling process f
 - [Security & Token Management](#security--token-management)
 - [Styling](#styling)
 - [Email Integration](#email-integration)
+- [Documentation](#documentation)
 
 ## Features
 
@@ -516,3 +517,20 @@ For any inquiries or feedback, please contact:
 
 - Leo Daniels - [leodaniels@CaliforniaDev.com](mailto:leodaniels@californiadev.com)
 - GitHub: [@CaliforniaDev](https://github.com/CaliforniaDev)
+
+## Documentation
+
+### 📚 Project Documentation
+
+- **[Project Overview](docs/PROJECT_OVERVIEW.md)** - Complete project description, tech stack, and feature overview
+- **[Architecture Guide](docs/ARCHITECTURE.md)** - Detailed documentation of project structure and architectural decisions
+- **[Dashboard Icons Guide](DASHBOARD_ICONS_GUIDE.md)** - Comprehensive usage guide for the dashboard icon system
+- **[UI Components Documentation](UI_COMPONENTS.md)** - Detailed component API and usage examples
+- **[Email Verification Improvements](EMAIL_VERIFICATION_IMPROVEMENT.md)** - Technical analysis of error handling improvements
+- **[Git Protection Guide](GIT_PROTECTION_GUIDE.md)** - Workflow and branch protection documentation
+
+### 📖 Additional Resources
+
+- **[Security Guide](SECURITY.md)** - Security practices and token management
+- **[Changelog](CHANGELOG.MD)** - Detailed version history and feature additions
+- **Component Documentation** - Individual component guides within the codebase

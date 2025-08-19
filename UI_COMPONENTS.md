@@ -301,3 +301,14 @@ This section outlines the custom type scale defined using Tailwind CSS for consi
 
 - Apply classes such as `.typescale-display-large`, `.typescale-headline-medium`, `.typescale-title-small`, etc., directly to HTML elements to ensure they adhere to the defined type scale.
 
+## Performance & Code Quality Standards
+
+The SplitShifts component library follows modern performance optimization patterns:
+
+- **Module-Level Computations**: All component variants use `clsx()` computations at module level to eliminate runtime overhead
+- **Design Token Constants**: Magic numbers are extracted into semantic constants (e.g., `SVG_ICON_ACTIVE_STROKE_WIDTH`) for maintainability
+- **Consistent Patterns**: All variant files use the same `clsx([...])` pattern for predictable code structure
+- **CVA Integration**: Class Variance Authority (CVA) provides type-safe variant systems with optimal performance characteristics
+
+These optimizations ensure consistent performance across the application while maintaining clean, maintainable code.
+
