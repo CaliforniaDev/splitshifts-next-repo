@@ -107,9 +107,14 @@ const config: Config = {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'landing-gradient':
+          'linear-gradient(180deg, #f7f9ff 15%, #D7DADF 100%)',
       },
       transitionProperty: {
         textfield: 'border, background-color, color, padding',
+      },
+      transitionTimingFunction: {
+        emphasized: 'cubic-bezier(0.2, 0, 0, 1)',
       },
       keyframes: {
         'caret-blink': {
@@ -117,28 +122,38 @@ const config: Config = {
           '20%,50%': { opacity: '0' },
         },
         'fade-in-up': {
-          '0%': { 
+          '0%': {
             opacity: '0',
-            transform: 'translateY(10px)'
+            transform: 'translateY(10px)',
           },
-          '100%': { 
+          '100%': {
             opacity: '1',
-            transform: 'translateY(0)'
+            transform: 'translateY(0)',
           },
         },
-        'draw': {
-          '0%': { 
-            strokeDashoffset: '20'
+        draw: {
+          '0%': {
+            strokeDashoffset: '20',
           },
-          '100%': { 
-            strokeDashoffset: '0'
+          '100%': {
+            strokeDashoffset: '0',
+          },
+        },
+        'expand-from-center': {
+          '0%': {
+            transform: 'scaleX(0)',
+          },
+          '100%': {
+            transform: 'scaleX(1)',
           },
         },
       },
       animation: {
         'caret-blink': 'caret-blink 1.25s ease-out infinite',
         'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
-        'draw': 'draw 0.8s ease-in-out forwards',
+        draw: 'draw 0.8s ease-in-out forwards',
+        'expand-from-center':
+          'expand-from-center 0.2s cubic-bezier(0.2, 0, 0, 1) forwards',
       },
     },
   },

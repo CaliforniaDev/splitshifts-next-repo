@@ -3,7 +3,7 @@
  *
  * Includes the site logo, navigation links, and primary action buttons.
  */
-
+import Link from 'next/link';
 import NavActions from './nav-actions';
 
 import Logo from '@/app/components/ui/logo';
@@ -11,9 +11,14 @@ import { NavList, NavLink } from './nav-items';
 
 export default function TopNav() {
   return (
-    <nav className='flex h-20 items-center justify-between gap-4 px-[72px] py-[18px]'>
-      <Logo />
-      <div className='flex w-full justify-center'>
+    <nav className='flex h-20 items-center gap-4 px-[72px] py-[18px]'>
+      <div className="flex-1">
+        <Link href="/" className="inline-block">
+          <Logo />
+        </Link>
+      </div>
+      
+      <div className='flex justify-center'>
         <NavList>
           <NavLink ariaLabel='Home Page' href='/'>
             Home
@@ -29,7 +34,10 @@ export default function TopNav() {
           </NavLink>
         </NavList>
       </div>
-      <NavActions />
+      
+      <div className="flex-1 flex justify-end">
+        <NavActions />
+      </div>
     </nav>
   );
 }
