@@ -3,7 +3,7 @@ import { auth } from '@/auth';
 import db from '@/db/drizzle';
 import { eq } from 'drizzle-orm';
 import { compare, hash } from 'bcryptjs';
-import { users } from '@/db/usersSchema';
+import { users } from '@/db/schema/usersSchema';
 
 import {
   ChangePasswordData,

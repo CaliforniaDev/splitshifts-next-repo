@@ -1,7 +1,7 @@
 'use server';
 import { auth } from '@/auth';
 import db from '@/db/drizzle';
-import { users } from '@/db/usersSchema';
+import { users } from '@/db/schema/usersSchema';
 import { authenticator } from 'otplib';
 import { eq } from 'drizzle-orm';
 

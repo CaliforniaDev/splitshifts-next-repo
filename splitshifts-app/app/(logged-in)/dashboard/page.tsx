@@ -11,7 +11,7 @@ import { Label } from '@/app/components/ui/label';
 
 import TwoFactorAuthForm from './two-factor-auth-form/index';
 import db from '@/db/drizzle';
-import { users } from '@/db/usersSchema';
+import { users } from '@/db/schema/usersSchema';
 import { eq } from 'drizzle-orm';
 
 export default async function Dashboard() {

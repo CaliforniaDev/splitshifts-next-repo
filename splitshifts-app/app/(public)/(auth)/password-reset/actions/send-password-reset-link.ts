@@ -4,8 +4,8 @@ import { auth } from '@/auth';
 
 import db from '@/db/drizzle';
 import { eq } from 'drizzle-orm';
-import { users } from '@/db/usersSchema';
-import { passwordResetTokenSchema } from '@/db/passwordResetTokenSchema';
+import { users } from '@/db/schema/usersSchema';
+import { passwordResetTokenSchema } from '@/db/schema/passwordResetTokenSchema';
 import { mailer } from '@/app/lib/email';
 import { buildPasswordResetLink, generateSecureToken } from '@/app/lib/utils';
 

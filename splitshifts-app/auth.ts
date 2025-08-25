@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import db from './db/drizzle';
-import { users } from './db/usersSchema';
+import { users } from './db/schema/usersSchema';
 import { eq } from 'drizzle-orm';
 import { compare } from 'bcryptjs';
 import { authenticator } from 'otplib';
