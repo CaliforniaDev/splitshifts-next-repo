@@ -1,6 +1,7 @@
 // File: app/(logged-in)/dashboard/page.tsx
 
 import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -23,6 +24,11 @@ export default async function Dashboard() {
     })
     .from(users)
     .where(eq(users.id, parseInt(session?.user?.id!)));
+
+  // If user doesn't exist in database but session exists, redirect to logout
+  if (!user) {
+    redirect('/api/auth/signout');
+  }
 
   return (
     // <section className='flex flex-1 rounded-xl bg-surface-container-low p-4'>

@@ -14,8 +14,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return token;
     },
-    session({ session, token }) {
-      session.user.id = token.id as string;
+    async session({ session, token }) {
+      if (token.id) {
+        session.user.id = token.id as string;
+        
+        // Check if user still exists in database
+        try {
+          const [user] = await db
+            .select({ id: users.id })
+            .from(users)
+            .where(eq(users.id, parseInt(token.id as string)));
+          
+          if (!user) {
+            // User was deleted, throw error to end session
+            throw new Error('User not found');
+          }
+        } catch (error) {
+          console.error('Error checking user existence:', error);
+          throw error;
+        }
+      }
       return session;
     },
   },
