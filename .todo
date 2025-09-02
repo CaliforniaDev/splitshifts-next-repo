@@ -6,13 +6,6 @@
 - add fade in animations to all form card contents
 
 
-
--update buttons
-
-- add button to the success card for Password Reset Link Sent
-when the user reset the password on the /password-reset page, there is no button to
-go back to the /login page
-
 // Use the named utility for clarity and to avoid ambiguity:
 '[&_svg]:ease-emphasized'
 

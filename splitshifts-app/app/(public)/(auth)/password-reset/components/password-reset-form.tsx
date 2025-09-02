@@ -86,6 +86,11 @@ function ResetPasswordSuccessCard({ form }: Pick<Props, 'form'>) {
         </span>
         .
       </CardContent>
+      <CardFooter className="flex flex-col items-center gap-2">
+          <Button  as="next-link" href='/login' variant="filled" className="w-full mt-2">
+            Back to Login
+          </Button>
+      </CardFooter>
     </Card>
   );
 }
