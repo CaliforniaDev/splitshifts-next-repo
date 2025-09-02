@@ -3,9 +3,9 @@ import { eq } from 'drizzle-orm';
 import { auth } from '@/auth';
 import db from '@/db/drizzle';
 import { passwordMatchSchema } from '@/app/(public)/(auth)/validation/auth-schema';
-import { passwordResetTokenSchema } from '@/db/passwordResetTokenSchema';
+import { passwordResetTokenSchema } from '@/db/schema/passwordResetTokenSchema';
 import { hash } from 'bcryptjs';
-import { users } from '@/db/usersSchema';
+import { users } from '@/db/schema/usersSchema';
 import { isValidTokenFormat } from '@/app/lib/utils';
 
 // Checks if a token exists and is not expired

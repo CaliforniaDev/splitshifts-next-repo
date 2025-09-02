@@ -5,6 +5,15 @@
 - fix codebase on login so that each time user is logged into the database for last time they were logged in
 - add fade in animations to all form card contents
 
+
+
 -update buttons
 
 - add button to the success card for Password Reset Link Sent
+when the user reset the password on the /password-reset page, there is no button to
+go back to the /login page
+
+// Use the named utility for clarity and to avoid ambiguity:
+'[&_svg]:ease-emphasized'
+
+-- create a email-templates directory inside of a libs folder, and create templates for email verification processes

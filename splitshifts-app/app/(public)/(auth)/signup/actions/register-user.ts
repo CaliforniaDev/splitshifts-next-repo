@@ -2,7 +2,7 @@
 
 import db from '@/db/drizzle';
 import { hash } from 'bcryptjs';
-import { users } from '@/db/usersSchema';
+import { users } from '@/db/schema/usersSchema';
 import { signUpFormSchema } from '../../validation/auth-schema';
 import { sendEmailVerification } from './send-email-verification';
 import type {

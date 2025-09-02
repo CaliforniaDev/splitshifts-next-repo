@@ -3,8 +3,8 @@
 import { auth } from '@/auth';
 import db from '@/db/drizzle';
 import { eq, and, gt } from 'drizzle-orm';
-import { users } from '@/db/usersSchema';
-import { emailVerificationTokenSchema } from '@/db/emailVerificationTokenSchema';
+import { users } from '@/db/schema/usersSchema';
+import { emailVerificationTokenSchema } from '@/db/schema/emailVerificationTokenSchema';
 import { isValidTokenFormat } from '@/app/lib/utils';
 
 /**

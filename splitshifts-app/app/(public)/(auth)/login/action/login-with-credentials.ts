@@ -4,7 +4,7 @@ import { compare } from 'bcryptjs';
 import { signIn } from '@/auth';
 
 import db from '@/db/drizzle';
-import { users } from '@/db/usersSchema';
+import { users } from '@/db/schema/usersSchema';
 import { loginFormSchema } from '@/app/(public)/(auth)/validation/auth-schema';
 import { LoginFormData, LoginResponse } from '../types/login-form-data';
 
