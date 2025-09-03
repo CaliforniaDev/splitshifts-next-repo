@@ -15,6 +15,7 @@ import { logError } from '@/app/lib/utils';
 import Button from '@/app/components/ui/buttons/button';
 import Input from '@/app/components/ui/inputs/input';
 import AnimatedCheckIcon from '@/app/components/ui/icons/animated-check-icon';
+import AnimatedTransition from '@/app/components/ui/animations/animated-transition';
 import {
   Card,
   CardContent,
@@ -125,20 +126,24 @@ export default function ResendVerificationForm() {
   return (
     <>
       {status === 'success' && (
-        <ResendVerificationSuccessCard 
-          message={message} 
-          onSendAnother={handleSendAnother} 
-        />
+        <AnimatedTransition animationKey="success">
+          <ResendVerificationSuccessCard 
+            message={message} 
+            onSendAnother={handleSendAnother} 
+          />
+        </AnimatedTransition>
       )}
       {status !== 'success' && (
-        <ResendVerificationFormCard
-          email={email}
-          setEmail={setEmail}
-          onSubmit={handleSubmit}
-          status={status}
-          message={message}
-          emailInputRef={emailInputRef}
-        />
+        <AnimatedTransition animationKey="form">
+          <ResendVerificationFormCard
+            email={email}
+            setEmail={setEmail}
+            onSubmit={handleSubmit}
+            status={status}
+            message={message}
+            emailInputRef={emailInputRef}
+          />
+        </AnimatedTransition>
       )}
     </>
   );

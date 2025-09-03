@@ -38,6 +38,7 @@ import {
 // Input & Button components
 import Input from '@/app/components/ui/inputs/input';
 import Button from '@/app/components/ui/buttons/button';
+import AnimatedTransition from '@/app/components/ui/animations/animated-transition';
 
 // Props passed from the server after token validation
 type Props = {
@@ -54,24 +55,26 @@ type Props = {
  */
 export default function UpdatePasswordForm({ token, isTokenValid }: Props) {
   return (
-    <Card className='w-full border-none shadow-elevation-0'>
-      <CardHeader>
-        <CardTitle>
-          {isTokenValid
-            ? 'Update Password'
-            : 'Your password reset link is invalid or has expired'}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {isTokenValid ? (
-          <UpdatePasswordFields token={token} />
-        ) : (
-          <Link className='underline' href='/password-reset'>
-            Request another password reset link
-          </Link>
-        )}
-      </CardContent>
-    </Card>
+    <AnimatedTransition animationKey={isTokenValid ? "valid-token" : "invalid-token"}>
+      <Card className='w-full border-none shadow-elevation-0'>
+        <CardHeader>
+          <CardTitle>
+            {isTokenValid
+              ? 'Update Password'
+              : 'Your password reset link is invalid or has expired'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isTokenValid ? (
+            <UpdatePasswordFields token={token} />
+          ) : (
+            <Link className='underline' href='/password-reset'>
+              Request another password reset link
+            </Link>
+          )}
+        </CardContent>
+      </Card>
+    </AnimatedTransition>
   );
 }
 
@@ -126,65 +129,69 @@ function UpdatePasswordFields({ token }: { token: string }) {
   );
 
   return isSubmitSuccessful ? (
-    <SubmitSuccessfulMessage />
+    <AnimatedTransition animationKey="success">
+      <SubmitSuccessfulMessage />
+    </AnimatedTransition>
   ) : (
-    <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <fieldset disabled={isSubmitting} className='space-y-8'>
-          {/* Form fields for password and password confirmation */}
-          <FormField
-            name='password'
-            control={control}
-            render={({ field, fieldState }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    {...field}
-                    label='New Password *'
-                    type='password'
-                    onBlur={field.onBlur}
-                    error={!!fieldState.error}
-                    errorMessage={fieldState.error?.message}
-                    supportingText='Your password must be at least 8 characters and contain at least one special character, such as !@#$%^&*().'
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            name='passwordConfirm'
-            control={control}
-            render={({ field, fieldState }) => {
-              return (
+    <AnimatedTransition animationKey="form">
+      <Form {...form}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <fieldset disabled={isSubmitting} className='space-y-8'>
+            {/* Form fields for password and password confirmation */}
+            <FormField
+              name='password'
+              control={control}
+              render={({ field, fieldState }) => (
                 <FormItem>
                   <FormControl>
                     <Input
                       {...field}
-                      label='New Password Confirm *'
+                      label='New Password *'
                       type='password'
                       onBlur={field.onBlur}
                       error={!!fieldState.error}
                       errorMessage={fieldState.error?.message}
+                      supportingText='Your password must be at least 8 characters and contain at least one special character, such as !@#$%^&*().'
                     />
                   </FormControl>
                 </FormItem>
-              );
-            }}
-          />
-          {!!errors.root?.message && (
-            <FormMessage>{errors.root?.message}</FormMessage>
-          )}
-          <Button
-            loading={isSubmitting}
-            loadingText='Updating Password...'
-            className='w-full'
-            type='submit'
-            variant='filled'
-          >
-            Update Password
-          </Button>
-        </fieldset>
-      </form>
-    </Form>
+              )}
+            />
+            <FormField
+              name='passwordConfirm'
+              control={control}
+              render={({ field, fieldState }) => {
+                return (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        label='New Password Confirm *'
+                        type='password'
+                        onBlur={field.onBlur}
+                        error={!!fieldState.error}
+                        errorMessage={fieldState.error?.message}
+                      />
+                    </FormControl>
+                  </FormItem>
+                );
+              }}
+            />
+            {!!errors.root?.message && (
+              <FormMessage>{errors.root?.message}</FormMessage>
+            )}
+            <Button
+              loading={isSubmitting}
+              loadingText='Updating Password...'
+              className='w-full'
+              type='submit'
+              variant='filled'
+            >
+              Update Password
+            </Button>
+          </fieldset>
+        </form>
+      </Form>
+    </AnimatedTransition>
   );
 }
