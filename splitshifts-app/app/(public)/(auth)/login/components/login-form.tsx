@@ -47,6 +47,7 @@ import {
 import { toast } from '@/app/components/ui/toast';
 import WarningIcon from '@/app/components/ui/icons/warning-icon';
 import ChevronRightIcon from '@/app/components/ui/icons/chevron-right-icon';
+import AnimatedTransition from '@/app/components/ui/animations/animated-transition';
 
 // ---Constants--------------------------------------------------------
 enum Step {
@@ -169,24 +170,28 @@ export default function LoginForm() {
   return (
     <>
       {step === Step.INITIAL && (
-        <LoginCard
-          form={form}
-          isSubmitting={isSubmitting}
-          handleSubmit={handleSubmit}
-          resetPasswordHref={resetPasswordHref}
-          emailInputRef={emailInputRef}
-        />
+        <AnimatedTransition animationKey="login">
+          <LoginCard
+            form={form}
+            isSubmitting={isSubmitting}
+            handleSubmit={handleSubmit}
+            resetPasswordHref={resetPasswordHref}
+            emailInputRef={emailInputRef}
+          />
+        </AnimatedTransition>
       )}
       {step === Step.REQUIRE_OTP && (
-        <OtpCard
-          otpForm={otpForm}
-          handleOTPSubmit={handleOTPSubmit}
-          onBackToLogin={() => {
-            otpForm.reset();
-            setStep(Step.INITIAL);
-          }}
-          ref={otpInputRef}
-        />
+        <AnimatedTransition animationKey="otp">
+          <OtpCard
+            otpForm={otpForm}
+            handleOTPSubmit={handleOTPSubmit}
+            onBackToLogin={() => {
+              otpForm.reset();
+              setStep(Step.INITIAL);
+            }}
+            ref={otpInputRef}
+          />
+        </AnimatedTransition>
       )}
     </>
   );

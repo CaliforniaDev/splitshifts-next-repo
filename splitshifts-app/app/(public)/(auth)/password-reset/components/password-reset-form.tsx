@@ -26,6 +26,7 @@ import {
 import Input from '@/app/components/ui/inputs/input';
 import Button from '@/app/components/ui/buttons/button';
 import AnimatedCheckIcon from '@/app/components/ui/icons/animated-check-icon';
+import AnimatedTransition from '@/app/components/ui/animations/animated-transition';
 import { maskEmail } from '@/app/lib/utils';
 
 export default function PasswordResetPageForm() {
@@ -48,14 +49,18 @@ export default function PasswordResetPageForm() {
     await resetPassword(data.email);
   };
   return isSubmitSuccessful ? (
-    <ResetPasswordSuccessCard form={form} />
+    <AnimatedTransition animationKey="success">
+      <ResetPasswordSuccessCard form={form} />
+    </AnimatedTransition>
   ) : (
-    <ResetPasswordFormCard
-      form={form}
-      isSubmitting={isSubmitting}
-      handleSubmit={handleSubmit}
-      emailInputRef={emailInputRef}
-    />
+    <AnimatedTransition animationKey="form">
+      <ResetPasswordFormCard
+        form={form}
+        isSubmitting={isSubmitting}
+        handleSubmit={handleSubmit}
+        emailInputRef={emailInputRef}
+      />
+    </AnimatedTransition>
   );
 }
 

@@ -13,6 +13,7 @@ import { logError } from '@/app/lib/utils';
 
 // ---UI Components-----------------------------------------------------
 import Button from '@/app/components/ui/buttons/button';
+import AnimatedTransition from '@/app/components/ui/animations/animated-transition';
 import {
   Card,
   CardContent,
@@ -72,14 +73,26 @@ export default function VerifyEmailForm() {
 
   // ---Render-----------------------------------------------------------
   if (status === 'loading') {
-    return <VerifyEmailLoadingCard />;
+    return (
+      <AnimatedTransition animationKey="loading">
+        <VerifyEmailLoadingCard />
+      </AnimatedTransition>
+    );
   }
 
   if (status === 'success') {
-    return <VerifyEmailSuccessCard message={message} email={email} />;
+    return (
+      <AnimatedTransition animationKey="success">
+        <VerifyEmailSuccessCard message={message} email={email} />
+      </AnimatedTransition>
+    );
   }
 
-  return <VerifyEmailErrorCard message={message} />;
+  return (
+    <AnimatedTransition animationKey="error">
+      <VerifyEmailErrorCard message={message} />
+    </AnimatedTransition>
+  );
 }
 
 // ---Sub-Components---------------------------------------------------

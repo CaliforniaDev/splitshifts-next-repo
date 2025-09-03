@@ -7,6 +7,7 @@ import { registerUser } from '../actions/register-user';
 
 import Button from '@/app/components/ui/buttons/button';
 import Input from '@/app/components/ui/inputs/input';
+import AnimatedTransition from '@/app/components/ui/animations/animated-transition';
 
 import {
   Card,
@@ -75,14 +76,18 @@ export default function SignUpForm() {
   };
 
   return isSubmitSuccessful ? (
-    <SignUpSuccessCard />
+    <AnimatedTransition animationKey="success">
+      <SignUpSuccessCard />
+    </AnimatedTransition>
   ) : (
-    <SignUpFormCard
-      form={form}
-      isSubmitting={isSubmitting}
-      onSubmit={submitHandler}
-      firstNameInputRef={firstNameInputRef}
-    />
+    <AnimatedTransition animationKey="form">
+      <SignUpFormCard
+        form={form}
+        isSubmitting={isSubmitting}
+        onSubmit={submitHandler}
+        firstNameInputRef={firstNameInputRef}
+      />
+    </AnimatedTransition>
   );
 }
 
