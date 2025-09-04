@@ -31,6 +31,10 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - **tw-animate-css** `1.3.5` - Additional animations
 - **clsx** `2.1.1` - Conditional className utility
 
+### Image Processing & Optimization
+- **Sharp** `0.33.6` - High-performance image processing for blur placeholders
+- **Next.js Image Optimization** - Built-in WebP conversion and responsive images
+
 ### UI Component Libraries
 - **Radix UI** - Headless, accessible components:
   - `@radix-ui/react-label` `2.1.7` - Form labels
@@ -66,6 +70,17 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
   - `list-variants.ts` - CVA styling variants for navigation states
   - `nav-config.tsx` - Navigation configuration and routing
 
+### Authentication Layout System
+- **Location**: `/app/components/ui/auth/`
+- **Key Components**:
+  - `auth-layout.tsx` - Responsive auth layouts with image optimization
+  - `animated-transition.tsx` - Reusable animation wrapper for forms
+- **Features**:
+  - Automatic blur placeholder generation using Sharp
+  - Multiple layout variants (Default, Wide, Compact)
+  - CSS-based transitions for smooth loading
+  - Server-side image optimization
+
 ### Icon System
 - **Location**: `/app/components/ui/icons/dashboard/`
 - **Architecture**: Custom React components based on HeroIcons design patterns
@@ -89,6 +104,9 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - Two-factor authentication with QR codes
 - Password reset functionality
 - Session management
+- Responsive auth layouts with image optimization
+- Automatic blur placeholder generation
+- Smooth form animations and transitions
 
 ### ✅ Navigation System
 - Material Design 3 compliant styling
@@ -140,11 +158,13 @@ splitshifts-app/
 ├── app/
 │   ├── components/ui/
 │   │   ├── nav/dashboard/     # Navigation system
+│   │   ├── auth/              # Auth layouts & animations
 │   │   └── icons/dashboard/   # Icon components
 │   ├── (logged-in)/          # Protected routes
 │   ├── (public)/             # Public routes
 │   └── api/                  # API routes
 ├── db/                       # Database schemas
+├── lib/                      # Utilities (image processing, etc.)
 └── public/                   # Static assets
 ```
 

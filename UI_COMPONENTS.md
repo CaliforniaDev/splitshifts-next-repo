@@ -12,6 +12,9 @@ This document provides detailed descriptions, usage examples, and styling inform
 - [Input Component](#input-component)
   - [Props](#input-component-props)
   - [Example Usage](#input-component-example-usage)
+- [AuthLayout Component](#authlayout-component)
+  - [Features](#authlayout-features)
+  - [Usage](#authlayout-usage)
 - [Typography and Styling Guide](#typography-and-styling-guide)
 - [Additional Components](#additional-components)
 
@@ -258,6 +261,48 @@ function ExampleForm() {
   );
 }
 ```
+
+## AuthLayout Component
+
+The `AuthLayout` component provides a responsive layout system for authentication pages with optimized image loading and smooth transitions. It features automatic blur placeholder generation for improved perceived performance.
+
+### Features {#authlayout-features}
+
+- **Responsive Design**: Full-width form on mobile, split layout on desktop
+- **Image Optimization**: Automatic blur placeholder generation using Sharp
+- **Smooth Transitions**: CSS-based opacity transitions for seamless loading
+- **Multiple Variants**: Default (50/50), Wide (60/40), and Compact (66/33) layouts
+- **Server Component**: Async component that generates blur placeholders at build time
+- **Customizable**: Support for custom images, layout direction, and overlays
+
+### Usage {#authlayout-usage}
+
+```jsx
+import AuthLayout, { AuthLayoutWide, AuthLayoutCompact } from '@/app/components/ui/auth/auth-layout';
+
+// Default 50/50 layout
+<AuthLayout>
+  <LoginForm />
+</AuthLayout>
+
+// Wide 60/40 layout for complex forms
+<AuthLayoutWide imageSrc="/assets/custom-bg.webp">
+  <SignupForm />
+</AuthLayoutWide>
+
+// Compact 66/33 layout for simple forms
+<AuthLayoutCompact reverse={true}>
+  <PasswordResetForm />
+</AuthLayoutCompact>
+```
+
+**Key Props:**
+- `imageSrc`: Custom image path (defaults to login side image)
+- `reverse`: Switch form and image sides
+- `showOverlay`: Control gradient overlay visibility
+- `showLogo`: Toggle logo display in form section
+
+For complete documentation, see [`README-AuthLayout.md`](./splitshifts-app/app/components/ui/auth/README-AuthLayout.md).
 
 ## Typography and Styling Guide
 
