@@ -2,13 +2,16 @@
 
 ## Overview
 
-The `AuthLayout` component provides a responsive layout system for authentication pages with an image on the left side and forms on the right side. It automatically adapts to different screen sizes and provides multiple layout variants for different use cases.
+The `AuthLayout` component provides a responsive layout system for authentication pages with optimized image loading and smooth transitions. It automatically generates blur placeholders using Sharp for improved perceived performance and features CSS-based transitions for seamless loading experiences.
 
 ## Features
 
 - **Responsive Design**: Full-width form on mobile, split layout on desktop
+- **Image Optimization**: Automatic blur placeholder generation using Sharp
+- **Smooth Transitions**: CSS-based opacity transitions (500ms duration)
 - **Multiple Variants**: Default (50/50), Wide (60/40), and Compact (66/33) layouts
-- **Customizable Images**: Use any image with proper optimization
+- **Server Components**: Async components that generate blur placeholders at build time
+- **Customizable Images**: Use any image with automatic optimization
 - **Flexible Direction**: Option to reverse layout (form left, image right)
 - **Design System Integration**: Uses your existing Tailwind design tokens
 - **Accessibility**: Proper image alt text and semantic structure
@@ -179,10 +182,39 @@ export default function SignupPage() {
 
 ## Image Optimization
 
-- Use WebP format for better performance
-- Provide multiple sizes for different screen densities
-- Use `priority` prop for above-the-fold images
-- Consider dark/light theme variants
+The AuthLayout components automatically generate blur placeholders for optimal loading experience:
+
+- **Automatic Generation**: Server-side blur placeholder creation using Sharp
+- **Smooth Transitions**: 500ms CSS opacity transitions between blur and final image
+- **WebP Format**: Use WebP format for better performance
+- **Responsive Sizing**: Proper `sizes` attributes for optimal loading
+- **Priority Loading**: Images marked as priority for above-the-fold content
+
+### Technical Implementation
+
+```tsx
+// Server component automatically generates blur placeholder
+export default async function AuthLayout({ imageSrc, ...props }) {
+  const { blurDataURL } = await getBlurredPlaceholder(imageSrc);
+  
+  return (
+    <Image
+      src={imageSrc}
+      placeholder="blur"
+      blurDataURL={blurDataURL}
+      className="transition-opacity duration-500"
+      // ... other props
+    />
+  );
+}
+```
+
+## Performance Benefits
+
+- **Instant Visual Feedback**: Blur placeholders appear immediately
+- **Perceived Performance**: Users see content faster
+- **Smooth Loading**: No jarring image pop-in effects
+- **Next.js Optimization**: Leverages built-in image optimization
 
 ## Best Practices
 

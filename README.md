@@ -54,6 +54,8 @@ SplitShifts is a web application designed to streamline the scheduling process f
   - **AuthLayout System**: Professional responsive layout for authentication pages
     - **Three Layout Variants**: Default (50/50), Wide (60/40), and Compact (66/33) split layouts
     - **Responsive Design**: Mobile-first approach with image hidden on mobile devices
+    - **Image Optimization**: Automatic blur placeholder generation using Sharp for improved perceived performance
+    - **Smooth Transitions**: CSS-based opacity transitions (500ms) for seamless loading experience
     - **Smart Image Loading**: Next.js Image optimization with conditional loading based on screen size
     - **Clickable Logo**: Integrated logo component with navigation back to home page
     - **Flexible Customization**: Configurable image sources, overlay options, and layout direction
@@ -111,6 +113,7 @@ SplitShifts is a web application designed to streamline the scheduling process f
 - **React 19**: Frontend library for building user interfaces
 - **TypeScript**: Static type checking for enhanced developer experience
 - **Tailwind CSS**: Utility-first CSS framework for responsive design
+- **Sharp**: High-performance image processing for blur placeholders and optimization
 - **PostgreSQL**: Relational database via Neon serverless platform
 - **Drizzle ORM**: Type-safe database operations and schema management
 - **NextAuth.js**: Authentication and session management

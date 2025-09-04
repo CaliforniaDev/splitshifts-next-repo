@@ -1,9 +1,8 @@
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/app/lib/utils';
 import Logo from '@/app/components/ui/logo';
+import { getBlurredPlaceholder } from '@/app/lib/image-processing';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -51,11 +50,13 @@ interface AuthLayoutProps {
  *
  * Features:
  * - Responsive design with mobile-first approach
+ * - Automatic blur placeholder generation using Sharp
+ * - Smooth image loading transitions
  * - Customizable image and layout direction
  * - Follows the existing design system
  * - Optimized for all auth form types
  */
-export default function AuthLayout({
+export default async function AuthLayout({
   children,
   imageSrc = '/assets/auth/login-side-image.webp',
   imageAlt = 'Abstract image',
@@ -65,6 +66,9 @@ export default function AuthLayout({
   showLogo = true,
   logoHref = '/',
 }: AuthLayoutProps) {
+  // Automatically generate blur placeholder
+  const { blurDataURL } = await getBlurredPlaceholder(imageSrc);
+
   return (
     <div
       className={cn('min-h-screen w-full lg:grid lg:grid-cols-2', className)}
@@ -77,12 +81,14 @@ export default function AuthLayout({
         )}
       >
         <Image
+          fill
+          priority
           src={imageSrc}
           alt={imageAlt}
-          fill
-          className='object-cover object-center'
-          priority
+          placeholder='blur'
           sizes='(max-width: 1024px) 0px, 50vw'
+          blurDataURL={blurDataURL}
+          className='object-cover object-center transition-opacity duration-500'
         />
         {/* Optional overlay for better text contrast if needed */}
         {showOverlay && (
@@ -116,8 +122,9 @@ export default function AuthLayout({
 /**
  * Alternative layout with different proportions
  * Image takes up 60% on large screens, form takes 40%
+ * Includes automatic blur placeholder generation and smooth loading transitions
  */
-export function AuthLayoutWide({
+export async function AuthLayoutWide({
   children,
   imageSrc = '/assets/auth/login-side-image.webp',
   imageAlt = 'Abstract image',
@@ -127,6 +134,7 @@ export function AuthLayoutWide({
   showLogo = true,
   logoHref = '/',
 }: AuthLayoutProps) {
+  const { blurDataURL } = await getBlurredPlaceholder(imageSrc);
   return (
     <div
       className={cn('min-h-screen w-full lg:grid lg:grid-cols-5', className)}
@@ -139,12 +147,14 @@ export function AuthLayoutWide({
         )}
       >
         <Image
+          fill
+          priority
           src={imageSrc}
           alt={imageAlt}
-          fill
-          className='object-cover object-center'
-          priority
+          placeholder='blur'
           sizes='(max-width: 1024px) 0px, 60vw'
+          blurDataURL={blurDataURL}
+          className='object-cover object-center transition-opacity duration-500'
         />
         {showOverlay && (
           <div className='absolute inset-0 bg-gradient-to-r from-black/5 to-transparent' />
@@ -177,8 +187,9 @@ export function AuthLayoutWide({
 /**
  * Compact layout for simpler forms
  * Smaller form container with more padding
+ * Includes automatic blur placeholder generation and smooth loading transitions
  */
-export function AuthLayoutCompact({
+export async function AuthLayoutCompact({
   children,
   imageSrc = '/assets/auth/login-side-image.webp',
   imageAlt = 'Abstract image',
@@ -188,6 +199,7 @@ export function AuthLayoutCompact({
   showLogo = true,
   logoHref = '/',
 }: AuthLayoutProps) {
+  const { blurDataURL } = await getBlurredPlaceholder(imageSrc);
   return (
     <div
       className={cn('min-h-screen w-full lg:grid lg:grid-cols-3', className)}
@@ -200,12 +212,14 @@ export function AuthLayoutCompact({
         )}
       >
         <Image
+          fill
+          priority
           src={imageSrc}
           alt={imageAlt}
-          fill
-          className='object-cover object-center'
-          priority
+          placeholder='blur'
           sizes='(max-width: 1024px) 0px, 66.67vw'
+          className='object-cover object-center transition-opacity duration-500'
+          blurDataURL={blurDataURL}
         />
         {showOverlay && (
           <div className='absolute inset-0 bg-gradient-to-r from-black/5 to-transparent' />
