@@ -7,14 +7,17 @@ import { getBlurredPlaceholder } from '@/app/lib/image-processing';
 
 export default async function Hero() {
   // Use the original file path instead of the optimized .src path
-  const { blurDataURL } = await getBlurredPlaceholder('/assets/mockups/dashboard-light.webp', {
-    vibrant: true,        
-    saturation: 1.8,      // Higher saturation to pull out colors
-    brightness: 0.9,      // Slightly darken to avoid white washout
-    size: 20,             // Medium size for balance
-    quality: 50,          
-    blur: 1.5,            // More blur to blend colors
-  });
+  const { blurDataURL } = await getBlurredPlaceholder(
+    '/assets/mockups/dashboard-light.webp',
+    {
+      vibrant: true,
+      saturation: 1.8, // Higher saturation to pull out colors
+      brightness: 0.9, // Slightly darken to avoid white washout
+      size: 20, // Medium size for balance
+      quality: 50,
+      blur: 1.5, // More blur to blend colors
+    },
+  );
   return (
     <section className='flex flex-col gap-6 text-center text-on-surface'>
       <header className='flex flex-col gap-5'>
