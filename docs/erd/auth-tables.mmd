@@ -1,0 +1,34 @@
+erDiagram
+  USERS ||--o| EMAIL_VERIFICATION_TOKENS : "has 0..1"
+  USERS ||--o| PASSWORD_RESET_TOKENS     : "has 0..1"
+
+  USERS {
+    int      id PK
+    varchar  first_name
+    varchar  last_name
+    varchar  email  "UNIQUE"
+    text     password
+    timestamp created_at
+    timestamp updated_at
+    boolean  is_active
+    text     two_fa_secret
+    boolean  two_fa_enabled
+    timestamp last_login
+    boolean  email_verified
+    timestamp email_verified_at
+  }
+
+  EMAIL_VERIFICATION_TOKENS {
+    int       id PK
+    int       user_id FK "UNIQUE -> users.id"
+    text      token
+    timestamp token_expiration
+    timestamp created_at
+  }
+
+  PASSWORD_RESET_TOKENS {
+    int       id PK 
+    int       user_id FK "UNIQUE -> users.id"
+    text      token
+    timestamp token_expiration
+  }
