@@ -5,38 +5,39 @@
 ### Core Business Entities
 
 1. **organizations** - Multi-tenant root entity; each company/business using SplitShifts
-2. **users** - Authentication layer; people who can log into the system (admins, managers, employees)
-3. **employees** - Business layer; workers who can be scheduled (may or may not have user accounts)
-4. **work_sites** - Physical locations where work/services are provided (offices, client sites, facilities, etc.)
-5. **roles** - Job types/positions (customizable per organization - Security Guard, Nurse, Technician, etc.)
+2. **organization_users** - Links users to organizations with roles (admin, manager, member)
+3. **users** - Authentication layer; people who can log into the system (admins, managers, employees)
+4. **employees** - Business layer; workers who can be scheduled (may or may not have user accounts)
+5. **work_sites** - Physical locations where work/services are provided (offices, client sites, facilities, etc.)
+6. **roles** - Job types/positions (customizable per organization - Security Guard, Nurse, Technician, etc.)
 
 ### Scheduling Core
 
-6. **shifts** - Individual work periods with start/end times, tied to site and role
-7. **shift_assignments** - Links employees to shifts with acceptance/decline status
-8. **shift_groups** - Groups related shifts together (for split-shift modeling)
-9. **shift_templates** - Reusable shift patterns for recurring schedules
-10. **schedule_periods** - Defined time ranges for schedule planning (weekly, bi-weekly, etc.)
+7. **shifts** - Individual work periods with start/end times, tied to site and role
+8. **shift_assignments** - Links employees to shifts with acceptance/decline status
+9. **shift_groups** - Groups related shifts together (for split-shift modeling)
+10. **shift_templates** - Reusable shift patterns for recurring schedules
+11. **schedule_periods** - Defined time ranges for schedule planning (weekly, bi-weekly, etc.)
 
 ### Coverage & Requirements
 
-11. **site_coverage_rules** - Required staffing levels by role/skill per time window (e.g., minimum 2 guards, 1 supervisor)
-12. **employee_availability** - When employees are available to work (weekly rules + overrides)
-13. **employee_skills** - Links employees to roles they're qualified for (certifications, training, etc.)
-14. **certifications** - Required credentials for specific roles (licenses, training certificates, etc.)
-15. **employee_certifications** - Tracks which employees have which certifications
+12. **site_coverage_rules** - Required staffing levels by role/skill per time window (e.g., minimum 2 guards, 1 supervisor)
+13. **employee_availability** - When employees are available to work (weekly rules + overrides)
+14. **employee_skills** - Links employees to roles they're qualified for (certifications, training, etc.)
+15. **certifications** - Required credentials for specific roles (licenses, training certificates, etc.)
+16. **employee_certifications** - Tracks which employees have which certifications
 
 ### Time Management
 
-16. **time_off_requests** - Vacation, sick leave, personal time requests
-17. **holiday_calendars** - Organization-specific holidays and special dates
-18. **overtime_policies** - Org-specific rules for overtime calculation (if needed)
+17. **time_off_requests** - Vacation, sick leave, personal time requests
+18. **holiday_calendars** - Organization-specific holidays and special dates
+19. **overtime_policies** - Org-specific rules for overtime calculation (if needed)
 
 ### System Features
 
-19. **notifications_outbox** - System notifications and alerts
-20. **audit_log** - Change tracking for compliance and debugging
-21. **user_sessions** - Optional session management beyond NextAuth
+20. **notifications_outbox** - System notifications and alerts
+21. **audit_log** - Change tracking for compliance and debugging
+22. **user_sessions** - Optional session management beyond NextAuth
 
 ## Key Design Decisions
 
@@ -44,6 +45,13 @@
 - **org_id** on every business table for hard isolation
 - Row Level Security (RLS) policies on all business tables
 - Auth tables (users, tokens) remain global for SSO potential
+
+### User-Organization Relationship
+- **organization_users** table links users to organizations with roles
+- **Many-to-many relationship**: Users can belong to multiple organizations, organizations can have multiple users
+- **Role-based access**: admin (full control), manager (scheduling/employees), member (basic access)
+- **Ownership model**: When Leo creates "Acme Security", he gets an admin role in organization_users
+- **Future extensibility**: Ready for user invitations and multi-org access
 
 ### Primary Key Strategy
 - **UUIDv7** for new tables (time-ordered, index-friendly)

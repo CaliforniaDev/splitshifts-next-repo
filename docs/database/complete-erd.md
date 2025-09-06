@@ -13,6 +13,11 @@ erDiagram
   ORGANIZATIONS ||--o{ ROLES : "defines"
   ORGANIZATIONS ||--o{ SHIFTS : "schedules"
   ORGANIZATIONS ||--o{ CERTIFICATIONS : "manages"
+  ORGANIZATIONS ||--o{ ORGANIZATION_USERS : "links to"
+
+  %% User-Organization Relationship
+  ORGANIZATION_USERS }|--|| USERS : "belongs to"
+  ORGANIZATION_USERS }|--|| ORGANIZATIONS : "belongs to"
 
   %% User Management (Global for SSO)
   USERS ||--o| EMAIL_VERIFICATION_TOKENS : "has 0..1"
@@ -50,6 +55,17 @@ erDiagram
     timestamptz created_at
     timestamptz updated_at
     timestamptz deleted_at
+  }
+
+  ORGANIZATION_USERS {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    integer user_id FK "-> users.id"
+    varchar role "admin, manager, member"
+    boolean is_active
+    timestamptz joined_at
+    timestamptz created_at
+    timestamptz updated_at
   }
 
   USERS {

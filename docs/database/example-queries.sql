@@ -6,6 +6,50 @@
 -- SELECT set_config('app.current_org_id', 'your-org-uuid-here', true);
 
 -- ============================================================================
+-- 0. USER-ORGANIZATION RELATIONSHIP QUERIES
+-- ============================================================================
+
+-- Find all organizations a user belongs to (for user login/org selection)
+SELECT 
+    o.id as org_id,
+    o.name as org_name,
+    ou.role,
+    ou.is_active,
+    ou.joined_at
+FROM organization_users ou
+JOIN organizations o ON o.id = ou.org_id
+WHERE ou.user_id = 123  -- User's ID from session
+    AND ou.is_active = true
+    AND o.deleted_at IS NULL
+ORDER BY ou.joined_at DESC;
+
+-- Find all admins for an organization (for permission checks)
+SELECT 
+    u.id as user_id,
+    u.first_name,
+    u.last_name,
+    u.email,
+    ou.role,
+    ou.joined_at
+FROM organization_users ou
+JOIN users u ON u.id = ou.user_id
+WHERE ou.org_id = current_org_id()
+    AND ou.role = 'admin'
+    AND ou.is_active = true
+    AND u.is_active = true
+ORDER BY u.last_name, u.first_name;
+
+-- Check if user has admin access to organization (authorization query)
+SELECT EXISTS (
+    SELECT 1 
+    FROM organization_users ou
+    WHERE ou.org_id = current_org_id()
+        AND ou.user_id = 123  -- Current user's ID
+        AND ou.role = 'admin'
+        AND ou.is_active = true
+) as has_admin_access;
+
+-- ============================================================================
 -- 1. WEEKLY HOURS COMPUTATION PER EMPLOYEE
 -- ============================================================================
 

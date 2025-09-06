@@ -53,6 +53,18 @@ CREATE TABLE users (
     email_verified_at TIMESTAMPTZ
 );
 
+-- Organization Users (Links users to organizations with roles)
+CREATE TABLE organization_users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    role VARCHAR(50) NOT NULL DEFAULT 'admin',
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- Auth token tables (keeping existing structure)
 CREATE TABLE email_verification_tokens (
     id SERIAL PRIMARY KEY,
@@ -350,6 +362,7 @@ CREATE TABLE user_sessions (
 
 -- Enable RLS on all multi-tenant tables
 ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE organization_users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE employees ENABLE ROW LEVEL SECURITY;
 ALTER TABLE work_sites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE roles ENABLE ROW LEVEL SECURITY;
@@ -380,6 +393,10 @@ CREATE POLICY org_isolation ON organizations
     FOR ALL TO authenticated
     USING (id = current_org_id());
 
+CREATE POLICY org_isolation ON organization_users
+    FOR ALL TO authenticated
+    USING (org_id = current_org_id());
+
 CREATE POLICY org_isolation ON employees
     FOR ALL TO authenticated
     USING (org_id = current_org_id());
@@ -409,6 +426,10 @@ CREATE POLICY org_isolation ON shift_assignments
 -- Composite indexes for multi-tenant queries
 CREATE INDEX idx_employees_org_id ON employees(org_id) WHERE deleted_at IS NULL;
 CREATE INDEX idx_employees_org_user ON employees(org_id, user_id) WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_organization_users_org_id ON organization_users(org_id);
+CREATE INDEX idx_organization_users_user_id ON organization_users(user_id);
+CREATE INDEX idx_organization_users_org_user ON organization_users(org_id, user_id);
 
 CREATE INDEX idx_work_sites_org_id ON work_sites(org_id) WHERE deleted_at IS NULL;
 CREATE INDEX idx_roles_org_id ON roles(org_id) WHERE deleted_at IS NULL;

@@ -8,12 +8,20 @@ erDiagram
   ORGANIZATIONS ||--o{ SHIFTS : "schedules"
   ORGANIZATIONS ||--o{ OVERTIME_POLICIES : "has"
   ORGANIZATIONS ||--o{ HOLIDAY_CALENDARS : "has"
+  ORGANIZATIONS ||--o{ SCHEDULE_PERIODS : "manages"
+  ORGANIZATIONS ||--o{ SITE_COVERAGE_RULES : "sets"
+  ORGANIZATIONS ||--o{ ORGANIZATION_USERS : "links to"
+
+  ORGANIZATION_USERS }|--|| USERS : "belongs to"
+  ORGANIZATION_USERS }|--|| ORGANIZATIONS : "belongs to"
+
 
   %% User Management
   USERS ||--o| EMAIL_VERIFICATION_TOKENS : "has 0..1"
   USERS ||--o| PASSWORD_RESET_TOKENS : "has 0..1"
   USERS ||--o{ USER_SESSIONS : "has"
   USERS ||--o{ EMPLOYEES : "may link to"
+
 
   %% Employee & Skills
   EMPLOYEES ||--o{ EMPLOYEE_SKILLS : "has"
@@ -54,6 +62,17 @@ erDiagram
     timestamptz created_at
     timestamptz updated_at
     timestamptz deleted_at
+  }
+
+  ORGANIZATION_USERS {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    integer user_id FK "-> users.id"
+    varchar role "admin, manager, member"
+    boolean is_active
+    timestamptz joined_at
+    timestamptz created_at
+    timestamptz updated_at
   }
 
   USERS {
