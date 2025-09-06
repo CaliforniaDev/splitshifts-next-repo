@@ -54,9 +54,10 @@
 - **Future extensibility**: Ready for user invitations and multi-org access
 
 ### Primary Key Strategy
-- **UUIDv7** for new tables (time-ordered, index-friendly)
-- Keep existing **serial** keys for auth tables (backward compatibility)
-- UUIDv7 provides better distribution and avoids sequence gaps
+- **UUIDv7** for all tables (time-ordered, index-friendly, globally unique)
+- **Migrated from serial keys** to UUID for better scalability and distribution
+- UUIDv7 provides natural ordering while avoiding sequence bottlenecks
+- Eliminates potential key conflicts in multi-region deployments
 
 ### Timestamp Strategy
 - **timestamptz** (timestamp with timezone) everywhere for consistency

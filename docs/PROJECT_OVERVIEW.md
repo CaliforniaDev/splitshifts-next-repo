@@ -19,9 +19,11 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - **qrcode.react** `4.2.0` - QR code generation for 2FA
 
 ### Database & ORM
-- **Drizzle ORM** `0.40.1` - TypeScript-first ORM
+- **Drizzle ORM** `0.40.1` - TypeScript-first ORM with UUID support
 - **Drizzle Kit** `0.31.4` - Database migrations and tooling
-- **Neon Database** `0.10.4` - Serverless PostgreSQL
+- **Neon Database** `0.10.4` - Serverless PostgreSQL with UUID primary keys
+- **UUID** `12.0.0` - UUIDv7 generation for scalable primary keys
+- **@types/uuid** `10.0.0` - TypeScript types for UUID
 
 ### Styling & UI Framework
 - **Tailwind CSS** `3.4.17` - Utility-first CSS framework
@@ -99,6 +101,15 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 
 ## Key Features
 
+### ✅ Database Architecture
+- **20-Table Schema**: Complete shift scheduling system with UUID primary keys
+- **Multi-Tenant Design**: Organization-based data isolation
+- **UUID Primary Keys**: Scalable UUIDv7 for all entities
+- **Proper Relationships**: Foreign keys with cascade/set null behaviors
+- **Audit Logging**: Complete change tracking system
+- **Soft Deletes**: Data retention with deleted_at timestamps
+- **Advanced Types**: JSONB, custom enums, numeric precision for monetary fields
+
 ### ✅ Authentication System
 - NextAuth.js integration
 - Two-factor authentication with QR codes
@@ -121,9 +132,11 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - Accessible form components
 
 ### ✅ Database Integration
-- Drizzle ORM with TypeScript schemas
-- Migration system
-- Serverless PostgreSQL with Neon
+- **UUID-Based Schema**: 20-table system with UUIDv7 primary keys
+- **Drizzle ORM**: TypeScript-first ORM with complete type safety
+- **Migration System**: Clean migration workflow with UUID consistency
+- **Multi-Tenant Architecture**: Organization-based data isolation
+- **Serverless PostgreSQL**: Neon database with advanced features
 
 ### ✅ Accessibility Features
 - Proper ARIA roles and labels
@@ -180,6 +193,6 @@ splitshifts-app/
 
 ---
 
-**Last Updated**: August 2025  
+**Last Updated**: September 2025  
 **Project Version**: 0.1.0  
-**Status**: Active Development
+**Status**: Active Development - UUID Migration Complete
