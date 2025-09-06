@@ -4,7 +4,7 @@
 - [ ] update all components to MODERN standards
 - [ ] update toast component to a sonner
 - [ ] change color of button for the Disable Two-Factor Auth button
-- [ ] fix codebase on login so that each time user is logged into the database for last time they were logged in
+- [ ] fix codebase to update user's last login timestamp in database on each login
 - [ ] create a email-templates directory inside of a libs folder, and create templates for email verification processes
 - [ ] fix database so all sensitive data uses uuid instead of serial or integers
 
