@@ -34,7 +34,7 @@ export const changePassword = async (
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.id, parseInt(session.user.id)));
+      .where(eq(users.id, session.user.id));
 
     if (!user) {
       return {
@@ -55,7 +55,7 @@ export const changePassword = async (
     await db
       .update(users)
       .set({ password: hashedPassword })
-      .where(eq(users.id, parseInt(session.user.id)));
+      .where(eq(users.id, session.user.id));
     return {
       error: false,
       message: 'Password changed successfully.',

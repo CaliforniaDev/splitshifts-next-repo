@@ -23,7 +23,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const [user] = await db
             .select({ id: users.id })
             .from(users)
-            .where(eq(users.id, parseInt(token.id as string)));
+            .where(eq(users.id, token.id as string));
           
           if (!user) {
             // User was deleted, throw error to end session

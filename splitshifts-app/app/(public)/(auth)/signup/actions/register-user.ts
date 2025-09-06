@@ -2,6 +2,7 @@
 
 import db from '@/db/drizzle';
 import { hash } from 'bcryptjs';
+import { v7 as uuidv7 } from 'uuid';
 import { users } from '@/db/schema/usersSchema';
 import { signUpFormSchema } from '../../validation/auth-schema';
 import { sendEmailVerification } from './send-email-verification';
@@ -71,6 +72,7 @@ export const registerUser = async ({
 
     // Create user account with email verification disabled initially
     await db.insert(users).values({
+      id: uuidv7(),
       firstName,
       lastName,
       email,

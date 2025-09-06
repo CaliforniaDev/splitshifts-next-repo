@@ -3,6 +3,25 @@
 ## [Unreleased]
 
 ### Added
+- **Complete Database Schema Migration to UUID**: Implemented comprehensive 20-table database schema with UUID primary keys for scalability and multi-tenancy
+  - **UUID Primary Keys**: Migrated all tables from serial integers to UUID for better distributed system support and security
+  - **Organization-Based Multi-Tenancy**: Complete organization isolation with proper user-organization relationships
+  - **20-Table Schema**: Full shift scheduling system including organizations, users, employees, shifts, roles, work sites, time-off requests, certifications, skills, availability, audit logs, notifications, and session management
+  - **Proper Foreign Key Relationships**: All foreign keys now reference UUID fields with consistent cascade/set null behaviors
+  - **Clean Migration System**: Fresh migration (0000_clammy_zzzax.sql) with proper UUID constraints and relationships
+- **UUID Authentication System**: Updated entire authentication flow for UUID compatibility
+  - **NextAuth UUID Support**: Modified auth.ts callbacks to handle UUID user IDs instead of integers
+  - **Registration System**: User registration now generates UUIDv7 for new accounts with proper token creation
+  - **Token Management**: Email verification and password reset tokens use UUID primary keys
+  - **Session Management**: All authentication sessions work with UUID-based user identification
+  - **Type Safety**: Removed parseInt() calls throughout auth system for proper UUID string handling
+- **Enhanced Database Schema Features**:
+  - **Monetary Fields**: Proper numeric(10,2) types for hourly rates and financial data
+  - **Audit Logging**: Complete audit trail system with operation tracking and user attribution
+  - **Soft Deletes**: Deleted_at timestamps for data retention across appropriate tables
+  - **JSONB Support**: Advanced JSON fields for flexible data storage (settings, contact info, requirements)
+  - **Custom Enums**: Proper PostgreSQL enums for status fields and categorical data
+  - **Timezone Support**: Work site timezone management for distributed organizations
 - **Performance & Code Quality Improvements**:
   - **CVA Component Optimization**: Refactored navigation list and button variant components for optimal performance
     - **Module-Level Computations**: Eliminated runtime `clsx()` calls by computing class strings once at module level

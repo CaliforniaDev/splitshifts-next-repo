@@ -23,7 +23,7 @@ export default async function Dashboard() {
       twoFactorEnabled: users.twoFactorEnabled,
     })
     .from(users)
-    .where(eq(users.id, parseInt(session?.user?.id!)));
+    .where(eq(users.id, session?.user?.id!));
 
   // If user doesn't exist in database but session exists, redirect to logout
   if (!user) {

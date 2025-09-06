@@ -3,6 +3,7 @@
 import { auth } from '@/auth';
 import db from '@/db/drizzle';
 import { eq, lt } from 'drizzle-orm';
+import { v7 as uuidv7 } from 'uuid';
 import { users } from '@/db/schema/usersSchema';
 import { emailVerificationTokenSchema } from '@/db/schema/emailVerificationTokenSchema';
 import { mailer } from '@/app/lib/email';
@@ -86,6 +87,7 @@ export async function sendEmailVerification(emailAddress: string) {
   await db
     .insert(emailVerificationTokenSchema)
     .values({
+      id: uuidv7(),
       userId: user.id,
       token: verificationToken,
       tokenExpiration,
