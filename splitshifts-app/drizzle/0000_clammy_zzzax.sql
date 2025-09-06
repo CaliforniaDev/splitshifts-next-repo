@@ -8,7 +8,7 @@ CREATE TYPE "public"."time_off_type" AS ENUM('vacation', 'sick', 'personal', 'em
 CREATE TABLE "audit_log" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid,
-	"user_id" integer,
+	"user_id" uuid,
 	"table_name" varchar(100) NOT NULL,
 	"operation" "audit_operation" NOT NULL,
 	"record_id" uuid NOT NULL,
@@ -29,6 +29,15 @@ CREATE TABLE "certifications" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"deleted_at" timestamp with time zone
+);
+--> statement-breakpoint
+CREATE TABLE "email_verification_tokens" (
+	"id" uuid PRIMARY KEY NOT NULL,
+	"user_id" uuid NOT NULL,
+	"token" text NOT NULL,
+	"token_expiration" timestamp NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "email_verification_tokens_user_id_unique" UNIQUE("user_id")
 );
 --> statement-breakpoint
 CREATE TABLE "employee_availability" (
@@ -77,7 +86,7 @@ CREATE TABLE "employee_skills" (
 CREATE TABLE "employees" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
-	"user_id" integer,
+	"user_id" uuid,
 	"first_name" varchar(255) NOT NULL,
 	"last_name" varchar(255) NOT NULL,
 	"email" varchar(255),
@@ -106,7 +115,7 @@ CREATE TABLE "holiday_calendars" (
 CREATE TABLE "notifications_outbox" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
-	"user_id" integer,
+	"user_id" uuid,
 	"notification_type" varchar(100) NOT NULL,
 	"subject" varchar(255) NOT NULL,
 	"message" text NOT NULL,
@@ -116,6 +125,17 @@ CREATE TABLE "notifications_outbox" (
 	"sent_at" timestamp with time zone,
 	"retry_count" integer DEFAULT 0 NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "organization_users" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"org_id" uuid NOT NULL,
+	"user_id" uuid NOT NULL,
+	"role" varchar(50) DEFAULT 'admin' NOT NULL,
+	"is_active" boolean DEFAULT true NOT NULL,
+	"joined_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "organizations" (
@@ -129,12 +149,21 @@ CREATE TABLE "organizations" (
 	"deleted_at" timestamp with time zone
 );
 --> statement-breakpoint
+CREATE TABLE "password_reset_tokens" (
+	"id" uuid PRIMARY KEY NOT NULL,
+	"user_id" uuid,
+	"token" text,
+	"token_expiration" timestamp,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "password_reset_tokens_user_id_unique" UNIQUE("user_id")
+);
+--> statement-breakpoint
 CREATE TABLE "roles" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"description" text,
-	"hourly_rate" varchar(20),
+	"hourly_rate" numeric(10, 2),
 	"requirements" jsonb,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -191,7 +220,7 @@ CREATE TABLE "time_off_requests" (
 	"end_date" date NOT NULL,
 	"reason" text,
 	"status" "request_status" DEFAULT 'pending' NOT NULL,
-	"approved_by" integer,
+	"approved_by" uuid,
 	"approved_at" timestamp with time zone,
 	"approval_notes" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -201,7 +230,7 @@ CREATE TABLE "time_off_requests" (
 --> statement-breakpoint
 CREATE TABLE "user_sessions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
 	"session_token" text NOT NULL,
 	"refresh_token" text,
 	"expires_at" timestamp with time zone NOT NULL,
@@ -210,6 +239,23 @@ CREATE TABLE "user_sessions" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "user_sessions_session_token_unique" UNIQUE("session_token")
+);
+--> statement-breakpoint
+CREATE TABLE "users" (
+	"id" uuid PRIMARY KEY NOT NULL,
+	"first_name" varchar(255) NOT NULL,
+	"last_name" varchar(255) NOT NULL,
+	"email" varchar(255) NOT NULL,
+	"password" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	"is_active" boolean DEFAULT true NOT NULL,
+	"2fa_secret" text,
+	"2fa_enabled" boolean DEFAULT false NOT NULL,
+	"last_login" timestamp,
+	"email_verified" boolean DEFAULT false NOT NULL,
+	"email_verified_at" timestamp,
+	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
 CREATE TABLE "work_sites" (
@@ -226,10 +272,10 @@ CREATE TABLE "work_sites" (
 	"deleted_at" timestamp with time zone
 );
 --> statement-breakpoint
-ALTER TABLE "password_reset_tokens" ADD COLUMN "created_at" timestamp DEFAULT now() NOT NULL;--> statement-breakpoint
 ALTER TABLE "audit_log" ADD CONSTRAINT "audit_log_org_id_organizations_id_fk" FOREIGN KEY ("org_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "audit_log" ADD CONSTRAINT "audit_log_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "certifications" ADD CONSTRAINT "certifications_org_id_organizations_id_fk" FOREIGN KEY ("org_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "email_verification_tokens" ADD CONSTRAINT "email_verification_tokens_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "employee_availability" ADD CONSTRAINT "employee_availability_org_id_organizations_id_fk" FOREIGN KEY ("org_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "employee_availability" ADD CONSTRAINT "employee_availability_employee_id_employees_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."employees"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "employee_certifications" ADD CONSTRAINT "employee_certifications_org_id_organizations_id_fk" FOREIGN KEY ("org_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -243,6 +289,9 @@ ALTER TABLE "employees" ADD CONSTRAINT "employees_user_id_users_id_fk" FOREIGN K
 ALTER TABLE "holiday_calendars" ADD CONSTRAINT "holiday_calendars_org_id_organizations_id_fk" FOREIGN KEY ("org_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "notifications_outbox" ADD CONSTRAINT "notifications_outbox_org_id_organizations_id_fk" FOREIGN KEY ("org_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "notifications_outbox" ADD CONSTRAINT "notifications_outbox_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "organization_users" ADD CONSTRAINT "organization_users_org_id_organizations_id_fk" FOREIGN KEY ("org_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "organization_users" ADD CONSTRAINT "organization_users_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "password_reset_tokens" ADD CONSTRAINT "password_reset_tokens_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "roles" ADD CONSTRAINT "roles_org_id_organizations_id_fk" FOREIGN KEY ("org_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "shift_assignments" ADD CONSTRAINT "shift_assignments_org_id_organizations_id_fk" FOREIGN KEY ("org_id") REFERENCES "public"."organizations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "shift_assignments" ADD CONSTRAINT "shift_assignments_shift_id_shifts_id_fk" FOREIGN KEY ("shift_id") REFERENCES "public"."shifts"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
