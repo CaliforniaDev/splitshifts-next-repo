@@ -14,7 +14,7 @@ export const getTwoFactorSecret = async () => {
       message: 'Unauthorized',
     };
   }
-  const currentUserId = parseInt(session.user.id);
+  const currentUserId = session.user.id;
 
   const [user] = await db
     .select({
@@ -56,7 +56,7 @@ export const activateTwoFactorAuth = async (token: string) => {
     return { error: true, message: 'Unauthorized' };
   }
 
-  const currentUserId = parseInt(session.user.id);
+  const currentUserId = session.user.id;
 
   // Fetch user's existing 2FA secret
   const [user] = await db
@@ -88,7 +88,7 @@ export const disableTwoFactorAuth = async () => {
   if (!session?.user?.id) {
     return { error: true, message: 'Unauthorized' };
   }
-  const currentUserId = parseInt(session.user.id);
+  const currentUserId = session.user.id;
 
   await db
     .update(users)

@@ -4,6 +4,7 @@ import { auth } from '@/auth';
 
 import db from '@/db/drizzle';
 import { eq } from 'drizzle-orm';
+import { v7 as uuidv7 } from 'uuid';
 import { users } from '@/db/schema/usersSchema';
 import { passwordResetTokenSchema } from '@/db/schema/passwordResetTokenSchema';
 import { mailer } from '@/app/lib/email';
@@ -52,6 +53,7 @@ export async function resetPassword(emailAddress: string) {
   await db
     .insert(passwordResetTokenSchema)
     .values({
+      id: uuidv7(),
       userId: user.id,
       token: passwordResetToken,
       tokenExpiration,

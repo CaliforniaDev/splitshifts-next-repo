@@ -4,12 +4,13 @@ import {
   text,
   timestamp,
   integer,
+  uuid,
 } from 'drizzle-orm/pg-core';
 import { users } from './usersSchema';
 
 export const emailVerificationTokenSchema = pgTable('email_verification_tokens', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id')
+  id: uuid('id').primaryKey(),
+  userId: uuid('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' })
     .unique(),

@@ -1,0 +1,372 @@
+
+erDiagram
+  %% Core Business Entities
+  ORGANIZATIONS ||--o{ USERS : "has"
+  ORGANIZATIONS ||--o{ EMPLOYEES : "has"
+  ORGANIZATIONS ||--o{ WORK_SITES : "has"
+  ORGANIZATIONS ||--o{ ROLES : "defines"
+  ORGANIZATIONS ||--o{ SHIFTS : "schedules"
+  ORGANIZATIONS ||--o{ OVERTIME_POLICIES : "has"
+  ORGANIZATIONS ||--o{ HOLIDAY_CALENDARS : "has"
+  ORGANIZATIONS ||--o{ SCHEDULE_PERIODS : "manages"
+  ORGANIZATIONS ||--o{ SITE_COVERAGE_RULES : "sets"
+  ORGANIZATIONS ||--o{ ORGANIZATION_USERS : "links to"
+
+  ORGANIZATION_USERS }|--|| USERS : "belongs to"
+  ORGANIZATION_USERS }|--|| ORGANIZATIONS : "belongs to"
+
+
+  %% User Management
+  USERS ||--o| EMAIL_VERIFICATION_TOKENS : "has 0..1"
+  USERS ||--o| PASSWORD_RESET_TOKENS : "has 0..1"
+  USERS ||--o{ USER_SESSIONS : "has"
+  USERS ||--o{ EMPLOYEES : "may link to"
+
+
+  %% Employee & Skills
+  EMPLOYEES ||--o{ EMPLOYEE_SKILLS : "has"
+  EMPLOYEES ||--o{ EMPLOYEE_CERTIFICATIONS : "has"
+  EMPLOYEES ||--o{ EMPLOYEE_AVAILABILITY : "has"
+  EMPLOYEES ||--o{ SHIFT_ASSIGNMENTS : "assigned to"
+  EMPLOYEES ||--o{ TIME_OFF_REQUESTS : "requests"
+
+  ROLES ||--o{ EMPLOYEE_SKILLS : "requires"
+  ROLES ||--o{ SITE_COVERAGE_RULES : "needed for"
+  ROLES ||--o{ SHIFTS : "requires"
+
+  CERTIFICATIONS ||--o{ EMPLOYEE_CERTIFICATIONS : "held by"
+
+  %% Work Sites & Coverage
+  WORK_SITES ||--o{ SHIFTS : "hosts"
+  WORK_SITES ||--o{ SITE_COVERAGE_RULES : "has"
+
+  %% Scheduling Core
+  SHIFTS ||--o| SHIFT_ASSIGNMENTS : "has 0..1"
+  SHIFTS }|--o| SHIFT_GROUPS : "belongs to"
+  SHIFTS }|--o| SHIFT_TEMPLATES : "created from"
+
+  SHIFT_TEMPLATES ||--o{ SHIFTS : "generates"
+  SCHEDULE_PERIODS ||--o{ SHIFTS : "contains"
+
+  %% System Tables
+  ORGANIZATIONS ||--o{ NOTIFICATIONS_OUTBOX : "has"
+  ORGANIZATIONS ||--o{ AUDIT_LOG : "tracks"
+
+  %% Entity Definitions
+  ORGANIZATIONS {
+    uuid id PK
+    varchar name "UNIQUE per org"
+    text description
+    enum week_start_day "0=Sunday, 1=Monday, etc"
+    jsonb settings "Dashboard tint, pay periods, etc"
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  ORGANIZATION_USERS {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    integer user_id FK "-> users.id"
+    varchar role "admin, manager, member"
+    boolean is_active
+    timestamptz joined_at
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  USERS {
+    serial id PK
+    varchar first_name
+    varchar last_name
+    varchar email "UNIQUE"
+    text password
+    timestamptz created_at
+    timestamptz updated_at
+    boolean is_active
+    text two_fa_secret
+    boolean two_fa_enabled
+    timestamptz last_login
+    boolean email_verified
+    timestamptz email_verified_at
+  }
+
+  EMPLOYEES {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    uuid user_id FK "-> users.id NULLABLE"
+    varchar first_name
+    varchar last_name
+    varchar email "NULLABLE for employees without accounts"
+    varchar phone
+    text address
+    date hire_date
+    date termination_date "NULLABLE"
+    jsonb emergency_contact
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  WORK_SITES {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    varchar name "UNIQUE per org"
+    text address
+    varchar timezone "e.g., 'America/New_York'"
+    jsonb contact_info
+    boolean is_24_7
+    jsonb access_instructions
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  ROLES {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    varchar name "e.g., 'Security Guard'"
+    text description
+    numeric hourly_rate "NULLABLE"
+    jsonb requirements "Skills, certifications needed"
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  SHIFTS {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    uuid work_site_id FK "-> work_sites.id"
+    uuid role_id FK "-> roles.id"
+    uuid shift_group_id FK "-> shift_groups.id NULLABLE"
+    uuid shift_template_id FK "-> shift_templates.id NULLABLE"
+    timestamptz shift_start
+    timestamptz shift_end
+    numeric hourly_rate "Override role rate if needed"
+    text notes
+    enum status "draft, published, cancelled"
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  SHIFT_ASSIGNMENTS {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    uuid shift_id FK "-> shifts.id UNIQUE"
+    uuid employee_id FK "-> employees.id"
+    enum status "pending, accepted, declined, cancelled"
+    timestamptz assigned_at
+    timestamptz responded_at
+    text response_notes
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  SHIFT_GROUPS {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    varchar name "e.g., 'Split Shift - Site A'"
+    text description
+    date shift_date
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  SHIFT_TEMPLATES {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    varchar name
+    uuid work_site_id FK "-> work_sites.id"
+    uuid role_id FK "-> roles.id"
+    time start_time
+    time end_time
+    jsonb recurrence_rule "RRULE format"
+    boolean is_active
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  SCHEDULE_PERIODS {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    varchar name "e.g., 'Week of 2024-03-01'"
+    date start_date
+    date end_date
+    enum status "draft, published, locked"
+    timestamptz published_at
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  SITE_COVERAGE_RULES {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    uuid work_site_id FK "-> work_sites.id"
+    uuid role_id FK "-> roles.id"
+    time start_time
+    time end_time
+    integer required_count
+    enum days_of_week "1=Mon, 2=Tue, etc. JSON array"
+    date effective_from
+    date effective_until "NULLABLE"
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  EMPLOYEE_SKILLS {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    uuid employee_id FK "-> employees.id"
+    uuid role_id FK "-> roles.id"
+    date qualified_since
+    date expires_on "NULLABLE"
+    text notes
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  CERTIFICATIONS {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    varchar name "e.g., 'Security Guard License'"
+    text description
+    integer validity_months "How long cert is valid"
+    boolean is_required
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  EMPLOYEE_CERTIFICATIONS {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    uuid employee_id FK "-> employees.id"
+    uuid certification_id FK "-> certifications.id"
+    varchar certificate_number
+    date issued_date
+    date expires_date
+    varchar issuing_authority
+    text notes
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  EMPLOYEE_AVAILABILITY {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    uuid employee_id FK "-> employees.id"
+    enum day_of_week "1=Mon, 2=Tue, etc"
+    time start_time
+    time end_time
+    date effective_from
+    date effective_until "NULLABLE"
+    text notes
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  TIME_OFF_REQUESTS {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    uuid employee_id FK "-> employees.id"
+    enum request_type "vacation, sick, personal, emergency"
+    date start_date
+    date end_date
+    text reason
+    enum status "pending, approved, denied, cancelled"
+    uuid approved_by FK "-> users.id NULLABLE"
+    timestamptz approved_at
+    text approval_notes
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  HOLIDAY_CALENDARS {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    varchar name "e.g., 'Christmas Day'"
+    date holiday_date
+    boolean is_recurring "Annual holiday"
+    text description
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  OVERTIME_POLICIES {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    varchar name
+    text description
+    jsonb rules "Complex overtime calculation rules"
+    boolean is_active
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+
+  NOTIFICATIONS_OUTBOX {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    uuid user_id FK "-> users.id NULLABLE"
+    varchar notification_type
+    varchar subject
+    text message
+    jsonb data "Additional context"
+    enum status "pending, sent, failed"
+    timestamptz scheduled_for
+    timestamptz sent_at
+    integer retry_count
+    timestamptz created_at
+  }
+
+  AUDIT_LOG {
+    uuid id PK
+    uuid org_id FK "-> organizations.id"
+    uuid user_id FK "-> users.id NULLABLE"
+    varchar table_name
+    varchar operation "INSERT, UPDATE, DELETE"
+    uuid record_id
+    jsonb old_values
+    jsonb new_values
+    text user_agent
+    inet ip_address
+    timestamptz created_at
+  }
+
+  USER_SESSIONS {
+    uuid id PK
+    uuid user_id FK "-> users.id"
+    text session_token "UNIQUE"
+    text refresh_token "NULLABLE"
+    timestamptz expires_at
+    text user_agent
+    inet ip_address
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  EMAIL_VERIFICATION_TOKENS {
+    serial id PK
+    integer user_id FK "UNIQUE -> users.id"
+    text token
+    timestamptz token_expiration
+    timestamptz created_at
+  }
+
+  PASSWORD_RESET_TOKENS {
+    serial id PK 
+    integer user_id FK "UNIQUE -> users.id"
+    text token
+    timestamptz token_expiration
+    timestamptz created_at
+  }
