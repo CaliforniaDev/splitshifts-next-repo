@@ -6,6 +6,7 @@
 - [ ] change color of button for the Disable Two-Factor Auth button
 - [ ] fix codebase on login so that each time user is logged into the database for last time they were logged in
 - [ ] create a email-templates directory inside of a libs folder, and create templates for email verification processes
+- [ ] fix database so all sensitive data uses uuid instead of serial or integers
 
 ## ✅ Completed Tasks
 - [x] send-password-reset-link ui/ux needs to be updated to match the send email verifications
