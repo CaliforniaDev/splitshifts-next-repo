@@ -17,7 +17,7 @@ export const organizationUsers = pgTable('organization_users', {
   orgId: uuid('org_id')
     .notNull()
     .references(() => organizations.id, { onDelete: 'cascade' }),
-  userId: integer('user_id')
+  userId: uuid('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   role: varchar('role', { length: 50 }).notNull().default('admin'), // For now, everyone who creates org is admin

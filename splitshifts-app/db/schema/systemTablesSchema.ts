@@ -14,7 +14,7 @@ export const notificationsOutbox = pgTable('notifications_outbox', {
   orgId: uuid('org_id')
     .notNull()
     .references(() => organizations.id, { onDelete: 'cascade' }),
-  userId: integer('user_id')
+  userId: uuid('user_id')
     .references(() => users.id, { onDelete: 'cascade' }),
   notificationType: varchar('notification_type', { length: 100 }).notNull(),
   subject: varchar('subject', { length: 255 }).notNull(),
@@ -33,7 +33,7 @@ export const auditLog = pgTable('audit_log', {
     .default(sql`gen_random_uuid()`),
   orgId: uuid('org_id')
     .references(() => organizations.id, { onDelete: 'cascade' }),
-  userId: integer('user_id')
+  userId: uuid('user_id')
     .references(() => users.id, { onDelete: 'set null' }),
   tableName: varchar('table_name', { length: 100 }).notNull(),
   operation: auditOperationEnum('operation').notNull(),
@@ -65,7 +65,7 @@ export const userSessions = pgTable('user_sessions', {
   id: uuid('id')
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  userId: integer('user_id')
+  userId: uuid('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   sessionToken: text('session_token').notNull().unique(),

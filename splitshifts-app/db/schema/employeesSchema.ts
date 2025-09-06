@@ -10,7 +10,7 @@ export const employees = pgTable('employees', {
   orgId: uuid('org_id')
     .notNull()
     .references(() => organizations.id, { onDelete: 'cascade' }),
-  userId: integer('user_id')
+  userId: uuid('user_id')
     .references(() => users.id, { onDelete: 'set null' }),
   firstName: varchar('first_name', { length: 255 }).notNull(),
   lastName: varchar('last_name', { length: 255 }).notNull(),

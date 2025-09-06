@@ -106,7 +106,7 @@ export const timeOffRequests = pgTable('time_off_requests', {
   endDate: date('end_date').notNull(),
   reason: text('reason'),
   status: requestStatusEnum('status').notNull().default('pending'),
-  approvedBy: integer('approved_by')
+  approvedBy: uuid('approved_by')
     .references(() => users.id, { onDelete: 'set null' }),
   approvedAt: timestamp('approved_at', { withTimezone: true }),
   approvalNotes: text('approval_notes'),
