@@ -7,6 +7,7 @@
 - [ ] fix codebase to update user's last login timestamp in database on each login
 - [ ] create a email-templates directory inside of a libs folder, and create templates for email verification processes
 - [ ] fix database so all sensitive data uses uuid instead of serial or integers
+- [ ] add PWA screenshots to manifest for better installation experience (dashboard, calendar view, employee scheduling interface)
 
 ## ✅ Completed Tasks
 - [x] send-password-reset-link ui/ux needs to be updated to match the send email verifications
