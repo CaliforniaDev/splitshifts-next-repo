@@ -7,6 +7,7 @@ export { ArchivesIcon } from './archives-icon';
 export { RemindersIcon } from './reminders-icon';
 export { SettingsIcon } from './settings-icon';
 export { KeyIcon } from './key-icon';
+export { BriefcaseIcon } from './briefcase';
 
 // Types
 export interface DashboardIconProps {
@@ -15,7 +16,7 @@ export interface DashboardIconProps {
 }
 
 // Icon names type for type safety
-export type DashboardIconName = 
+export type DashboardIconName =
   | 'home'
   | 'calendar'
   | 'employees'
@@ -23,7 +24,8 @@ export type DashboardIconName =
   | 'archives'
   | 'reminders'
   | 'settings'
-  | 'key';
+  | 'key'
+  | 'briefcase';
 
 // Navigation items type for dashboard
 export interface NavItem {

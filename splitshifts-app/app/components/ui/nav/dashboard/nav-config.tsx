@@ -69,6 +69,12 @@ export const dashboardNavigation: NavItem[] = [
     matchStrategy: 'startsWith' // Supports sub-routes like /dashboard/locations/[id]
   },
   {
+    name: 'Organization',
+    href: '/dashboard/organization',
+    icon: 'briefcase', 
+    matchStrategy: 'startsWith' // Supports sub-routes like /dashboard/organization/settings
+  },
+  {
     name: 'Settings',
     href: '/settings',
     icon: 'settings',

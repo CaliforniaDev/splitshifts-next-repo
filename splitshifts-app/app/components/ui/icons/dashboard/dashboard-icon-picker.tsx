@@ -8,6 +8,7 @@ import {
   RemindersIcon,
   SettingsIcon,
   KeyIcon,
+  BriefcaseIcon,
   type DashboardIconProps,
   type DashboardIconName
 } from './index';
@@ -25,6 +26,7 @@ const iconComponents = {
   reminders: RemindersIcon,
   settings: SettingsIcon,
   key: KeyIcon,
+  briefcase: BriefcaseIcon,
 } as const;
 
 export function DashboardIcon({ name, className = 'h-6 w-6', variant = 'outline' }: UnifiedDashboardIconProps) {
