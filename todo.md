@@ -23,6 +23,7 @@
 - [ ] Add hover and focus animations to interactive elements
 - [ ] Create consistent spacing and layout animations for dashboard components
 - [ ] Add animation preferences/reduced motion support for accessibility
+- [ ] Convert onboarding step indicators into bullet points that are checked off when completed
 
 ## 🔧 Code Organization & Quality
 - [ ] Convert remaining manual animation classes throughout the app to use AnimatedTransition
