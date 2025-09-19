@@ -47,19 +47,83 @@ const stepIndicatorVariants = cva(
   },
 );
 
-const stepTextVariants = cva('typescale-body-medium', {
+const stepTextVariants = cva('typescale-label-large', {
   variants: {
     active: {
-      true: 'text-on-surface',
-      false: 'text-on-surface-variant',
+      true: 'text-on-surface typescale-body-medium-prominent',
+      false: 'text-on-surface-variant opacity-70',
     },
   },
   defaultVariants: { active: false },
 });
 
+// Progress header component for all steps
+function StepProgress({ currentStepNumber }: { currentStepNumber: number }) {
+  const steps = [
+    { text: 'Organization', active: currentStepNumber >= 1 },
+    { text: 'Work Site', active: currentStepNumber >= 2 },
+    { text: 'Roles', active: currentStepNumber >= 3 },
+    { text: 'Employees', active: currentStepNumber >= 4 },
+  ];
+
+  return (
+    <div className="mb-6 px-4">
+      <nav aria-label="Progress" role="progressbar" aria-valuenow={currentStepNumber} aria-valuemin={1} aria-valuemax={4}>
+        <ol className="flex items-center w-full">
+          {steps.map((step, index) => {
+            const isCompleted = currentStepNumber > index + 1;
+            const isActive = currentStepNumber === index + 1;
+            const isLast = index === steps.length - 1;
+
+            return (
+              <li key={index} className="flex items-center flex-1 last:flex-none">
+                {/* Step Indicator and Label */}
+                <div className="flex items-center flex-shrink-0">
+                  <div 
+                    className={stepIndicatorVariants({ 
+                      active: isActive || isCompleted 
+                    })}
+                  >
+                    <span className="typescale-label-small">{index + 1}</span>
+                  </div>
+                  <span className={`ml-2 typescale-body-small whitespace-nowrap ${
+                    isActive || isCompleted ? 'text-on-surface' : 'text-on-surface-variant'
+                  }`}>
+                    {step.text}
+                  </span>
+                </div>
+                
+                {/* Connecting Line - only show if not last step */}
+                {!isLast && (
+                  <div 
+                    className={`flex-1 min-w-8 h-1 mx-4 rounded-full transition-colors duration-300 ${
+                      isCompleted ? 'bg-secondary' : 'bg-outline/50'
+                    }`} 
+                  />
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+    </div>
+  );
+}
+
+enum OnboardingStep {
+  WELCOME = 'welcome',
+  ORGANIZATION = 'organization',
+  WORKSITE = 'worksite',
+  ROLES = 'roles',
+  EMPLOYEES = 'employees',
+  COMPLETED = 'completed',
+}
+
 export function OnBoardingWizard() {
   const router = useRouter();
-  const [step, setStep] = useState<'welcome' | 'form'>('welcome');
+  const [currentStep, setCurrentStep] = useState<OnboardingStep>(
+    OnboardingStep.WELCOME,
+  );
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<CreateOrganizationFormData>({
@@ -75,19 +139,19 @@ export function OnBoardingWizard() {
 
   // Auto-focus name input when form loads
   useEffect(() => {
-    if (step === 'form' && nameInputRef.current) {
+    if (currentStep === OnboardingStep.ORGANIZATION && nameInputRef.current) {
       const raf = requestAnimationFrame(() => {
         nameInputRef.current?.focus();
       });
       return () => cancelAnimationFrame(raf);
     }
-  }, [step]);
+  }, [currentStep]);
 
   const handleSubmit = async (data: CreateOrganizationFormData) => {
     try {
       const response = await createOrganization(data);
       if (response.success) {
-        router.refresh();
+        handleOrganizationComplete();
       } else {
         form.setError('root', {
           type: 'server',
@@ -102,43 +166,214 @@ export function OnBoardingWizard() {
     }
   };
 
+  const handleOrganizationComplete = () => {
+    setCurrentStep(OnboardingStep.WORKSITE);
+    if (nameInputRef.current) {
+      nameInputRef.current.blur(); // Blur the input to avoid focus issues
+    }
+    // Optionally, you can scroll to the top of the page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleWorkSiteComplete = () => {
+    setCurrentStep(OnboardingStep.ROLES);
+    // Optionally, you can scroll to the top of the page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleRolesComplete = () => {
+    setCurrentStep(OnboardingStep.EMPLOYEES);
+    // Optionally, you can scroll to the top of the page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleEmployeesComplete = () => {
+    setCurrentStep(OnboardingStep.COMPLETED);
+    // Optionally, you can scroll to the top of the page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const getStepNumber = () => {
+    switch (currentStep) {
+      case OnboardingStep.WELCOME:
+        return 1; // Show step 1 as active when on welcome
+      case OnboardingStep.ORGANIZATION:
+        return 1; // Stay on step 1 during organization form
+      case OnboardingStep.WORKSITE:
+        return 2;
+      case OnboardingStep.ROLES:
+        return 3;
+      case OnboardingStep.EMPLOYEES:
+        return 4;
+      case OnboardingStep.COMPLETED:
+        return 4; // All steps complete
+      default:
+        return 1;
+    }
+  };
+
   const handleSkip = () => {
     router.refresh();
   };
 
-  if (step === 'welcome') {
+  if (currentStep === OnboardingStep.WELCOME) {
     return (
       <AnimatedTransition animationKey='welcome'>
-        <WelcomeCard onContinue={() => setStep('form')} onSkip={handleSkip} />
+        <WelcomeCard
+          onContinue={() => setCurrentStep(OnboardingStep.ORGANIZATION)}
+          onSkip={handleSkip}
+          currentStepNumber={getStepNumber()}
+        />
+      </AnimatedTransition>
+    );
+  }
+  if (currentStep === OnboardingStep.ORGANIZATION) {
+    return (
+      <AnimatedTransition animationKey='organization'>
+        <div>
+          <StepProgress currentStepNumber={getStepNumber()} />
+          <OrganizationFormCard
+            form={form}
+            isSubmitting={isSubmitting}
+            onSubmit={handleSubmit}
+            onBack={() => setCurrentStep(OnboardingStep.WELCOME)}
+            nameInputRef={nameInputRef}
+          />
+        </div>
       </AnimatedTransition>
     );
   }
 
-  return (
-    <AnimatedTransition animationKey='form'>
-      <OrganizationFormCard
-        form={form}
-        isSubmitting={isSubmitting}
-        onSubmit={handleSubmit}
-        onBack={() => setStep('welcome')}
-        nameInputRef={nameInputRef}
-      />
-    </AnimatedTransition>
-  );
+  if (currentStep === OnboardingStep.WORKSITE) {
+    return (
+      <AnimatedTransition animationKey='worksite'>
+        <div>
+          <StepProgress currentStepNumber={getStepNumber()} />
+          <Card className='mx-auto w-full max-w-md border-none shadow-elevation-0'>
+            <CardHeader className='text-center'>
+              <CardTitle>Add Your First Work Site</CardTitle>
+              <CardDescription>
+                Work sites help organize your shifts by location.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='text-center space-y-4'>
+              <div className='text-4xl'>🏢</div>
+              <p className='text-on-surface-variant'>
+                Work site form coming soon...
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={handleWorkSiteComplete} variant='filled' className='w-full'>
+                Continue
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </AnimatedTransition>
+    );
+  }
+
+  if (currentStep === OnboardingStep.ROLES) {
+    return (
+      <AnimatedTransition animationKey='roles'>
+        <div>
+          <StepProgress currentStepNumber={getStepNumber()} />
+          <Card className='mx-auto w-full max-w-md border-none shadow-elevation-0'>
+            <CardHeader className='text-center'>
+              <CardTitle>Create Job Roles</CardTitle>
+              <CardDescription>
+                Define the different positions in your organization.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='text-center space-y-4'>
+              <div className='text-4xl'>👔</div>
+              <p className='text-on-surface-variant'>
+                Job roles form coming soon...
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={handleRolesComplete} variant='filled' className='w-full'>
+                Continue
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </AnimatedTransition>
+    );
+  }
+  if (currentStep === OnboardingStep.EMPLOYEES) {
+    return (
+      <AnimatedTransition animationKey='employees'>
+        <div>
+          <StepProgress currentStepNumber={getStepNumber()} />
+          <Card className='mx-auto w-full max-w-md border-none shadow-elevation-0'>
+            <CardHeader className='text-center'>
+              <CardTitle>Add Employees</CardTitle>
+              <CardDescription>
+                Invite your team members to join your organization.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='text-center space-y-4'>
+              <div className='text-4xl'>👥</div>
+              <p className='text-on-surface-variant'>
+                Employee invitation form coming soon...
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={handleEmployeesComplete} variant='filled' className='w-full'>
+                Complete Setup
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </AnimatedTransition>
+    );
+  }
+
+  if (currentStep === OnboardingStep.COMPLETED) {
+    return (
+      <AnimatedTransition animationKey='completed'>
+        <Card className='mx-auto w-full max-w-md border-none bg-surface-container-low shadow-elevation-1'>
+          <CardHeader className='text-center'>
+            <div className='mb-4 text-6xl'>✅</div>
+            <CardTitle className='typescale-title-large'>
+              Setup Complete!
+            </CardTitle>
+            <CardDescription className='typescale-body-large'>
+              Welcome to SplitShifts. Let's start managing your shifts!
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              variant='filled' 
+              className='w-full' 
+              onClick={() => router.refresh()}
+            >
+              Go to Dashboard
+            </Button>
+          </CardContent>
+        </Card>
+      </AnimatedTransition>
+    );
+  }
+
+  return null;
 }
 
 function WelcomeCard({
   onContinue,
   onSkip,
+  currentStepNumber = 1,
 }: {
   onContinue: () => void;
   onSkip: () => void;
+  currentStepNumber?: number;
 }) {
   const steps = [
-    { text: 'Create your organization', active: true },
-    { text: 'Add your first location', active: false },
-    { text: 'Create job roles', active: false },
-    { text: 'Add employees', active: false },
+    { text: 'Create your organization', active: currentStepNumber  >= 1 },
+    { text: 'Add your first work site', active: currentStepNumber >= 2 },
+    { text: 'Create job roles', active: currentStepNumber >= 3 },
+    { text: 'Add employees', active: currentStepNumber >= 4 },
   ];
 
   return (
@@ -260,8 +495,8 @@ function OrganizationFormCard({
                         <select
                           {...field}
                           className={`w-full rounded-lg border p-3 text-on-surface ${
-                            fieldState.error 
-                              ? 'border-error bg-error-container/10' 
+                            fieldState.error
+                              ? 'border-error bg-error-container/10'
                               : 'border-outline bg-surface'
                           }`}
                         >
