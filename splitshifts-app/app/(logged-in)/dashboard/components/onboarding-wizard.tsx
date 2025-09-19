@@ -59,47 +59,35 @@ const stepTextVariants = cva('typescale-label-large', {
 
 // Progress header component for all steps
 function StepProgress({ currentStepNumber }: { currentStepNumber: number }) {
-  const steps = [
-    { text: 'Organization', active: currentStepNumber >= 1 },
-    { text: 'Work Site', active: currentStepNumber >= 2 },
-    { text: 'Roles', active: currentStepNumber >= 3 },
-    { text: 'Employees', active: currentStepNumber >= 4 },
-  ];
+  const steps = ['Organization', 'Work Site', 'Roles', 'Employees'];
 
   return (
     <div className="mb-6 px-4">
-      <nav aria-label="Progress" role="progressbar" aria-valuenow={currentStepNumber} aria-valuemin={1} aria-valuemax={4}>
+      <nav aria-label="Progress">
         <ol className="flex items-center w-full">
-          {steps.map((step, index) => {
-            const isCompleted = currentStepNumber > index + 1;
-            const isActive = currentStepNumber === index + 1;
+          {steps.map((stepText, index) => {
+            const stepNumber = index + 1;
+            const isCompleted = currentStepNumber > stepNumber;
+            const isActive = currentStepNumber === stepNumber;
             const isLast = index === steps.length - 1;
 
             return (
-              <li key={index} className="flex items-center flex-1 last:flex-none">
-                {/* Step Indicator and Label */}
+              <li key={stepNumber} className="flex items-center flex-1 last:flex-none">
                 <div className="flex items-center flex-shrink-0">
-                  <div 
-                    className={stepIndicatorVariants({ 
-                      active: isActive || isCompleted 
-                    })}
-                  >
-                    <span className="typescale-label-small">{index + 1}</span>
+                  <div className={stepIndicatorVariants({ active: isActive || isCompleted })}>
+                    <span className="typescale-label-small">{stepNumber}</span>
                   </div>
                   <span className={`ml-2 typescale-body-small whitespace-nowrap ${
                     isActive || isCompleted ? 'text-on-surface' : 'text-on-surface-variant'
                   }`}>
-                    {step.text}
+                    {stepText}
                   </span>
                 </div>
                 
-                {/* Connecting Line - only show if not last step */}
                 {!isLast && (
-                  <div 
-                    className={`flex-1 min-w-8 h-1 mx-4 rounded-full transition-colors duration-300 ${
-                      isCompleted ? 'bg-secondary' : 'bg-outline/50'
-                    }`} 
-                  />
+                  <div className={`flex-1 min-w-8 h-1 mx-4 rounded-full transition-colors ${
+                    isCompleted ? 'bg-secondary' : 'bg-outline/50'
+                  }`} />
                 )}
               </li>
             );
@@ -227,11 +215,14 @@ export function OnBoardingWizard() {
       </AnimatedTransition>
     );
   }
-  if (currentStep === OnboardingStep.ORGANIZATION) {
-    return (
-      <AnimatedTransition animationKey='organization'>
-        <div>
-          <StepProgress currentStepNumber={getStepNumber()} />
+
+  // For all other steps, show progress bar outside animation + content inside animation
+  return (
+    <div>
+      <StepProgress currentStepNumber={getStepNumber()} />
+      
+      {currentStep === OnboardingStep.ORGANIZATION && (
+        <AnimatedTransition animationKey='organization'>
           <OrganizationFormCard
             form={form}
             isSubmitting={isSubmitting}
@@ -239,16 +230,11 @@ export function OnBoardingWizard() {
             onBack={() => setCurrentStep(OnboardingStep.WELCOME)}
             nameInputRef={nameInputRef}
           />
-        </div>
-      </AnimatedTransition>
-    );
-  }
+        </AnimatedTransition>
+      )}
 
-  if (currentStep === OnboardingStep.WORKSITE) {
-    return (
-      <AnimatedTransition animationKey='worksite'>
-        <div>
-          <StepProgress currentStepNumber={getStepNumber()} />
+      {currentStep === OnboardingStep.WORKSITE && (
+        <AnimatedTransition animationKey='worksite'>
           <Card className='mx-auto w-full max-w-md border-none shadow-elevation-0'>
             <CardHeader className='text-center'>
               <CardTitle>Add Your First Work Site</CardTitle>
@@ -268,16 +254,11 @@ export function OnBoardingWizard() {
               </Button>
             </CardFooter>
           </Card>
-        </div>
-      </AnimatedTransition>
-    );
-  }
+        </AnimatedTransition>
+      )}
 
-  if (currentStep === OnboardingStep.ROLES) {
-    return (
-      <AnimatedTransition animationKey='roles'>
-        <div>
-          <StepProgress currentStepNumber={getStepNumber()} />
+      {currentStep === OnboardingStep.ROLES && (
+        <AnimatedTransition animationKey='roles'>
           <Card className='mx-auto w-full max-w-md border-none shadow-elevation-0'>
             <CardHeader className='text-center'>
               <CardTitle>Create Job Roles</CardTitle>
@@ -297,15 +278,11 @@ export function OnBoardingWizard() {
               </Button>
             </CardFooter>
           </Card>
-        </div>
-      </AnimatedTransition>
-    );
-  }
-  if (currentStep === OnboardingStep.EMPLOYEES) {
-    return (
-      <AnimatedTransition animationKey='employees'>
-        <div>
-          <StepProgress currentStepNumber={getStepNumber()} />
+        </AnimatedTransition>
+      )}
+
+      {currentStep === OnboardingStep.EMPLOYEES && (
+        <AnimatedTransition animationKey='employees'>
           <Card className='mx-auto w-full max-w-md border-none shadow-elevation-0'>
             <CardHeader className='text-center'>
               <CardTitle>Add Employees</CardTitle>
@@ -325,39 +302,35 @@ export function OnBoardingWizard() {
               </Button>
             </CardFooter>
           </Card>
-        </div>
-      </AnimatedTransition>
-    );
-  }
+        </AnimatedTransition>
+      )}
 
-  if (currentStep === OnboardingStep.COMPLETED) {
-    return (
-      <AnimatedTransition animationKey='completed'>
-        <Card className='mx-auto w-full max-w-md border-none bg-surface-container-low shadow-elevation-1'>
-          <CardHeader className='text-center'>
-            <div className='mb-4 text-6xl'>✅</div>
-            <CardTitle className='typescale-title-large'>
-              Setup Complete!
-            </CardTitle>
-            <CardDescription className='typescale-body-large'>
-              Welcome to SplitShifts. Let's start managing your shifts!
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button 
-              variant='filled' 
-              className='w-full' 
-              onClick={() => router.refresh()}
-            >
-              Go to Dashboard
-            </Button>
-          </CardContent>
-        </Card>
-      </AnimatedTransition>
-    );
-  }
-
-  return null;
+      {currentStep === OnboardingStep.COMPLETED && (
+        <AnimatedTransition animationKey='completed'>
+          <Card className='mx-auto w-full max-w-md border-none bg-surface-container-low shadow-elevation-1'>
+            <CardHeader className='text-center'>
+              <div className='mb-4 text-6xl'>✅</div>
+              <CardTitle className='typescale-title-large'>
+                Setup Complete!
+              </CardTitle>
+              <CardDescription className='typescale-body-large'>
+                Welcome to SplitShifts. Let's start managing your shifts!
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                variant='filled' 
+                className='w-full' 
+                onClick={() => router.refresh()}
+              >
+                Go to Dashboard
+              </Button>
+            </CardContent>
+          </Card>
+        </AnimatedTransition>
+      )}
+    </div>
+  );
 }
 
 function WelcomeCard({
