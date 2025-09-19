@@ -1,6 +1,9 @@
 'use client';
+
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+
+import clsx from 'clsx';
 import { cva } from 'class-variance-authority';
 
 import { useForm } from 'react-hook-form';
@@ -35,12 +38,12 @@ import AnimatedTransition from '@/app/components/ui/animations/animated-transiti
 
 // CVA variants
 const stepIndicatorVariants = cva(
-  'flex h-8 w-8 items-center justify-center rounded-full',
+  'flex h-8 w-8 items-center justify-center rounded-full transition-all duration-500',
   {
     variants: {
       active: {
-        true: 'bg-secondary-container text-on-secondary-container',
-        false: 'bg-on-surface/16 text-on-surface-variant opacity-30',
+        true: 'bg-secondary-container text-on-secondary-container scale-110',
+        false: 'bg-on-surface/16 text-on-surface-variant opacity-30 scale-100',
       },
     },
     defaultVariants: { active: false },
@@ -62,9 +65,9 @@ function StepProgress({ currentStepNumber }: { currentStepNumber: number }) {
   const steps = ['Organization', 'Work Site', 'Roles', 'Employees'];
 
   return (
-    <div className="mb-6 px-4">
-      <nav aria-label="Progress">
-        <ol className="flex items-center w-full">
+    <div className='mb-6 px-4'>
+      <nav aria-label='Progress'>
+        <ol className='flex w-full items-center'>
           {steps.map((stepText, index) => {
             const stepNumber = index + 1;
             const isCompleted = currentStepNumber > stepNumber;
@@ -72,22 +75,39 @@ function StepProgress({ currentStepNumber }: { currentStepNumber: number }) {
             const isLast = index === steps.length - 1;
 
             return (
-              <li key={stepNumber} className="flex items-center flex-1 last:flex-none">
-                <div className="flex items-center flex-shrink-0">
-                  <div className={stepIndicatorVariants({ active: isActive || isCompleted })}>
-                    <span className="typescale-label-small">{stepNumber}</span>
+              <li
+                key={stepNumber}
+                className='flex flex-1 items-center last:flex-none'
+              >
+                <div className='flex flex-shrink-0 items-center'>
+                  <div
+                    className={stepIndicatorVariants({
+                      active: isActive || isCompleted,
+                    })}
+                  >
+                    <span className='typescale-label-small'>{stepNumber}</span>
                   </div>
-                  <span className={`ml-2 typescale-body-small whitespace-nowrap ${
-                    isActive || isCompleted ? 'text-on-surface' : 'text-on-surface-variant'
-                  }`}>
+                  <span
+                    className={clsx(
+                      'typescale-body-small ml-2 whitespace-nowrap transition-colors duration-300',
+                      isActive || isCompleted
+                        ? 'text-on-surface'
+                        : 'text-on-surface-variant',
+                    )}
+                  >
                     {stepText}
                   </span>
                 </div>
-                
+
                 {!isLast && (
-                  <div className={`flex-1 min-w-8 h-1 mx-4 rounded-full transition-colors ${
-                    isCompleted ? 'bg-secondary' : 'bg-outline/50'
-                  }`} />
+                  <div className='relative mx-4 h-1 min-w-8 flex-1 overflow-hidden rounded-full bg-outline/50'>
+                    <div
+                      className={clsx(
+                        'absolute inset-0 h-full rounded-full bg-secondary transition-all duration-700 ease-out',
+                        isCompleted ? 'w-full' : 'w-0',
+                      )}
+                    />
+                  </div>
                 )}
               </li>
             );
@@ -220,7 +240,7 @@ export function OnBoardingWizard() {
   return (
     <div>
       <StepProgress currentStepNumber={getStepNumber()} />
-      
+
       {currentStep === OnboardingStep.ORGANIZATION && (
         <AnimatedTransition animationKey='organization'>
           <OrganizationFormCard
@@ -242,14 +262,18 @@ export function OnBoardingWizard() {
                 Work sites help organize your shifts by location.
               </CardDescription>
             </CardHeader>
-            <CardContent className='text-center space-y-4'>
+            <CardContent className='space-y-4 text-center'>
               <div className='text-4xl'>🏢</div>
               <p className='text-on-surface-variant'>
                 Work site form coming soon...
               </p>
             </CardContent>
             <CardFooter>
-              <Button onClick={handleWorkSiteComplete} variant='filled' className='w-full'>
+              <Button
+                onClick={handleWorkSiteComplete}
+                variant='filled'
+                className='w-full'
+              >
                 Continue
               </Button>
             </CardFooter>
@@ -266,14 +290,18 @@ export function OnBoardingWizard() {
                 Define the different positions in your organization.
               </CardDescription>
             </CardHeader>
-            <CardContent className='text-center space-y-4'>
+            <CardContent className='space-y-4 text-center'>
               <div className='text-4xl'>👔</div>
               <p className='text-on-surface-variant'>
                 Job roles form coming soon...
               </p>
             </CardContent>
             <CardFooter>
-              <Button onClick={handleRolesComplete} variant='filled' className='w-full'>
+              <Button
+                onClick={handleRolesComplete}
+                variant='filled'
+                className='w-full'
+              >
                 Continue
               </Button>
             </CardFooter>
@@ -290,14 +318,18 @@ export function OnBoardingWizard() {
                 Invite your team members to join your organization.
               </CardDescription>
             </CardHeader>
-            <CardContent className='text-center space-y-4'>
+            <CardContent className='space-y-4 text-center'>
               <div className='text-4xl'>👥</div>
               <p className='text-on-surface-variant'>
                 Employee invitation form coming soon...
               </p>
             </CardContent>
             <CardFooter>
-              <Button onClick={handleEmployeesComplete} variant='filled' className='w-full'>
+              <Button
+                onClick={handleEmployeesComplete}
+                variant='filled'
+                className='w-full'
+              >
                 Complete Setup
               </Button>
             </CardFooter>
@@ -318,9 +350,9 @@ export function OnBoardingWizard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button 
-                variant='filled' 
-                className='w-full' 
+              <Button
+                variant='filled'
+                className='w-full'
                 onClick={() => router.refresh()}
               >
                 Go to Dashboard
@@ -343,7 +375,7 @@ function WelcomeCard({
   currentStepNumber?: number;
 }) {
   const steps = [
-    { text: 'Create your organization', active: currentStepNumber  >= 1 },
+    { text: 'Create your organization', active: currentStepNumber >= 1 },
     { text: 'Add your first work site', active: currentStepNumber >= 2 },
     { text: 'Create job roles', active: currentStepNumber >= 3 },
     { text: 'Add employees', active: currentStepNumber >= 4 },
