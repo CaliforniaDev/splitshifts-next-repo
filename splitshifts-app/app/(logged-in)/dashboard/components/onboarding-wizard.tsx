@@ -36,6 +36,14 @@ import Input from '@/app/components/ui/inputs/input';
 import Button from '@/app/components/ui/buttons/button';
 import AnimatedTransition from '@/app/components/ui/animations/animated-transition';
 
+// Step configuration - single source of truth
+const STEP_DISPLAY_CONFIG = [
+  { key: 'organization', title: 'Organization', description: 'Create your organization' },
+  { key: 'worksite', title: 'Worksite', description: 'Add your first worksite' },
+  { key: 'roles', title: 'Roles', description: 'Create job roles' },
+  { key: 'employees', title: 'Employees', description: 'Add employees' },
+] as const;
+
 // CVA variants
 const stepIndicatorVariants = cva(
   'flex h-8 w-8 items-center justify-center rounded-full transition-all duration-500',
@@ -62,21 +70,19 @@ const stepTextVariants = cva('typescale-label-large', {
 
 // Progress header component for all steps
 function StepProgress({ currentStepNumber }: { currentStepNumber: number }) {
-  const steps = ['Organization', 'Work Site', 'Roles', 'Employees'];
-
   return (
     <div className='mb-6 px-4'>
       <nav aria-label='Progress'>
         <ol className='flex w-full items-center'>
-          {steps.map((stepText, index) => {
+          {STEP_DISPLAY_CONFIG.map((step, index) => {
             const stepNumber = index + 1;
             const isCompleted = currentStepNumber > stepNumber;
             const isActive = currentStepNumber === stepNumber;
-            const isLast = index === steps.length - 1;
+            const isLast = index === STEP_DISPLAY_CONFIG.length - 1;
 
             return (
               <li
-                key={stepNumber}
+                key={step.key}
                 className='flex flex-1 items-center last:flex-none'
               >
                 <div className='flex flex-shrink-0 items-center'>
@@ -95,7 +101,7 @@ function StepProgress({ currentStepNumber }: { currentStepNumber: number }) {
                         : 'text-on-surface-variant',
                     )}
                   >
-                    {stepText}
+                    {step.title}
                   </span>
                 </div>
 
@@ -115,6 +121,41 @@ function StepProgress({ currentStepNumber }: { currentStepNumber: number }) {
         </ol>
       </nav>
     </div>
+  );
+}
+
+// Reusable placeholder card component
+function PlaceholderStepCard({
+  title,
+  description,
+  icon,
+  onContinue,
+  buttonText = 'Continue',
+}: {
+  title: string;
+  description: string;
+  icon: string;
+  onContinue: () => void;
+  buttonText?: string;
+}) {
+  return (
+    <Card className='mx-auto w-full max-w-md border-none shadow-elevation-0'>
+      <CardHeader className='text-center'>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
+      </CardHeader>
+      <CardContent className='space-y-4 text-center'>
+        <div className='text-4xl'>{icon}</div>
+        <p className='text-on-surface-variant'>
+          Form coming soon...
+        </p>
+      </CardContent>
+      <CardFooter>
+        <Button onClick={onContinue} variant='filled' className='w-full'>
+          {buttonText}
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
 
@@ -179,26 +220,18 @@ export function OnboardingWizard() {
     if (nameInputRef.current) {
       nameInputRef.current.blur(); // Blur the input to avoid focus issues
     }
-    // Optionally, you can scroll to the top of the page
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleWorkSiteComplete = () => {
+  const handleWorksiteComplete = () => {
     setCurrentStep(OnboardingStep.ROLES);
-    // Optionally, you can scroll to the top of the page
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleRolesComplete = () => {
     setCurrentStep(OnboardingStep.EMPLOYEES);
-    // Optionally, you can scroll to the top of the page
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleEmployeesComplete = () => {
     setCurrentStep(OnboardingStep.COMPLETED);
-    // Optionally, you can scroll to the top of the page
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const getStepNumber = () => {
@@ -255,85 +288,35 @@ export function OnboardingWizard() {
 
       {currentStep === OnboardingStep.WORKSITE && (
         <AnimatedTransition animationKey='worksite'>
-          <Card className='mx-auto w-full max-w-md border-none shadow-elevation-0'>
-            <CardHeader className='text-center'>
-              <CardTitle>Add Your First Work Site</CardTitle>
-              <CardDescription>
-                Work sites help organize your shifts by location.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className='space-y-4 text-center'>
-              <div className='text-4xl'>🏢</div>
-              <p className='text-on-surface-variant'>
-                Work site form coming soon...
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Button
-                onClick={handleWorkSiteComplete}
-                variant='filled'
-                className='w-full'
-              >
-                Continue
-              </Button>
-            </CardFooter>
-          </Card>
+          <PlaceholderStepCard
+            title='Add Your First Worksite'
+            description='Worksites help organize your shifts by location.'
+            icon='🏢'
+            onContinue={handleWorksiteComplete}
+          />
         </AnimatedTransition>
       )}
 
       {currentStep === OnboardingStep.ROLES && (
         <AnimatedTransition animationKey='roles'>
-          <Card className='mx-auto w-full max-w-md border-none shadow-elevation-0'>
-            <CardHeader className='text-center'>
-              <CardTitle>Create Job Roles</CardTitle>
-              <CardDescription>
-                Define the different positions in your organization.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className='space-y-4 text-center'>
-              <div className='text-4xl'>👔</div>
-              <p className='text-on-surface-variant'>
-                Job roles form coming soon...
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Button
-                onClick={handleRolesComplete}
-                variant='filled'
-                className='w-full'
-              >
-                Continue
-              </Button>
-            </CardFooter>
-          </Card>
+          <PlaceholderStepCard
+            title='Create Job Roles'
+            description='Define the different positions in your organization.'
+            icon='👔'
+            onContinue={handleRolesComplete}
+          />
         </AnimatedTransition>
       )}
 
       {currentStep === OnboardingStep.EMPLOYEES && (
         <AnimatedTransition animationKey='employees'>
-          <Card className='mx-auto w-full max-w-md border-none shadow-elevation-0'>
-            <CardHeader className='text-center'>
-              <CardTitle>Add Employees</CardTitle>
-              <CardDescription>
-                Invite your team members to join your organization.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className='space-y-4 text-center'>
-              <div className='text-4xl'>👥</div>
-              <p className='text-on-surface-variant'>
-                Employee invitation form coming soon...
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Button
-                onClick={handleEmployeesComplete}
-                variant='filled'
-                className='w-full'
-              >
-                Complete Setup
-              </Button>
-            </CardFooter>
-          </Card>
+          <PlaceholderStepCard
+            title='Add Employees'
+            description='Invite your team members to join your organization.'
+            icon='👥'
+            onContinue={handleEmployeesComplete}
+            buttonText='Complete Setup'
+          />
         </AnimatedTransition>
       )}
 
@@ -374,13 +357,6 @@ function WelcomeCard({
   onSkip: () => void;
   currentStepNumber?: number;
 }) {
-  const steps = [
-    { text: 'Create your organization', active: currentStepNumber >= 1 },
-    { text: 'Add your first work site', active: currentStepNumber >= 2 },
-    { text: 'Create job roles', active: currentStepNumber >= 3 },
-    { text: 'Add employees', active: currentStepNumber >= 4 },
-  ];
-
   return (
     <Card className='mx-auto w-full max-w-md border-none bg-surface-container-low shadow-elevation-1'>
       <CardHeader className='text-center'>
@@ -394,16 +370,21 @@ function WelcomeCard({
       </CardHeader>
       <CardContent className='space-y-6'>
         <ol className='space-y-3'>
-          {steps.map((step, index) => (
-            <li key={index} className='flex items-center space-x-3'>
-              <div className={stepIndicatorVariants({ active: step.active })}>
-                <span className='typescale-label-medium'>{index + 1}</span>
-              </div>
-              <span className={stepTextVariants({ active: step.active })}>
-                {step.text}
-              </span>
-            </li>
-          ))}
+          {STEP_DISPLAY_CONFIG.map((step, index) => {
+            const stepNumber = index + 1;
+            const isActive = currentStepNumber >= stepNumber;
+            
+            return (
+              <li key={step.key} className='flex items-center space-x-3'>
+                <div className={stepIndicatorVariants({ active: isActive })}>
+                  <span className='typescale-label-medium'>{stepNumber}</span>
+                </div>
+                <span className={stepTextVariants({ active: isActive })}>
+                  {step.description}
+                </span>
+              </li>
+            );
+          })}
         </ol>
         <div className='flex flex-col space-y-3 pt-4'>
           <Button variant='filled' className='w-full' onClick={onContinue}>
@@ -537,7 +518,7 @@ function OrganizationFormCard({
           className='w-full'
           onClick={onBack}
         >
-          Cancel
+          Back
         </Button>
       </CardFooter>
     </Card>
