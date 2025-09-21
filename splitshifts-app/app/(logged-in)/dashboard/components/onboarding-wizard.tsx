@@ -127,7 +127,7 @@ enum OnboardingStep {
   COMPLETED = 'completed',
 }
 
-export function OnBoardingWizard() {
+export function OnboardingWizard() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(
     OnboardingStep.WELCOME,

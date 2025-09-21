@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from '@/app/components/ui/card';
 import { Label } from '@/app/components/ui/label';
-import { OnBoardingWizard } from './components/onboarding-wizard';
+import { OnboardingWizard } from './components/onboarding-wizard';
 
 export default async function Dashboard() {
   const session = await auth();
@@ -37,7 +37,7 @@ export default async function Dashboard() {
   if (!userOrg) {
     return (
       <div className='flex items-start justify-center p-4'>
-        <OnBoardingWizard 
+        <OnboardingWizard 
         />
       </div>
       // <Card className='w-full max-w-2xl mx-auto'>
