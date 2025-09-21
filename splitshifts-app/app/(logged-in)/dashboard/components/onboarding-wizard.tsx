@@ -196,25 +196,7 @@ export function OnboardingWizard() {
     }
   }, [currentStep]);
 
-  const handleSubmit = async (data: CreateOrganizationFormData) => {
-    try {
-      const response = await createOrganization(data);
-      if (response.success) {
-        handleOrganizationComplete();
-      } else {
-        form.setError('root', {
-          type: 'server',
-          message: response.error || 'Failed to create organization',
-        });
-      }
-    } catch {
-      form.setError('root', {
-        type: 'server',
-        message: 'An unexpected error occurred',
-      });
-    }
-  };
-
+  // Step completion handlers - in logical flow order
   const handleOrganizationComplete = () => {
     setCurrentStep(OnboardingStep.WORKSITE);
     if (nameInputRef.current) {
@@ -232,6 +214,26 @@ export function OnboardingWizard() {
 
   const handleEmployeesComplete = () => {
     setCurrentStep(OnboardingStep.COMPLETED);
+  };
+
+  // Form submission handler - depends on completion handlers above
+  const handleSubmit = async (data: CreateOrganizationFormData) => {
+    try {
+      const response = await createOrganization(data);
+      if (response.success) {
+        handleOrganizationComplete();
+      } else {
+        form.setError('root', {
+          type: 'server',
+          message: response.error || 'Failed to create organization',
+        });
+      }
+    } catch {
+      form.setError('root', {
+        type: 'server',
+        message: 'An unexpected error occurred',
+      });
+    }
   };
 
   const getStepNumber = () => {
