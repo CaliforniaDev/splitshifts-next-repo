@@ -38,8 +38,16 @@ import AnimatedTransition from '@/app/components/ui/animations/animated-transiti
 
 // Step configuration - single source of truth
 const STEP_DISPLAY_CONFIG = [
-  { key: 'organization', title: 'Organization', description: 'Create your organization' },
-  { key: 'worksite', title: 'Worksite', description: 'Add your first worksite' },
+  {
+    key: 'organization',
+    title: 'Organization',
+    description: 'Create your organization',
+  },
+  {
+    key: 'worksite',
+    title: 'Worksite',
+    description: 'Add your first worksite',
+  },
   { key: 'roles', title: 'Roles', description: 'Create job roles' },
   { key: 'employees', title: 'Employees', description: 'Add employees' },
 ] as const;
@@ -146,9 +154,7 @@ function PlaceholderStepCard({
       </CardHeader>
       <CardContent className='space-y-4 text-center'>
         <div className='text-4xl'>{icon}</div>
-        <p className='text-on-surface-variant'>
-          Form coming soon...
-        </p>
+        <p className='text-on-surface-variant'>Form coming soon...</p>
       </CardContent>
       <CardFooter>
         <Button onClick={onContinue} variant='filled' className='w-full'>
@@ -375,7 +381,7 @@ function WelcomeCard({
           {STEP_DISPLAY_CONFIG.map((step, index) => {
             const stepNumber = index + 1;
             const isActive = currentStepNumber >= stepNumber;
-            
+
             return (
               <li key={step.key} className='flex items-center space-x-3'>
                 <div className={stepIndicatorVariants({ active: isActive })}>
@@ -499,30 +505,30 @@ function OrganizationFormCard({
                   </FormItem>
                 )}
               />
+              <div className='flex flex-col space-y-4 pt-4'>
+                <Button
+                  type='submit'
+                  variant='filled'
+                  className='w-full'
+                  loading={isSubmitting}
+                  loadingText='Creating...'
+                  onClick={form.handleSubmit(onSubmit)}
+                >
+                  Create Organization
+                </Button>
+                <Button
+                  type='button'
+                  variant='outlined'
+                  className='w-full'
+                  onClick={onBack}
+                >
+                  Back
+                </Button>
+              </div>
             </fieldset>
           </form>
         </Form>
       </CardContent>
-      <CardFooter className='flex flex-col space-y-3 pt-4'>
-        <Button
-          type='submit'
-          variant='filled'
-          className='w-full'
-          loading={isSubmitting}
-          loadingText='Creating...'
-          onClick={form.handleSubmit(onSubmit)}
-        >
-          Create Organization
-        </Button>
-        <Button
-          type='button'
-          variant='outlined'
-          className='w-full'
-          onClick={onBack}
-        >
-          Back
-        </Button>
-      </CardFooter>
     </Card>
   );
 }
