@@ -15,6 +15,8 @@ import {
 } from '@/app/lib/validation/organization';
 import { createOrganization } from '@/app/(logged-in)/dashboard/actions/create-organization';
 
+import OrganizationFormCard from './organization-form-card';
+
 import {
   Card,
   CardContent,
@@ -402,132 +404,6 @@ function WelcomeCard({
             Skip for now
           </Button>
         </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-interface OrganizationFormCardProps {
-  form: ReturnType<typeof useForm<CreateOrganizationFormData>>;
-  isSubmitting: boolean;
-  onSubmit: (data: CreateOrganizationFormData) => Promise<void>;
-  onBack: () => void;
-  nameInputRef: React.RefObject<HTMLInputElement | null>;
-}
-
-function OrganizationFormCard({
-  form,
-  isSubmitting,
-  onSubmit,
-  onBack,
-  nameInputRef,
-}: OrganizationFormCardProps) {
-  return (
-    <Card className='mx-auto w-full max-w-md border-none shadow-elevation-0'>
-      <CardHeader>
-        <CardTitle>Create Your Organization</CardTitle>
-        <CardDescription>
-          Start by providing some basic details about your organization.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {form.formState.errors.root && (
-          <div className='mb-4'>
-            <FormMessage>{form.formState.errors.root.message}</FormMessage>
-          </div>
-        )}
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <fieldset disabled={isSubmitting} className='space-y-4'>
-              <FormField
-                name='name'
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        ref={nameInputRef}
-                        label='Organization Name'
-                        type='text'
-                        onBlur={field.onBlur}
-                        error={!!fieldState.error}
-                        errorMessage={fieldState.error?.message}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name='description'
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        label='Description (Optional)'
-                        type='text'
-                        onBlur={field.onBlur}
-                        error={!!fieldState.error}
-                        errorMessage={fieldState.error?.message}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name='weekStartDay'
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormControl>
-                      <div className='space-y-2'>
-                        <label className='typescale-body-medium block text-on-surface'>
-                          Week Starts On
-                        </label>
-                        <select
-                          {...field}
-                          className={`w-full rounded-lg border p-3 text-on-surface ${
-                            fieldState.error
-                              ? 'border-error bg-error-container/10'
-                              : 'border-outline bg-surface'
-                          }`}
-                        >
-                          <option value='monday'>Monday</option>
-                          <option value='sunday'>Sunday</option>
-                        </select>
-                        {fieldState.error && (
-                          <FormMessage>{fieldState.error.message}</FormMessage>
-                        )}
-                      </div>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <div className='flex flex-col space-y-4 pt-4'>
-                <Button
-                  type='submit'
-                  variant='filled'
-                  className='w-full'
-                  loading={isSubmitting}
-                  loadingText='Creating...'
-                  onClick={form.handleSubmit(onSubmit)}
-                >
-                  Create Organization
-                </Button>
-                <Button
-                  type='button'
-                  variant='outlined'
-                  className='w-full'
-                  onClick={onBack}
-                >
-                  Back
-                </Button>
-              </div>
-            </fieldset>
-          </form>
-        </Form>
       </CardContent>
     </Card>
   );
