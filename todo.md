@@ -33,6 +33,7 @@
 - [ ] Add TypeScript strict mode compliance checking
 - [ ] Implement comprehensive error boundaries
 - [ ] Document animation patterns and usage guidelines
+- [ ] Review Core lib folder for possible extractions and organizations, focusing on identifying reusable modules (e.g., form hooks, animation utilities, error boundaries) for extraction and reorganization to ensure modularity and maintainability as per project guidelines.
 
 ## 📱 Performance & Accessibility
 - [ ] Optimize animation performance for mobile devices
