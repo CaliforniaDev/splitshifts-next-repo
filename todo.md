@@ -34,6 +34,7 @@
 - [ ] Implement comprehensive error boundaries
 - [ ] Document animation patterns and usage guidelines
 - [ ] Review Core lib folder for possible extractions and organizations, focusing on identifying reusable modules (e.g., form hooks, animation utilities, error boundaries) for extraction and reorganization to ensure modularity and maintainability as per project guidelines.
+- [ ] Review settings-utils.ts. File name may need to be renamed.
 
 ## 📱 Performance & Accessibility
 - [ ] Optimize animation performance for mobile devices
@@ -43,4 +44,5 @@
 
 ## 💡 Development Notes
 - [ ] Use the named utility for clarity and to avoid ambiguity:
+- [ ] Look into the library libphonenumber-js/min
 '[&_svg]:ease-emphasized'
