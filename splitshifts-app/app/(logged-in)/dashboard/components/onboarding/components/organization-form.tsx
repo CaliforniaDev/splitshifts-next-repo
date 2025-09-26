@@ -1,6 +1,11 @@
-import { useForm } from 'react-hook-form';
+'use client';
 
-import { type CreateOrganizationFormData } from '@/app/lib/validation/organization';
+import { useEffect, useRef } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import { createOrganizationSchema, type CreateOrganizationFormData } from '@/app/lib/validation/organization';
+import { createOrganization } from '@/app/(logged-in)/dashboard/actions/create-organization';
 
 import {
   Card,
@@ -21,21 +26,53 @@ import {
 import Input from '@/app/components/ui/inputs/input';
 import Button from '@/app/components/ui/buttons/button';
 
-interface OrganizationFormCardProps {
-  form: ReturnType<typeof useForm<CreateOrganizationFormData>>;
-  isSubmitting: boolean;
-  onSubmit: (data: CreateOrganizationFormData) => Promise<void>;
+interface OrganizationFormProps {
+  onSuccess: () => void;
   onBack: () => void;
-  nameInputRef: React.RefObject<HTMLInputElement | null>;
 }
-
-export default function OrganizationFormCard({
-  form,
-  isSubmitting,
-  onSubmit,
+export default function OrganizationForm({
+  onSuccess,
   onBack,
-  nameInputRef,
-}: OrganizationFormCardProps) {
+}: OrganizationFormProps) {
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const form = useForm<CreateOrganizationFormData>({
+      resolver: zodResolver(createOrganizationSchema),
+      defaultValues: {
+        name: '',
+        description: '',
+        weekStartDay: 'monday',
+      },
+  });
+  
+  const isSubmitting = form.formState.isSubmitting;
+  
+  useEffect(() => {
+    const timer = requestAnimationFrame(() => {
+      nameInputRef.current?.focus();
+    });
+    return () => cancelAnimationFrame(timer);
+  }, []);
+
+  const handleSubmit = async (data: CreateOrganizationFormData) => {
+    try {
+      const response = await createOrganization(data);
+      if (response.success) {
+        onSuccess();
+      } else {
+        form.setError('root', {
+          type: 'server',
+          message: response.error || 'Failed to create organization',
+        });
+      }
+    } catch {
+      form.setError('root', {
+        type: 'server',
+        message: 'An unexpected error occurred',
+      });
+    }
+  };
+
+
   return (
     <Card className='mx-auto w-full max-w-md border-none shadow-elevation-0'>
       <CardHeader>
@@ -51,7 +88,7 @@ export default function OrganizationFormCard({
           </div>
         )}
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
             <fieldset disabled={isSubmitting} className='space-y-4'>
               <FormField
                 name='name'
@@ -62,7 +99,7 @@ export default function OrganizationFormCard({
                       <Input
                         {...field}
                         ref={nameInputRef}
-                        label='Organization Name'
+                        label='Organization Name *'
                         type='text'
                         onBlur={field.onBlur}
                         error={!!fieldState.error}
@@ -126,7 +163,6 @@ export default function OrganizationFormCard({
                   className='w-full'
                   loading={isSubmitting}
                   loadingText='Creating...'
-                  onClick={form.handleSubmit(onSubmit)}
                 >
                   Create Organization
                 </Button>
