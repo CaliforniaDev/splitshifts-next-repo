@@ -1,7 +1,7 @@
 import { pgTable, uuid, varchar, text, timestamp, numeric, pgEnum } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { organizations } from './organizationsSchema';
-import { workSites, roles } from './workSitesAndRolesSchema';
+import { worksites, roles } from './workSitesAndRolesSchema';
 import { employees } from './employeesSchema';
 
 // Enums for status fields
@@ -32,7 +32,7 @@ export const shifts = pgTable('shifts', {
     .references(() => organizations.id, { onDelete: 'cascade' }),
   workSiteId: uuid('work_site_id')
     .notNull()
-    .references(() => workSites.id, { onDelete: 'cascade' }),
+    .references(() => worksites.id, { onDelete: 'cascade' }),
   roleId: uuid('role_id')
     .notNull()
     .references(() => roles.id, { onDelete: 'cascade' }),

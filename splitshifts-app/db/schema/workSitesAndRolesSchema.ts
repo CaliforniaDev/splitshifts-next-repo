@@ -2,7 +2,7 @@ import { pgTable, uuid, varchar, text, timestamp, jsonb, boolean, numeric } from
 import { sql } from 'drizzle-orm';
 import { organizations } from './organizationsSchema';
 
-export const workSites = pgTable('work_sites', {
+export const worksites = pgTable('work_sites', {
   id: uuid('id')
     .primaryKey()
     .default(sql`gen_random_uuid()`),

@@ -7,7 +7,7 @@ export { emailVerificationTokenSchema } from './emailVerificationTokenSchema';
 export { organizations } from './organizationsSchema';
 export { organizationUsers, orgRoleEnum } from './organizationUsersSchema';
 export { employees } from './employeesSchema';
-export { workSites, roles } from './workSitesAndRolesSchema';
+export { worksites, roles } from './workSitesAndRolesSchema';
 
 // Scheduling schemas
 export { 
