@@ -159,7 +159,7 @@
   }
   .typescale-body-large {
     @apply text-body-lg;
-    letter-spacing: 0px;
+    letter-spacing: 0.5px;
   }
   .typescale-body-medium {
     @apply text-body-md;
