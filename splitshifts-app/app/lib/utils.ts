@@ -1,7 +1,8 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { randomBytes } from 'crypto';
-
+// ---Utility Functions---------------------------------------------------------
+// CN AKA Class Names - Tailwind Merge + clsx
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }

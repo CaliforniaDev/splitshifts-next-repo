@@ -3,6 +3,11 @@
  * Centralized location for regex patterns to ensure consistency and reusability
  */
 
+// UUID patterns
+
+export const UUID_V4_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 // Phone number patterns
 export const PHONE_REGEX = /^\+?[\d\s\-\(\)]+$/;
 export const US_PHONE_REGEX =
