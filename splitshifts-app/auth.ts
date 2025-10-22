@@ -2,6 +2,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import db from './db/drizzle';
 import { users } from './db/schema/usersSchema';
+import { organizationUsers } from './db/schema/organizationUsersSchema';
 import { eq } from 'drizzle-orm';
 import { compare } from 'bcryptjs';
 import { authenticator } from 'otplib';
@@ -11,12 +12,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.orgId = user.orgId;
       }
       return token;
     },
     async session({ session, token }) {
       if (token.id) {
         session.user.id = token.id as string;
+        session.user.orgId = token.orgId as string | null;
         
         // Check if user still exists in database
         try {
@@ -78,9 +81,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
         }
 
+        // Get user's organization for session
+        const [orgUser] = await db
+          .select({ orgId: organizationUsers.orgId })
+          .from(organizationUsers)
+          .where(eq(organizationUsers.userId, user.id));
+
         return {
           id: user.id.toString(),
           email: user.email,
+          orgId: orgUser?.orgId || null,
         };
       },
     }),
