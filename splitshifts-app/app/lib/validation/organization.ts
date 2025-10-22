@@ -1,5 +1,11 @@
-import {z} from 'zod';
+import { z } from 'zod';
 
+/**
+ * Validation schemas for organization CRUD operations
+ * Centralized location for organization-related Zod schemas
+ */
+
+// Schema for creating a new organization
 export const createOrganizationSchema = z.object({
   name: z
     .string()
@@ -11,5 +17,16 @@ export const createOrganizationSchema = z.object({
     .optional(),
   weekStartDay: z.enum(['monday', 'sunday']).optional().default('monday'),
 });
-
 export type CreateOrganizationFormData = z.infer<typeof createOrganizationSchema>;
+
+// Schema for updating an organization - extends create schema with ID
+export const updateOrganizationSchema = createOrganizationSchema.extend({
+  id: z.string().uuid('Invalid organization ID format'),
+});
+export type UpdateOrganizationFormData = z.infer<typeof updateOrganizationSchema>;
+
+// Schema for deleting an organization - only requires ID
+export const deleteOrganizationSchema = z.object({
+  id: z.string().uuid('Invalid organization ID format'),
+});
+export type DeleteOrganizationData = z.infer<typeof deleteOrganizationSchema>;
