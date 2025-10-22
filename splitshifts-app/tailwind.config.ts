@@ -147,6 +147,26 @@ const config: Config = {
             transform: 'scaleX(1)',
           },
         },
+        'dialog-scale-in': {
+          '0%': {
+            opacity: '0',
+            transform: 'translate(-50%, -50%) scale(1.05)', // Starts slightly larger
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translate(-50%, -50%) scale(1)',
+          },
+        },
+        'dialog-scale-out': {
+          '0%': {
+            opacity: '1',
+            transform: 'translate(-50%, -50%) scale(1)',
+          },
+          '100%': {
+            opacity: '0',
+            transform: 'translate(-50%, -50%) scale(0.95)', // Ends slightly smaller
+          },
+        },
       },
       animation: {
         'caret-blink': 'caret-blink 1.25s ease-out infinite',
@@ -154,6 +174,11 @@ const config: Config = {
         draw: 'draw 0.8s ease-in-out forwards',
         'expand-from-center':
           'expand-from-center 0.2s cubic-bezier(0.2, 0, 0, 1) forwards',
+
+        'dialog-scale-in':
+          'dialog-scale-in 0.3s cubic-bezier(0.36, 0.66, 0.04, 1)', // iOS spring curve
+        'dialog-scale-out':
+          'dialog-scale-out 0.2s cubic-bezier(0.36, 0.66, 0.04, 1)',
       },
     },
   },

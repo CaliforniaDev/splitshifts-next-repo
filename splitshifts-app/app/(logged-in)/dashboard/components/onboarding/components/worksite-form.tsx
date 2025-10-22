@@ -28,6 +28,7 @@ import {
 
 import Input from '@/app/components/ui/inputs/input';
 import Button from '@/app/components/ui/buttons/button';
+import { addWorksite } from '@/app/(logged-in)/dashboard/actions/add-worksite';
 
 
 interface WorksiteFormCardProps {
@@ -61,18 +62,17 @@ export default function WorksiteForm({
 
   const handleSubmit = async (data: CreateWorksiteFormData) => {
     try {
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-      const response = { success: true }; // Simulate success response
+      const response = await addWorksite(data);
       if (response.success) {
         onSuccess();
       } else {
         form.setError('root', {
           type: 'server',
-          // message: response.error || 'Failed to create worksite',
+          message: response.error || 'Failed to create worksite',
         });
       }
-    } catch {
+    } catch (error) {
+      console.error('Failed to create worksite:', error);
       form.setError('root', {
         type: 'server',
         message: 'An unexpected error occurred',
