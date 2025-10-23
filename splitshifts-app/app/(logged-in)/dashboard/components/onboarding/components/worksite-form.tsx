@@ -29,7 +29,7 @@ import {
 import Input from '@/app/components/ui/inputs/input';
 import Button from '@/app/components/ui/buttons/button';
 import { addWorksite } from '@/app/(logged-in)/dashboard/actions/add-worksite';
-
+import WarningIcon from '@/app/components/ui/icons/warning-icon';
 
 interface WorksiteFormCardProps {
   onSuccess: () => void;
@@ -88,14 +88,9 @@ export default function WorksiteForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {form.formState.errors.root && (
-          <div className='mb-4'>
-            <FormMessage>{form.formState.errors.root.message}</FormMessage>
-          </div>
-        )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
-            <fieldset disabled={isSubmitting} className='space-y-4'>
+            <fieldset disabled={isSubmitting} className='space-y-8'>
               <FormField
                 name='name'
                 control={form.control}
@@ -151,7 +146,7 @@ export default function WorksiteForm({
                               : 'border-outline bg-surface'
                           }`}
                         >
-                          {TIMEZONE_OPTIONS.map((tz) => (
+                          {TIMEZONE_OPTIONS.map(tz => (
                             <option key={tz.value} value={tz.value}>
                               {tz.label}
                             </option>
@@ -165,6 +160,9 @@ export default function WorksiteForm({
                   </FormItem>
                 )}
               />
+              {form.formState.errors.root?.message && (
+                <ErrorDisplay message={form.formState.errors.root.message} />
+              )}
               <div className='flex flex-col space-y-4 pt-4'>
                 <Button
                   type='submit'
@@ -189,5 +187,22 @@ export default function WorksiteForm({
         </Form>
       </CardContent>
     </Card>
+  );
+}
+
+function ErrorDisplay({ message }: { message: string }) {
+  return (
+    <div className='rounded-lg border border-error bg-error-container p-4'>
+      <div className='flex items-center space-x-3'>
+        <div className='flex-shrink-0'>
+          <WarningIcon className='h-5 w-5 text-error' />
+        </div>
+        <div className='flex-1'>
+          <FormMessage className='text-on-error-container'>
+            {message}
+          </FormMessage>
+        </div>
+      </div>
+    </div>
   );
 }
