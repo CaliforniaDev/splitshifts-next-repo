@@ -447,9 +447,9 @@ function LoginErrorDisplay({
               {message}
             </FormMessage>
             <div className='mt-2'>
-              <Link
+                <Link
                 href={resendHref}
-                className='inline-flex items-center text-sm font-medium text-error underline hover:text-on-error'
+                className='inline-flex items-center text-sm font-medium text-error hover:underline'
               >
                 Resend verification email
                 <ChevronRightIcon className='ml-1 h-4 w-4' />
