@@ -1,11 +1,13 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+
 import db from './db/drizzle';
-import { users } from './db/schema/usersSchema';
-import { organizationUsers } from './db/schema/organizationUsersSchema';
 import { eq } from 'drizzle-orm';
 import { compare } from 'bcryptjs';
 import { authenticator } from 'otplib';
+
+import { users } from './db/schema/usersSchema';
+import { organizationUsers } from './db/schema/organizationUsersSchema';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
