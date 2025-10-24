@@ -67,6 +67,8 @@ export default function OrganizationManagementModal({
 }: ModalProps) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   const form = useForm<UpdateOrganizationFormData>({
     resolver: zodResolver(updateOrganizationSchema),
@@ -102,21 +104,18 @@ export default function OrganizationManagementModal({
   };
 
   const handleDelete = async () => {
-    const confirm = window.confirm(
-      `Are you sure you want to delete "${organization.name}"?\n\n` +
-        'This will remove the organization and all associated data. ' +
-        'You will need to create a new organization or join an existing one.\n\n' +
-        'This action cannot be undone.',
-    );
-    if (!confirm) return;
-
     setIsDeleting(true);
     try {
       const response = await deleteOrganization({ id: organization.id });
       if (response.success) {
+        setShowDeleteConfirm(false);
+        setDeleteConfirmText('');
         router.refresh();
       } else {
-        alert(response.error || 'Failed to delete organization');
+        form.setError('root', {
+          type: 'server',
+          message: response.error || 'Failed to delete organization',
+        });
       }
     } catch (error) {
       console.error('Unexpected error deleting organization:', error);
@@ -130,31 +129,32 @@ export default function OrganizationManagementModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Manage Organization</DialogTitle>
-          <DialogDescription>
-            Update your organization details or delete it entirely.
-          </DialogDescription>
-        </DialogHeader>
-        {/* Display form-level errors */}
-        {form.formState.errors.root && (
-          <div className='bg-destructive/10 mb-4 rounded-md p-3'>
-            <FormMessage className='text-destructive'>
-              {form.formState.errors.root.message}
-            </FormMessage>
-          </div>
-        )}
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleUpdate)}
-            className='space-y-4'
-          >
-            <fieldset
-              disabled={isSubmitting || isDeleting}
+    <>
+      <Dialog open={isOpen && !showDeleteConfirm} onOpenChange={onClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Manage Organization</DialogTitle>
+            <DialogDescription>
+              Update your organization details or delete it entirely.
+            </DialogDescription>
+          </DialogHeader>
+          {/* Display form-level errors */}
+          {form.formState.errors.root && (
+            <div className='bg-destructive/10 mb-4 rounded-md p-3'>
+              <FormMessage className='text-destructive'>
+                {form.formState.errors.root.message}
+              </FormMessage>
+            </div>
+          )}
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleUpdate)}
               className='space-y-4'
             >
+              <fieldset
+                disabled={isSubmitting || isDeleting}
+                className='space-y-4'
+              >
               <FormField
                 name='name'
                 control={form.control}
@@ -244,7 +244,7 @@ export default function OrganizationManagementModal({
             variant='destructive'
             loading={isDeleting}
             loadingText='Deleting...'
-            onClick={handleDelete}
+            onClick={() => setShowDeleteConfirm(true)}
             disabled={isSubmitting}
           >
             Delete
@@ -252,5 +252,61 @@ export default function OrganizationManagementModal({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    {/* Delete Confirmation Dialog */}
+    <Dialog open={showDeleteConfirm} onOpenChange={(open) => {
+      setShowDeleteConfirm(open);
+      if (!open) setDeleteConfirmText('');
+    }}>
+      <DialogContent className='max-w-md'>
+        <DialogHeader>
+          <DialogTitle className='text-error'>Delete Organization?</DialogTitle>
+        </DialogHeader>
+        <div className='space-y-4 py-4'>
+          <p className='font-semibold text-on-surface typescale-body-medium'>
+            Are you sure you want to delete "{organization.name}"?
+          </p>
+          <p className='text-on-surface-variant typescale-body-medium'>
+            This will permanently remove the organization and all associated
+            data. You will need to create a new organization or join an
+            existing one.
+          </p>
+          <p className='font-semibold text-error typescale-body-medium'>
+            This action cannot be undone.
+          </p>
+
+            <Input
+              label='Type DELETE to confirm*'
+              type='text'
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              disabled={isDeleting}
+              error={deleteConfirmText.length > 0 && deleteConfirmText !== 'DELETE'}
+            />
+          </div>
+        <DialogFooter className='gap-2'>
+          <Button
+            variant='text'
+            onClick={() => {
+              setShowDeleteConfirm(false);
+              setDeleteConfirmText('');
+            }}
+            disabled={isDeleting}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant='destructive'
+            onClick={handleDelete}
+            loading={isDeleting}
+            loadingText='Deleting...'
+            disabled={deleteConfirmText !== 'DELETE'}
+          >
+            Delete Organization
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
