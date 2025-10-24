@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useSession } from 'next-auth/react';
 
 import { createOrganizationSchema, type CreateOrganizationFormData } from '@/app/lib/validation/organization';
 import { createOrganization } from '@/app/(logged-in)/dashboard/actions/create-organization';
@@ -35,6 +36,7 @@ export default function OrganizationForm({
   onBack,
 }: OrganizationFormProps) {
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const { update } = useSession();
   const form = useForm<CreateOrganizationFormData>({
       resolver: zodResolver(createOrganizationSchema),
       defaultValues: {
@@ -57,6 +59,8 @@ export default function OrganizationForm({
     try {
       const response = await createOrganization(data);
       if (response.success) {
+        // Update session with new orgId
+        await update({ orgId: response.organizationId });
         onSuccess();
       } else {
         form.setError('root', {

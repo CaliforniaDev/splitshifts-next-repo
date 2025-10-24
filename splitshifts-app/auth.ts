@@ -9,10 +9,14 @@ import { authenticator } from 'otplib';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
-    jwt({ token, user }) {
+    jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.orgId = user.orgId;
+      }
+      // Handle session updates from client (e.g., after creating organization)
+      if (trigger === 'update' && session?.orgId) {
+        token.orgId = session.orgId;
       }
       return token;
     },
