@@ -8,8 +8,8 @@ export const createWorksiteSchema = z.object({
     .min(2, 'Worksite name must be at least 2 characters long')
     .max(150, 'Worksite name must be at most 100 characters long')
     .regex(
-      ValidationPatterns.name.pattern,
-      ValidationPatterns.companyName.message,
+      ValidationPatterns.worksiteName.pattern,
+      ValidationPatterns.worksiteName.message,
     ),
   address: z
     .string()

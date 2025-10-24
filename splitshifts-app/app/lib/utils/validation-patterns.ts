@@ -56,6 +56,11 @@ export const ValidationPatterns = {
     message:
       'Company name can only contain letters, numbers, spaces, and common punctuation.',
   },
+  worksiteName: {
+    pattern: COMPANY_NAME_REGEX,
+    message:
+      'Worksite name can only contain letters, numbers, spaces, and common punctuation.',
+  },
   address: {
     pattern: ADDRESS_REGEX,
     message: 'Address contains invalid characters.',
