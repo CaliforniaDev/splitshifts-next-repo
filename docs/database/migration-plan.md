@@ -122,7 +122,7 @@ CREATE TABLE work_sites (
 CREATE TABLE roles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
     description TEXT,
     hourly_rate NUMERIC(10,2),
     requirements JSONB,
@@ -130,7 +130,7 @@ CREATE TABLE roles (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
     
-    CONSTRAINT unique_role_name_per_org UNIQUE (org_id, name) WHERE deleted_at IS NULL
+    CONSTRAINT unique_role_title_per_org UNIQUE (org_id, title) WHERE deleted_at IS NULL
 );
 ```
 
@@ -489,7 +489,7 @@ BEGIN
     RETURNING id INTO user_id;
     
     -- Create basic roles
-    INSERT INTO roles (org_id, name, description, hourly_rate)
+    INSERT INTO roles (org_id, title, description, hourly_rate)
     VALUES 
         (org_id, 'Security Guard', 'Basic security patrol and monitoring', 18.00),
         (org_id, 'Supervisor', 'Site supervisor and team lead', 25.00);

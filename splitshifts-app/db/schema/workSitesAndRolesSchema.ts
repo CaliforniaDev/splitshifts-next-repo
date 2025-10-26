@@ -38,7 +38,7 @@ export const roles = pgTable('roles', {
   orgId: uuid('org_id')
     .notNull()
     .references(() => organizations.id, { onDelete: 'cascade' }),
-  name: varchar('name', { length: 255 }).notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   hourlyRate: numeric('hourly_rate', { precision: 10, scale: 2 }), // Use numeric for monetary values
   requirements: jsonb('requirements').$type<{

@@ -125,7 +125,7 @@ erDiagram
   ROLES {
     uuid id PK
     uuid org_id FK "-> organizations.id"
-    varchar name "e.g., 'Security Guard'"
+    varchar title "e.g., 'Security Guard'"
     text description
     numeric hourly_rate "NULLABLE"
     jsonb requirements "Skills, certifications needed"
