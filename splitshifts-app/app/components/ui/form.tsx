@@ -14,6 +14,7 @@ import {
 
 import { cn } from '@/app/lib/utils';
 import { Label } from '@/app/components/ui/label';
+import WarningIcon from '@/app/components/ui/icons/warning-icon';
 
 const Form = FormProvider;
 
@@ -165,6 +166,35 @@ const FormMessage: React.FC<React.HTMLAttributes<HTMLParagraphElement>> = ({
   );
 };
 
+const FormErrorDisplay: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
+  className,
+  children,
+  ...props
+}) => {
+  if (!children) return null;
+
+  return (
+    <div
+      className={cn(
+        'rounded-lg border border-error bg-error-container p-4',
+        className,
+      )}
+      {...props}
+    >
+      <div className='flex items-center space-x-3'>
+        <div className='flex-shrink-0'>
+          <WarningIcon className='h-5 w-5 text-error' />
+        </div>
+        <div className='flex-1'>
+          <FormMessage className='text-on-error-container'>
+            {children}
+          </FormMessage>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export {
   useFormField,
   Form,
@@ -174,4 +204,5 @@ export {
   FormDescription,
   FormMessage,
   FormField,
+  FormErrorDisplay,
 };
