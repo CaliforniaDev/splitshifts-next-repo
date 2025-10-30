@@ -63,6 +63,7 @@ enum Step {
 export default function LoginForm() {
   // ---State Management-------------------------------------------------
   const [step, setStep] = useState(Step.INITIAL);
+  const [isNavigating, setIsNavigating] = useState(false);
   const otpInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
 
@@ -72,7 +73,7 @@ export default function LoginForm() {
 
   // ---Router & Navigation----------------------------------------------
   const router = useRouter();
-  const isSubmitting = form.formState.isSubmitting;
+  const isSubmitting = form.formState.isSubmitting || isNavigating;
 
   // ---Dynamic Password Reset Link-------------------------------------
   // Watch the email field to create a dynamic link for password reset
@@ -140,6 +141,7 @@ export default function LoginForm() {
           type: response.errorType,
         });
       } else {
+        setIsNavigating(true);
         router.push('/dashboard');
       }
     }
@@ -162,6 +164,7 @@ export default function LoginForm() {
         description: response.message,
       });
     } else {
+      setIsNavigating(true);
       router.push('/dashboard');
     }
   };
@@ -185,6 +188,7 @@ export default function LoginForm() {
           <OtpCard
             otpForm={otpForm}
             handleOTPSubmit={handleOTPSubmit}
+            isNavigating={isNavigating}
             onBackToLogin={() => {
               otpForm.reset();
               setStep(Step.INITIAL);
@@ -334,6 +338,7 @@ function LoginCard({
 interface OtpCardProps {
   otpForm: ReturnType<typeof useOtpForm>;
   handleOTPSubmit: (data: OtpFormData) => Promise<void>;
+  isNavigating: boolean;
   onBackToLogin: () => void;
   ref: React.RefObject<HTMLInputElement | null>;
 }
@@ -341,10 +346,11 @@ interface OtpCardProps {
 function OtpCard({
   otpForm,
   handleOTPSubmit,
+  isNavigating,
   onBackToLogin,
   ref,
 }: OtpCardProps) {
-  const isOtpSubmitting = otpForm.formState.isSubmitting;
+  const isOtpSubmitting = otpForm.formState.isSubmitting || isNavigating;
   const otpValue = useWatch({ control: otpForm.control, name: 'otp' });
 
   return (
