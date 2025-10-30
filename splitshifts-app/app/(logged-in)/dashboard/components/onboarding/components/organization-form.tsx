@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from '@/app/components/ui/form';
 
-import Input from '@/app/components/ui/inputs/input';
+import {Input, Textarea} from '@/app/components/ui/inputs';
 import Button from '@/app/components/ui/buttons/button';
 
 interface OrganizationFormProps {
@@ -119,10 +119,9 @@ export default function OrganizationForm({
                 render={({ field, fieldState }) => (
                   <FormItem>
                     <FormControl>
-                      <Input
+                      <Textarea
                         {...field}
                         label='Description (Optional)'
-                        type='text'
                         onBlur={field.onBlur}
                         error={!!fieldState.error}
                         errorMessage={fieldState.error?.message}
