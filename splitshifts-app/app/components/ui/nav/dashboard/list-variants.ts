@@ -20,14 +20,14 @@ const baseClasses = clsx([
   // Accessibility
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-outline focus-visible:outline-offset-2',
   // SVG Animation Setup
-  '[&_svg]:transition-all [&_svg]:duration-200 [&_svg]:ease-[cubic-bezier(0.2,0,0,1)]',
+  '[&_svg]:transition-all [&_svg]:duration-200 [&_svg]:ease-emphasized',
   // Z-index Layering
   '[&>*]:relative [&>*]:z-10',
 ]);
 
 const overlayBase = clsx([
   'after:absolute after:inset-0 after:rounded-full',
-  'after:transition-opacity after:duration-150 after:ease-[cubic-bezier(0.2,0,0,1)]',
+  'after:transition-opacity after:duration-150 after:ease-emphasized',
   'after:z-20',
 ]);
 

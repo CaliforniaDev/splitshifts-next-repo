@@ -16,7 +16,7 @@ import { cn } from '@/app/lib/utils';
 
 // Input/Textarea field styles
 const inputVariants = cva(
-  'relative w-full rounded-t-[4px] bg-surface-container-highest px-4 pb-2 text-on-surface focus:outline-none transition-colors duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
+  'relative w-full rounded-t-[4px] bg-surface-container-highest px-4 pb-2 text-on-surface focus:outline-none transition-colors duration-200 ease-emphasized',
   {
     variants: {
       multiline: {
@@ -129,7 +129,7 @@ const labelVariants = cva(
 
 // Hover state overlay (8% opacity on hover)
 const hoverOverlay = cva(
-  'pointer-events-none absolute inset-0 rounded-t-[4px] opacity-0 transition-opacity duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
+  'pointer-events-none absolute inset-0 rounded-t-[4px] opacity-0 transition-opacity duration-200 ease-emphasized',
   {
     variants: {
       focused: {
