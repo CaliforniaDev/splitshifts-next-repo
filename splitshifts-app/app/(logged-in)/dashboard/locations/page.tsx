@@ -1,7 +1,5 @@
 // File: app/(logged-in)/dashboard/locations/page.tsx
 
-'use client';
-
 export default function LocationsPage() {
   return (
     <section className="p-6 space-y-6">

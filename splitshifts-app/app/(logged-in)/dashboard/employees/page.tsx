@@ -1,7 +1,5 @@
 // File: app/(logged-in)/dashboard/employees/page.tsx
 
-'use client';
-
 export default function EmployeesPage() {
   return (
     <section className="p-6 space-y-6">

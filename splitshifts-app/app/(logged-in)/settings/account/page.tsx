@@ -1,7 +1,5 @@
 // File: app/(logged-in)/settings/account/page.tsx
 
-'use client';
-
 export default function AccountSettingsPage() {
   return (
     <section className="p-6 space-y-6">

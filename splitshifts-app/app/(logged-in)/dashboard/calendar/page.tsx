@@ -1,7 +1,5 @@
 // File: app/(logged-in)/dashboard/calendar/page.tsx
 
-'use client';
-
 export default function CalendarPage() {
   return (
     <section className="p-6 space-y-6">
