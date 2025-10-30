@@ -7,7 +7,8 @@ import {
   WelcomeCard,
   OrganizationForm,
   WorksiteForm,
-  PlaceholderCard,
+  RolesForm,
+  EmployeesForm,
   StepProgress,
   CompletionCard,
   OnboardingStep
@@ -79,23 +80,18 @@ export function OnboardingWizard() {
 
       {currentStep === OnboardingStep.ROLES && (
         <AnimatedTransition animationKey='roles'>
-          <PlaceholderCard
-            title='Create Job Roles'
-            description='Define the different positions in your organization.'
-            icon='👔'
-            onContinue={() => setCurrentStep(OnboardingStep.EMPLOYEES)}
+          <RolesForm
+            onSuccess={() => setCurrentStep(OnboardingStep.EMPLOYEES)}
+            onBack={() => setCurrentStep(OnboardingStep.WORKSITE)}
           />
         </AnimatedTransition>
       )}
 
       {currentStep === OnboardingStep.EMPLOYEES && (
         <AnimatedTransition animationKey='employees'>
-          <PlaceholderCard
-            title='Add Employees'
-            description='Invite your team members to join your organization.'
-            icon='👥'
-            onContinue={() => setCurrentStep(OnboardingStep.COMPLETED)}
-            buttonText='Complete Setup'
+          <EmployeesForm
+            onSuccess={() => setCurrentStep(OnboardingStep.COMPLETED)}
+            onBack={() => setCurrentStep(OnboardingStep.ROLES)}
           />
         </AnimatedTransition>
       )}
