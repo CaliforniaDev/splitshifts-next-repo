@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -27,6 +27,7 @@ import {
   FormErrorDisplay,
 } from '@/app/components/ui/form';
 
+import { useToast } from '@/app/components/ui/toast';
 import Input from '@/app/components/ui/inputs/input';
 import Button from '@/app/components/ui/buttons/button';
 import { addWorksite } from '@/app/(logged-in)/dashboard/actions/add-worksite';
@@ -40,7 +41,9 @@ export default function WorksiteForm({
   onSuccess,
   onBack,
 }: WorksiteFormCardProps) {
+  const { toast } = useToast();
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const [isAddingAnother, setIsAddingAnother] = useState(false);
 
   const form = useForm<CreateWorksiteFormData>({
     resolver: zodResolver(createWorksiteSchema),
@@ -60,23 +63,39 @@ export default function WorksiteForm({
     return () => cancelAnimationFrame(timer);
   }, []);
 
-  const handleSubmit = async (data: CreateWorksiteFormData) => {
+  const handleSubmit = async (data: CreateWorksiteFormData, addAnother = false) => {
+    if (addAnother) {
+      setIsAddingAnother(true);
+    }
+    
     try {
       const response = await addWorksite(data);
-      if (response.success) {
-        onSuccess();
-      } else {
+      if (!response.success) {
         form.setError('root', {
           type: 'server',
           message: response.error || 'Failed to create worksite',
         });
+        return;
       }
+      if (addAnother) {
+        form.reset();
+        toast({
+          title: 'Success',
+          description: 'Worksite added! Add another or continue.',
+        });
+        return;
+      }
+      onSuccess();
     } catch (error) {
       console.error('Failed to create worksite:', error);
       form.setError('root', {
         type: 'server',
         message: 'An unexpected error occurred',
       });
+    } finally {
+      if (addAnother) {
+        setIsAddingAnother(false);
+      }
     }
   };
   return (
@@ -89,7 +108,7 @@ export default function WorksiteForm({
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
+          <form onSubmit={form.handleSubmit((data) => handleSubmit(data, false))}>
             <fieldset disabled={isSubmitting} className='space-y-8'>
               <FormField
                 name='name'
@@ -167,19 +186,32 @@ export default function WorksiteForm({
               )}
               <div className='flex flex-col space-y-4 pt-4'>
                 <Button
-                  type='submit'
-                  variant='filled'
-                  className='w-full'
-                  loading={isSubmitting}
-                  loadingText='Creating...'
-                >
-                  Continue
-                </Button>
-                <Button
                   type='button'
                   variant='outlined'
                   className='w-full'
+                  onClick={form.handleSubmit((data) => handleSubmit(data, true))}
+                  loading={isAddingAnother}
+                  loadingText='Adding Worksite...'
+                  disabled={isSubmitting || isAddingAnother}
+                >
+                  Add Another Worksite
+                </Button>
+                <Button
+                  type='submit'
+                  variant='filled'
+                  className='w-full'
+                  loading={isSubmitting && !isAddingAnother}
+                  loadingText='Saving & Continuing...'
+                  disabled={isAddingAnother}
+                >
+                  Save & Continue
+                </Button>
+                <Button
+                  type='button'
+                  variant='text'
+                  className='w-full'
                   onClick={onBack}
+                  disabled={isSubmitting || isAddingAnother}
                 >
                   Back
                 </Button>
