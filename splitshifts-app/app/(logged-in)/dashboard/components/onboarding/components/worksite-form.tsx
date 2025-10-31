@@ -30,7 +30,7 @@ import {
 import { useToast } from '@/app/components/ui/toast';
 import Input from '@/app/components/ui/inputs/input';
 import Button from '@/app/components/ui/buttons/button';
-import { addWorksite } from '@/app/(logged-in)/dashboard/actions/add-worksite';
+import { addWorksite } from '@/app/(logged-in)/dashboard/actions/worksite/add-worksite';
 
 interface WorksiteFormCardProps {
   onSuccess: () => void;

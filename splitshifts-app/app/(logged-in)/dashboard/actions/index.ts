@@ -1,4 +1,10 @@
-// Organization management server actions
-export * from './create-organization';
-export * from './edit-organization';
-export * from './delete-organization';
+// Re-export all dashboard server actions by domain
+
+// Organization management
+export * from './organization';
+
+// Employee management
+export * from './employee';
+
+// Worksite and role management
+export * from './worksite';

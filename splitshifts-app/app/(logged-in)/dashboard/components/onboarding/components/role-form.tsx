@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  createEmployeeSchema,
-  type CreateEmployeeFormData,
-} from '@/app/lib/validation/employee';
+  createRolesSchema,
+  type CreateRolesFormData,
+} from '@/app/lib/validation/roles';
 
 import {
   Card,
@@ -25,30 +25,34 @@ import {
 } from '@/app/components/ui/form';
 
 import { useToast } from '@/app/components/ui/toast';
-import { Input } from '@/app/components/ui/inputs';
+import { Input, Textarea } from '@/app/components/ui/inputs';
 import Button from '@/app/components/ui/buttons/button';
-import { addEmployee } from '@/app/(logged-in)/dashboard/actions/add-employee';
+import { addRoles } from '@/app/(logged-in)/dashboard/actions/worksite/add-roles';
 import WarningIcon from '@/app/components/ui/icons/warning-icon';
 
-interface EmployeesFormProps {
+interface RoleFormProps {
   onSuccess: () => void;
   onBack: () => void;
 }
 
-export default function EmployeesForm({ onSuccess, onBack }: EmployeesFormProps) {
+export default function RoleForm({ onSuccess, onBack }: RoleFormProps) {
   const { toast } = useToast();
   const nameInputRef = useRef<HTMLInputElement>(null);
   const [isAddingAnother, setIsAddingAnother] = useState(false);
 
-  const form = useForm<CreateEmployeeFormData>({
-    resolver: zodResolver(createEmployeeSchema),
+  const form = useForm<CreateRolesFormData>({
+    resolver: zodResolver(createRolesSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      address: '',
-      hireDate: '',
+      title: '',
+      description: '',
+      hourlyRate: undefined,
+      requirements: {
+        minimumAge: undefined,
+        requiredCertifications: [],
+        physicalRequirements: [],
+        equipmentProvided: [],
+        specialSkills: [],
+      },
     },
   });
 
@@ -59,17 +63,17 @@ export default function EmployeesForm({ onSuccess, onBack }: EmployeesFormProps)
     return () => cancelAnimationFrame(timer);
   }, []);
 
-  const handleSubmit = async (data: CreateEmployeeFormData, addAnother = false) => {
+  const handleSubmit = async (data: CreateRolesFormData, addAnother = false) => {
     if (addAnother) {
       setIsAddingAnother(true);
     }
     
     try {
-      const response = await addEmployee(data);
+      const response = await addRoles(data);
       if (!response.success) {
         form.setError('root', {
           type: 'server',
-          message: response.error || 'Failed to add employee',
+          message: response.error || 'Failed to add role',
         });
         return;
       }
@@ -77,13 +81,13 @@ export default function EmployeesForm({ onSuccess, onBack }: EmployeesFormProps)
         form.reset();
         toast({
           title: 'Success',
-          description: 'Employee added! Add another or continue.',
+          description: 'Role added! Add another or continue.',
         });
         return;
       }
       onSuccess();
     } catch (error) {
-      console.error('Failed to add employee:', error);
+      console.error('Failed to add role:', error);
       form.setError('root', {
         type: 'server',
         message: 'An unexpected error occurred',
@@ -94,15 +98,14 @@ export default function EmployeesForm({ onSuccess, onBack }: EmployeesFormProps)
       }
     }
   };
-
   const isSubmitting = form.formState.isSubmitting;
-
   return (
     <Card className='mx-auto w-full max-w-md border-none shadow-elevation-0'>
       <CardHeader>
-        <CardTitle>Add Employees</CardTitle>
+        <CardTitle>Create Roles</CardTitle>
         <CardDescription>
-          Add team members to your organization.
+          Create the roles you want to assign later for each member of your
+          organization.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -115,7 +118,7 @@ export default function EmployeesForm({ onSuccess, onBack }: EmployeesFormProps)
           <form onSubmit={form.handleSubmit((data) => handleSubmit(data, false))}>
             <fieldset disabled={isSubmitting} className='space-y-6'>
               <FormField
-                name='firstName'
+                name='title'
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <FormItem>
@@ -123,7 +126,7 @@ export default function EmployeesForm({ onSuccess, onBack }: EmployeesFormProps)
                       <Input
                         {...field}
                         ref={nameInputRef}
-                        label='First Name *'
+                        label='Role Title *'
                         type='text'
                         onBlur={field.onBlur}
                         error={!!fieldState.error}
@@ -134,87 +137,14 @@ export default function EmployeesForm({ onSuccess, onBack }: EmployeesFormProps)
                 )}
               />
               <FormField
-                name='lastName'
+                name='description'
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <FormItem>
                     <FormControl>
-                      <Input
+                      <Textarea
                         {...field}
-                        label='Last Name *'
-                        type='text'
-                        onBlur={field.onBlur}
-                        error={!!fieldState.error}
-                        errorMessage={fieldState.error?.message}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name='email'
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        label='Email (Optional)'
-                        type='email'
-                        onBlur={field.onBlur}
-                        error={!!fieldState.error}
-                        errorMessage={fieldState.error?.message}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name='phone'
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        label='Phone (Optional)'
-                        type='tel'
-                        onBlur={field.onBlur}
-                        error={!!fieldState.error}
-                        errorMessage={fieldState.error?.message}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name='address'
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        label='Address (Optional)'
-                        type='text'
-                        onBlur={field.onBlur}
-                        error={!!fieldState.error}
-                        errorMessage={fieldState.error?.message}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name='hireDate'
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        label='Hire Date (Optional)'
-                        type='date'
+                        label='Description (Optional)'
                         onBlur={field.onBlur}
                         error={!!fieldState.error}
                         errorMessage={fieldState.error?.message}
@@ -230,10 +160,10 @@ export default function EmployeesForm({ onSuccess, onBack }: EmployeesFormProps)
                   className='w-full'
                   onClick={form.handleSubmit((data) => handleSubmit(data, true))}
                   loading={isAddingAnother}
-                  loadingText='Adding Employee...'
+                  loadingText='Adding Role...'
                   disabled={isSubmitting || isAddingAnother}
                 >
-                  Add Another Employee
+                  Add Another Role
                 </Button>
                 <Button
                   type='submit'
