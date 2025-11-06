@@ -18,6 +18,8 @@ const baseClasses = clsx([
   'before:absolute before:inset-0 before:transition-all before:duration-200',
   // Accessibility
   'focus:outline-none',
+  // Performance - Force GPU layer for ripple animations
+  '[transform-style:preserve-3d]',
 ]);
 
 // Common hover overlay (8% opacity on all variants)
