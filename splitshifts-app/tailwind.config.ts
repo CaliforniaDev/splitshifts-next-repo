@@ -167,6 +167,26 @@ const config: Config = {
             transform: 'translate(-50%, -50%) scale(0.95)', // Ends slightly smaller
           },
         },
+        'dropdown-fade-in': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(-8px) scaleY(0.95)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0) scaleY(1)',
+          },
+        },
+        'dropdown-fade-out': {
+          '0%': {
+            opacity: '1',
+            transform: 'translateY(0) scaleY(1)',
+          },
+          '100%': {
+            opacity: '0',
+            transform: 'translateY(-8px) scaleY(0.95)',
+          },
+        },
       },
       animation: {
         'caret-blink': 'caret-blink 1.25s ease-out infinite',
@@ -179,6 +199,10 @@ const config: Config = {
           'dialog-scale-in 0.3s cubic-bezier(0.36, 0.66, 0.04, 1)', // iOS spring curve
         'dialog-scale-out':
           'dialog-scale-out 0.2s cubic-bezier(0.36, 0.66, 0.04, 1)',
+        'dropdown-fade-in':
+          'dropdown-fade-in 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+        'dropdown-fade-out':
+          'dropdown-fade-out 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
       },
     },
   },
