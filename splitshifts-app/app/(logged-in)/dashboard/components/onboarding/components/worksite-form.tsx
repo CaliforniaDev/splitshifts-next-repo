@@ -29,6 +29,7 @@ import {
 
 import { useToast } from '@/app/components/ui/toast';
 import Input from '@/app/components/ui/inputs/input';
+import { SelectMenu } from '@/app/components/ui/inputs';
 import Button from '@/app/components/ui/buttons/button';
 import { addWorksite } from '@/app/(logged-in)/dashboard/actions/worksite/add-worksite';
 
@@ -153,28 +154,16 @@ export default function WorksiteForm({
                 render={({ field, fieldState }) => (
                   <FormItem>
                     <FormControl>
-                      <div className='space-y-2'>
-                        <label className='typescale-body-medium block text-on-surface'>
-                          Timezone *
-                        </label>
-                        <select
-                          {...field}
-                          className={`w-full rounded-lg border p-3 text-on-surface ${
-                            fieldState.error
-                              ? 'border-error bg-error-container/10'
-                              : 'border-outline bg-surface'
-                          }`}
-                        >
-                          {TIMEZONE_OPTIONS.map(tz => (
-                            <option key={tz.value} value={tz.value}>
-                              {tz.label}
-                            </option>
-                          ))}
-                        </select>
-                        {fieldState.error && (
-                          <FormMessage>{fieldState.error.message}</FormMessage>
-                        )}
-                      </div>
+                      <SelectMenu
+                        name={field.name}
+                        value={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        label='Timezone *'
+                        options={TIMEZONE_OPTIONS}
+                        error={!!fieldState.error}
+                        errorMessage={fieldState.error?.message}
+                      />
                     </FormControl>
                   </FormItem>
                 )}

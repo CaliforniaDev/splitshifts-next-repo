@@ -39,7 +39,7 @@ import {
   FormMessage,
 } from '@/app/components/ui/form';
 
-import { Input, Textarea } from '@/app/components/ui/inputs';
+import { Input, Textarea, SelectMenu } from '@/app/components/ui/inputs';
 import Button from '@/app/components/ui/buttons/button';
 import { Skeleton } from '@/app/components/ui/skeleton';
 
@@ -276,27 +276,19 @@ export default function OrganizationForm({
                       render={({ field, fieldState }) => (
                         <FormItem>
                           <FormControl>
-                            <div className='space-y-2'>
-                              <label className='typescale-body-medium block text-on-surface'>
-                                Week Starts On
-                              </label>
-                              <select
-                                {...field}
-                                className={`w-full rounded-lg border p-3 text-on-surface ${
-                                  fieldState.error
-                                    ? 'border-error bg-error-container/10'
-                                    : 'border-outline bg-surface'
-                                }`}
-                              >
-                                <option value='monday'>Monday</option>
-                                <option value='sunday'>Sunday</option>
-                              </select>
-                              {fieldState.error && (
-                                <FormMessage>
-                                  {fieldState.error.message}
-                                </FormMessage>
-                              )}
-                            </div>
+                            <SelectMenu
+                              name={field.name}
+                              value={field.value}
+                              onChange={field.onChange}
+                              onBlur={field.onBlur}
+                              label='Week Starts On'
+                              options={[
+                                { value: 'monday', label: 'Monday' },
+                                { value: 'sunday', label: 'Sunday' },
+                              ]}
+                              error={!!fieldState.error}
+                              errorMessage={fieldState.error?.message}
+                            />
                           </FormControl>
                         </FormItem>
                       )}
