@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import { z } from 'zod';
 
 import db from './db/drizzle';
 import { eq } from 'drizzle-orm';
@@ -8,6 +9,13 @@ import { authenticator } from 'otplib';
 
 import { users } from './db/schema/usersSchema';
 import { organizationUsers } from './db/schema/organizationUsersSchema';
+
+// Server-side credentials schema for validation
+const credentialsSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+  token: z.string().optional(),
+});
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
@@ -42,44 +50,79 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token: {},
       },
       authorize: async credentials => {
-        const [user] = await db
-          .select()
-          .from(users)
-          .where(eq(users.email, credentials.email as string));
+        // Validate credentials shape before proceeding
+        const validation = credentialsSchema.safeParse(credentials);
+        if (!validation.success) {
+          return null; // NextAuth treats null as invalid credentials
+        }
+
+        const { email, password, token } = validation.data;
+
+        // Query user with explicit column projection and scope to parent
+        let user;
+        try {
+          const [foundUser] = await db
+            .select({
+              id: users.id,
+              email: users.email,
+              password: users.password,
+              emailVerified: users.emailVerified,
+              twoFactorEnabled: users.twoFactorEnabled,
+              twoFactorSecret: users.twoFactorSecret,
+            })
+            .from(users)
+            .where(eq(users.email, email))
+            .limit(1);
+
+          user = foundUser;
+        } catch (error) {
+          console.error('Database error during login:', error);
+          return null;
+        }
 
         if (!user) {
-          throw new Error('Incorrect credentials');
-        } else {
-          const passwordCorrect = await compare(
-            credentials.password as string,
-            user.password!,
+          return null; // Generic: Invalid credentials
+        }
+
+        const passwordCorrect = await compare(password, user.password ?? '');
+        if (!passwordCorrect) {
+          return null; // Generic: Invalid credentials
+        }
+
+        // Check if email is verified
+        if (!user.emailVerified) {
+          return null; // Generic: Invalid credentials (don't leak email verification status)
+        }
+
+        // Validate 2FA if enabled
+        if (user.twoFactorEnabled) {
+          const tokenValid = authenticator.check(
+            token ?? '',
+            user.twoFactorSecret ?? '',
           );
-          if (!passwordCorrect) {
-            throw new Error('Incorrect credentials');
-          }
 
-          // Check if email is verified
-          if (!user.emailVerified) {
-            throw new Error('Email not verified');
+          if (!tokenValid) {
+            return null; // Generic: Invalid credentials (don't leak 2FA status)
           }
+        }
 
-          if (user.twoFactorEnabled) {
-            const tokenValid = authenticator.check(
-              credentials.token as string,
-              user.twoFactorSecret ?? '',
-            );
-
-            if (!tokenValid) {
-              throw new Error('Incorrect OTP');
-            }
-          }
+        // Update lastLogin timestamp
+        try {
+          await db
+            .update(users)
+            .set({ lastLogin: new Date() })
+            .where(eq(users.id, user.id));
+        } catch (error) {
+          console.error('Failed to update lastLogin:', error);
+          // Don't block login if timestamp update fails
         }
 
         // Get user's organization for session
         const [orgUser] = await db
           .select({ orgId: organizationUsers.orgId })
           .from(organizationUsers)
-          .where(eq(organizationUsers.userId, user.id));
+          .where(eq(organizationUsers.userId, user.id))
+          .limit(1);
 
         return {
           id: user.id.toString(),
