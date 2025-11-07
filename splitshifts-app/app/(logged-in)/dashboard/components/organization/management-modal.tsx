@@ -264,7 +264,7 @@ export default function OrganizationManagementModal({
         </DialogHeader>
         <div className='space-y-4 py-4'>
           <p className='font-semibold text-on-surface typescale-body-medium'>
-            Are you sure you want to delete "{organization.name}"?
+            Are you sure you want to delete &ldquo;{organization.name}&rdquo;?
           </p>
           <p className='text-on-surface-variant typescale-body-medium'>
             This will permanently remove the organization and all associated
