@@ -15,6 +15,7 @@
 - [x] add button to the success card for Password Reset Link Sent
 - [x] create reusable AnimatedTransition component for consistent animations
 - [x] convert all auth forms to use AnimatedTransition component
+- [x] Fix corrupted AGENTS.md file - Recreated entire file with heredoc, removed all duplicate content (1117 corrupted lines → 511 clean lines)
 
 ## 🎨 UI/UX Improvements
 - [ ] Update all toast notifications to use proper toast component (currently using alerts)
@@ -26,6 +27,9 @@
 - [ ] Convert onboarding step indicators into bullet points that are checked off when completed
 
 ## 🔧 Code Organization & Quality
+- [ ] Comment 11: 2FA Rate Limiting - Add rate limiting to 2FA activation/verification to prevent brute-force attacks (complex - may skip)
+- [ ] Comment 15: Public Auth Actions Security Audit - Apply auth.ts security improvements to public auth actions: Zod validation, explicit column projections, generic errors, token format validation (files: register-user.ts, verify-email.ts, send-password-reset.ts, update-password.ts)
+- [ ] Comment 16: 2FA Form Inline Errors - Show inline error messages on OTP input field instead of just toast notifications (cosmetic UX improvement - may skip)
 - [ ] Convert remaining manual animation classes throughout the app to use AnimatedTransition
 - [ ] Create consistent prop interfaces for all form components
 - [ ] Standardize error handling patterns across auth forms
