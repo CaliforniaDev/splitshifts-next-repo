@@ -1,8 +1,12 @@
 // File: app/(logged-in)/settings/change-password/page.tsx
 
+import { validateUserSession } from '@/app/lib/auth-utils';
 import ChangePasswordForm from "./components/change-password-form";
 
-export default function ChangePasswordPage() {
+export default async function ChangePasswordPage() {
+  // Validate user exists in database before allowing password change
+  await validateUserSession();
+
   return (
     <section className="p-6 space-y-6">
       {/* Header */}

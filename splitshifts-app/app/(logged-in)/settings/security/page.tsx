@@ -2,10 +2,10 @@
 
 import { redirect } from 'next/navigation';
 
-import { auth } from '@/auth';
 import db from '@/db/drizzle';
 import { eq } from 'drizzle-orm';
 import { users } from '@/db/schema/usersSchema';
+import { validateUserSession } from '@/app/lib/auth-utils';
 
 
 
@@ -16,11 +16,8 @@ import TwoFactorAuthFrom from './two-factor-auth-form';
 
 
 export default async function SecuritySettingsPage() {
-  const session = await auth();
-  
-  if (!session?.user?.id) {
-    redirect('/api/auth/signout');
-  }
+  // Validate session and ensure user exists in database
+  const session = await validateUserSession();
 
   const [user] = await db
     .select({
@@ -29,7 +26,7 @@ export default async function SecuritySettingsPage() {
     .from(users)
     .where(eq(users.id, session.user.id!));
 
-  // If user doesn't exist in database but session exists, redirect to logout
+  // Extra safety check (should never happen after validateUserSession)
   if (!user) {
     redirect('/api/auth/signout');
   }

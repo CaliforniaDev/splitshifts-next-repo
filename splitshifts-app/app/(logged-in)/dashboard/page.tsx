@@ -1,12 +1,10 @@
-import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
-
 import db from '@/db/drizzle';
 import { eq, and, isNull } from 'drizzle-orm';
 import { organizationUsers, organizations } from '@/db/schema';
 
 import OrganizationManagementClient from './components/organization/management-client';
 import { OnboardingWizard } from './components/onboarding-wizard';
+import { validateUserSession } from '@/app/lib/auth-utils';
 
 import {
   Card,
@@ -28,11 +26,8 @@ import { Label } from '@/app/components/ui/label';
  * Filters out soft-deleted organizations from the query.
  */
 export default async function Dashboard() {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    redirect('/api/auth/signout');
-  }
+  // Validate session and ensure user exists in database
+  const session = await validateUserSession();
 
   // Check if user has an organization (excluding deleted ones)
   const [userOrg] = await db

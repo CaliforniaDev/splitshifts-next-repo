@@ -1,6 +1,11 @@
 // File: app/(logged-in)/settings/account/page.tsx
 
-export default function AccountSettingsPage() {
+import { validateUserSession } from '@/app/lib/auth-utils';
+
+export default async function AccountSettingsPage() {
+  // Validate user exists in database before rendering account settings
+  await validateUserSession();
+
   return (
     <section className="p-6 space-y-6">
       {/* Header */}
