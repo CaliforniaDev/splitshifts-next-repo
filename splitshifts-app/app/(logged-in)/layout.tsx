@@ -1,7 +1,6 @@
-// File: app/(logged-in)/layout,
+// File: app/(logged-in)/layout.tsx
 
-import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
+import { requireSession } from '@/app/lib/auth-utils';
 import NavDrawer from '@/app/components/ui/nav/dashboard/nav-drawer';
 import AuthSessionProvider from '@/app/components/providers/session-provider';
 
@@ -10,10 +9,8 @@ export default async function LoggedInLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    redirect('/');
-  }
+  // Fast session check without DB query - pages handle DB validation
+  await requireSession();
   return (
     <AuthSessionProvider>
       <NavDrawer />
