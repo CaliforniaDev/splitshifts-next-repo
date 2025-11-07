@@ -1,7 +1,6 @@
 'use server';
 
-import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
+import { requireAuth } from '@/app/lib/auth-utils';
 import db from '@/db/drizzle';
 import { eq, and, sql } from 'drizzle-orm';
 import { organizations, organizationUsers } from '@/db/schema';
@@ -10,20 +9,6 @@ import { organizations, organizationUsers } from '@/db/schema';
  * Shared authorization utilities for organization actions
  * Reduces code duplication across create, edit, delete operations
  */
-
-/**
- * Verify user is authenticated and return session
- * Redirects to signout if not authenticated
- */
-export async function requireAuth() {
-  const session = await auth();
-  
-  if (!session?.user?.id) {
-    redirect('/api/auth/signout');
-  }
-  
-  return session;
-}
 
 /**
  * Verify user is an admin of the specified organization

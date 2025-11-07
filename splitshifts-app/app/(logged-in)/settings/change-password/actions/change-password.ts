@@ -1,5 +1,5 @@
 'use server';
-import { auth } from '@/auth';
+import { requireAuth } from '@/app/lib/auth-utils';
 import db from '@/db/drizzle';
 import { eq } from 'drizzle-orm';
 import { compare, hash } from 'bcryptjs';
@@ -15,13 +15,8 @@ export const changePassword = async (
   data: ChangePasswordData,
 ): Promise<ChangePasswordResponse> => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        error: true,
-        message: 'You must be logged in to change your password.',
-      };
-    }
+    // Use requireAuth() for consistent authentication check
+    const session = await requireAuth();
     const passwordValidation = changePasswordSchema.safeParse(data);
 
     if (passwordValidation?.error) {
