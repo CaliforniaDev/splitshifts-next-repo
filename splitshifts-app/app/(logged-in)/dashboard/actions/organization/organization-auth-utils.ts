@@ -91,6 +91,14 @@ export async function authorizeOrganizationAction(organizationId: string) {
     };
   }
   
+  // Hard-stop for soft-deleted organizations
+  if (status.isDeleted) {
+    return {
+      success: false,
+      error: 'Organization has been deleted',
+    };
+  }
+  
   return {
     success: true,
     session,
