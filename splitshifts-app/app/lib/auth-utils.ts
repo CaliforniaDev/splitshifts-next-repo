@@ -23,7 +23,7 @@ export async function validateUserSession() {
     redirect('/api/auth/signout');
   }
 
-  // Verify user still exists in database
+  // Verify user still exists in database (users table has no soft-delete)
   const [user] = await db
     .select({ id: users.id })
     .from(users)
