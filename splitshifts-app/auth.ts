@@ -27,21 +27,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.id as string;
         session.user.orgId = token.orgId as string | null;
         
-        // Check if user still exists in database
-        try {
-          const [user] = await db
-            .select({ id: users.id })
-            .from(users)
-            .where(eq(users.id, token.id as string));
-          
-          if (!user) {
-            // User was deleted, throw error to end session
-            throw new Error('User not found');
-          }
-        } catch (error) {
-          console.error('Error checking user existence:', error);
-          throw error;
-        }
+        // Note: User existence is validated during login and token refresh.
+        // Removed database check here to prevent performance degradation on every request.
+        // If a user is deleted, their token will be invalidated on next login attempt.
       }
       return session;
     },
