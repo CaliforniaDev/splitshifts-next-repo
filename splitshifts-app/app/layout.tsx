@@ -3,6 +3,7 @@ import './typeface/typography.css';
 import type { Metadata } from 'next';
 import { inter, spaceGrotesk } from '@/app/typeface/fonts';
 import { Toaster } from './components/ui/toast';
+import { HydrationProvider } from './components/providers/hydration-provider';
 
 export const metadata: Metadata = {
   title: 'SplitShifts',
@@ -21,8 +22,10 @@ export default async function RootLayout({
       className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}
     >
       <body className={`${inter.className} antialiased`}>
-        {children}
-        <Toaster />
+        <HydrationProvider>
+          {children}
+          <Toaster />
+        </HydrationProvider>
       </body>
     </html>
   );

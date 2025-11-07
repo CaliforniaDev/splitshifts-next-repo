@@ -17,7 +17,19 @@
   }
 }
 
+/* Hydration Protection: Prevent interactions until React hydrates */
+body:not(.hydrated) button,
+body:not(.hydrated) a,
+body:not(.hydrated) input,
+body:not(.hydrated) select,
+body:not(.hydrated) textarea {
+  pointer-events: none;
+}
 
+/* Visual feedback during hydration (optional - subtle opacity change) */
+body:not(.hydrated) {
+  cursor: wait;
+}
 
 @layer utilities {
   .text-balance {
