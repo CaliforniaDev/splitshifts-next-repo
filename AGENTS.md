@@ -369,16 +369,186 @@ const [userOrg] = await db
 
 ## Documentation
 
+### Code Comments
 - Update or add short comments near changed code only when it improves understanding
 - If a change affects security or performance, add a note to `docs/security/NAVIGATION_PERFORMANCE_FIX.md` or a relevant doc under `docs/`
 - **Do NOT create summary documents** for each change unless specifically requested by the user
 - **Consolidate existing docs** when you find duplicate or overlapping content
 
+### README Updates (Critical)
+**ALWAYS update README.md files when:**
+- Adding new features or components
+- Changing authentication flows or APIs
+- Adding new dependencies or technologies
+- Modifying environment variables
+- Changing project structure
+
+**README files to maintain:**
+- `/README.md` - Main project README with features, setup, and documentation links
+- `/docs/README.md` - Documentation index
+- Component-specific READMEs in their directories
+
+**Update process:**
+1. Read the existing README to understand current structure
+2. Add new content in the appropriate section
+3. Update table of contents if present
+4. Keep formatting consistent with existing style
+5. Commit README updates separately with descriptive message
+
+### CHANGELOG Updates (Critical)
+**ALWAYS update CHANGELOG.MD when:**
+- Adding new features (### Added)
+- Changing existing functionality (### Changed)
+- Deprecating features (### Deprecated)
+- Removing features (### Removed)
+- Fixing bugs (### Fixed)
+- Addressing security issues (### Security)
+
+**CHANGELOG format:**
+```markdown
+## [Unreleased]
+
+### Added
+- New feature description with issue reference if applicable
+
+### Changed
+- Description of changes to existing functionality
+
+### Fixed
+- Bug fix description with issue reference
+
+### Security
+- Security improvement description
+```
+
+**Update process:**
+1. Add entries to `[Unreleased]` section at the top
+2. Use present tense ("Add" not "Added")
+3. Include enough detail for users to understand impact
+4. Link to relevant documentation or issues
+5. Commit CHANGELOG with semantic commit message
+
 ## Commit Guidance
 
-- Atomic commits per logical change
-- Descriptive message: imperative mood, reference the area (e.g., "auth:", "db:", "settings:")
-- Group related changes together (e.g., all auth boundary changes in one commit)
+### Atomic Commits (Critical)
+**NEVER commit everything at once.** Each commit should represent ONE logical change.
+
+**How to create atomic commits:**
+
+1. **Make changes across multiple files**
+2. **Stage files by logical grouping:**
+   ```bash
+   # Stage only files related to one change
+   git add path/to/file1.ts path/to/file2.ts
+   git commit -m "feat: descriptive message"
+   
+   # Repeat for each logical change
+   git add path/to/file3.ts
+   git commit -m "fix: another change"
+   ```
+
+3. **If you accidentally stage everything:**
+   ```bash
+   # Unstage all files
+   git reset HEAD
+   
+   # Stage and commit one change at a time
+   git add specific/files
+   git commit -m "specific change message"
+   ```
+
+**Example workflow (from recent work):**
+```bash
+# 1. Add new utility file first
+git add app/lib/auth-utils.ts
+git commit -m "auth: add central authentication utility functions"
+
+# 2. Then update session callback
+git add auth.ts next.config.mjs
+git commit -m "perf: remove database query from session callback"
+
+# 3. Update layout
+git add app/(logged-in)/layout.tsx
+git commit -m "auth: use requireSession() in layout"
+
+# 4. Update pages
+git add app/(logged-in)/dashboard/page.tsx app/(logged-in)/settings/*/page.tsx
+git commit -m "auth: add validateUserSession() to pages"
+
+# 5. Fix lint issues
+git add components/modal.tsx
+git commit -m "fix: escape quotes in JSX"
+
+# 6. Update documentation
+git add README.md CHANGELOG.MD
+git commit -m "docs: update README and CHANGELOG for auth changes"
+```
+
+### Commit Message Format
+**Use conventional commits format:**
+
+```
+<type>(<scope>): <subject>
+
+<body>
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `perf`: Performance improvement
+- `refactor`: Code refactoring
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, no logic change)
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks
+- `security`: Security improvements
+- `auth`: Authentication/authorization changes
+- `db`: Database schema or query changes
+
+**Examples:**
+```bash
+git commit -m "feat: add employee shift swapping functionality"
+git commit -m "fix: resolve timezone bug in calendar view"
+git commit -m "perf: optimize organization query with column projection"
+git commit -m "docs: update README with new deployment instructions"
+git commit -m "security: null out 2FA secret when disabling"
+git commit -m "auth: implement four-layer authentication boundaries"
+```
+
+**Multi-line commits for complex changes:**
+```bash
+git commit -m "auth: implement four-layer authentication boundaries
+
+- Add requireSession() for layout (< 1ms)
+- Add validateUserSession() for page-level validation
+- Add requireAuth() for server actions
+- Remove DB query from session callback
+
+Performance: 4-10x faster navigation (200-500ms → <50ms)"
+```
+
+### When to Combine Commits
+**Only combine commits if:**
+- They are truly inseparable (e.g., adding a file and its test)
+- The change is trivial (< 5 lines in one file)
+- You're fixing a typo in comments/docs
+
+**Never combine:**
+- Feature additions with bug fixes
+- Multiple feature additions
+- Code changes with documentation updates
+- Different subsystems (auth + UI + database)
+
+### Commit Review Checklist
+Before committing, verify:
+- ✅ Only related files are staged
+- ✅ Commit message follows conventional format
+- ✅ No debug code, console.logs, or commented code
+- ✅ README.md updated if public-facing change
+- ✅ CHANGELOG.MD updated if user-visible change
+- ✅ No lint errors (`pnpm lint`)
+- ✅ TypeScript compiles (`pnpm build` or check for errors)
 
 ## Repository Conventions
 
