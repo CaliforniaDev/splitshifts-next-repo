@@ -92,6 +92,9 @@ export function logError(message: string, error?: unknown) {
  * In production: enforces HTTPS for security
  * In development: allows HTTP or HTTPS for flexibility
  * 
+ * Security Note: VERCEL_URL fallback is disabled in production to prevent
+ * mismatched domains and CSP violations. Always set SITE_BASE_URL explicitly.
+ * 
  * @throws Error if SITE_BASE_URL is missing or malformed
  * @returns The validated and normalized base URL
  */
@@ -99,14 +102,24 @@ export function getValidatedSiteBaseUrl(): string {
   const siteBaseUrl = process.env.SITE_BASE_URL;
   
   if (!siteBaseUrl) {
-    // In production, try to infer from Vercel environment variables
+    // In production, require explicit SITE_BASE_URL for security
     if (process.env.NODE_ENV === 'production') {
-      const vercelUrl = process.env.VERCEL_URL;
-      if (vercelUrl) {
-        const inferredUrl = `https://${vercelUrl}`;
-        console.warn(`SITE_BASE_URL not set, using inferred URL: ${inferredUrl}`);
-        return inferredUrl;
+      // Allow VERCEL_URL fallback only if explicitly enabled
+      if (process.env.ALLOW_VERCEL_URL_FALLBACK === 'true') {
+        const vercelUrl = process.env.VERCEL_URL;
+        if (vercelUrl) {
+          const inferredUrl = `https://${vercelUrl}`;
+          console.warn(
+            'SECURITY WARNING: Using VERCEL_URL fallback. Set SITE_BASE_URL explicitly.',
+            { inferredUrl }
+          );
+          return inferredUrl;
+        }
       }
+      throw new Error(
+        'SITE_BASE_URL environment variable is required in production. ' +
+        'Set ALLOW_VERCEL_URL_FALLBACK=true to use VERCEL_URL (not recommended).'
+      );
     }
     throw new Error('SITE_BASE_URL environment variable is missing.');
   }
