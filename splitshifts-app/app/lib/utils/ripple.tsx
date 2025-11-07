@@ -2,6 +2,28 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 
+/**
+ * Hook to detect user's motion preference
+ * Returns true if user prefers reduced motion
+ */
+export const usePrefersReducedMotion = (): boolean => {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  return prefersReducedMotion;
+};
+
 export interface RipplePosition {
   x: number;
   y: number;
@@ -100,15 +122,18 @@ export const RippleEffect: React.FC<RippleEffectProps> = ({
 /**
  * Hook for adding ripple effects to interactive components
  * Handles state management, event handlers, and cleanup
+ * Automatically disables ripple if user prefers reduced motion
  */
 export const useRipple = (config?: RippleConfig): UseRippleReturn => {
   const [ripples, setRipples] = useState<RipplePosition[]>([]);
   const rippleRef = useRef<HTMLElement | null>(null);
   const rippleIdRef = useRef(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
-      if (config?.disabled) return;
+      // Disable ripple if config says so or if user prefers reduced motion
+      if (config?.disabled || prefersReducedMotion) return;
 
       const rect = rippleRef.current?.getBoundingClientRect();
       if (!rect) return;
@@ -120,7 +145,7 @@ export const useRipple = (config?: RippleConfig): UseRippleReturn => {
 
       setRipples(prev => [...prev, { x, y, id, size, isReleased: false }]);
     },
-    [config?.disabled],
+    [config?.disabled, prefersReducedMotion],
   );
 
   const handleMouseUp = useCallback(() => {
