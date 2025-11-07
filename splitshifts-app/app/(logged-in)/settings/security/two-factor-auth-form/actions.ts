@@ -90,9 +90,13 @@ export const disableTwoFactorAuth = async () => {
   }
   const currentUserId = session.user.id;
 
+  // Disable 2FA and clear the secret for security
   await db
     .update(users)
-    .set({ twoFactorEnabled: false })
+    .set({ 
+      twoFactorEnabled: false,
+      twoFactorSecret: null // Clear secret when disabling for security
+    })
     .where(eq(users.id, currentUserId));
 
   return {
