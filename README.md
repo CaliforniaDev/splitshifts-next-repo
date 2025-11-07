@@ -527,13 +527,14 @@ For any inquiries or feedback, please contact:
 
 - **[Project Overview](docs/PROJECT_OVERVIEW.md)** - Complete project description, tech stack, and feature overview
 - **[Architecture Guide](docs/ARCHITECTURE.md)** - Detailed documentation of project structure and architectural decisions
-- **[Dashboard Icons Guide](DASHBOARD_ICONS_GUIDE.md)** - Comprehensive usage guide for the dashboard icon system
-- **[UI Components Documentation](UI_COMPONENTS.md)** - Detailed component API and usage examples
-- **[Email Verification Improvements](EMAIL_VERIFICATION_IMPROVEMENT.md)** - Technical analysis of error handling improvements
+- **[Dashboard Icons Guide](docs/ui/DASHBOARD_ICONS_GUIDE.md)** - Comprehensive usage guide for the dashboard icon system
+- **[UI Components Documentation](docs/ui/UI_COMPONENTS.md)** - Detailed component API and usage examples
+- **[Email Verification Improvements](docs/auth/EMAIL_VERIFICATION_IMPROVEMENT.md)** - Technical analysis of error handling improvements
 - **[Git Protection Guide](GIT_PROTECTION_GUIDE.md)** - Workflow and branch protection documentation
 
 ### 📖 Additional Resources
 
-- **[Security Guide](SECURITY.md)** - Security practices and token management
+- **[Security Guide](docs/security/SECURITY.md)** - Security practices and token management
+- **[Navigation Performance Fix](docs/security/NAVIGATION_PERFORMANCE_FIX.md)** - Session-layer refactor that removed 200-500ms navigation delays
 - **[Changelog](CHANGELOG.MD)** - Detailed version history and feature additions
 - **Component Documentation** - Individual component guides within the codebase

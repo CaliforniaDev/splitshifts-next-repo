@@ -8,6 +8,15 @@ Welcome to the SplitShifts documentation! This directory contains comprehensive 
 - **[Project Overview](./PROJECT_OVERVIEW.md)** - Complete tech stack, dependencies, and project structure
 - **[Architecture Guide](./ARCHITECTURE.md)** - System design patterns, data flow, and architectural decisions
 
+### Security & Auth
+- **[Security Policy](./security/SECURITY.md)** - Password, token, and environment hardening guidelines
+- **[Navigation Performance Fix](./security/NAVIGATION_PERFORMANCE_FIX.md)** - Session-layer refactor that eliminated navigation lag
+- **[Email Verification Improvements](./auth/EMAIL_VERIFICATION_IMPROVEMENT.md)** - Structured error handling and UX upgrades for login
+
+### UI Reference
+- **[UI Components](./ui/UI_COMPONENTS.md)** - Button, link, layout, and skeleton usage patterns
+- **[Dashboard Icons Guide](./ui/DASHBOARD_ICONS_GUIDE.md)** - Icon exports, variants, and navigation integration examples
+
 ### Development Guides *(Coming Soon)*
 - **[API Documentation](./API.md)** - API endpoints, authentication, and usage examples
 - **[Contributing Guide](./CONTRIBUTING.md)** - Development workflow, coding standards, and PR guidelines
