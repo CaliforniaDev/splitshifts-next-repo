@@ -13,7 +13,8 @@
 
 // Third-party imports
 import { usePathname } from 'next/navigation';
-import { LogOut as LogoutIcon } from 'lucide-react';
+import { LogOut as LogoutIcon, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 // Internal component imports
 import Logo from '@/app/components/ui/logo';
@@ -26,16 +27,18 @@ import { logOut } from '@/app/(public)/(auth)/actions/logout';
 
 export default function NavDrawer() {
   const pathname = usePathname();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   /**
-   * Handle user logout with error handling
+   * Handle user logout with loading state
+   * Note: logOut() action triggers a redirect, which will navigate away from the page
    */
   const handleLogout = async () => {
-    try {
-      await logOut();
-    } catch (error) {
-      console.error('Failed to log out:', error);
-    }
+    if (isLoggingOut) return; // Prevent double-click
+    
+    setIsLoggingOut(true);
+    await logOut();
+    // Note: Code after this won't execute because redirect happens
   };
 
   return (
@@ -81,11 +84,16 @@ export default function NavDrawer() {
           <div>
             <button
               onClick={handleLogout}
-              className='mt-auto flex w-full items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-outline'
-              aria-label='Sign out of your account'
+              disabled={isLoggingOut}
+              className='mt-auto flex w-full items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-outline disabled:opacity-50 disabled:cursor-not-allowed'
+              aria-label={isLoggingOut ? 'Signing out...' : 'Sign out of your account'}
             >
-              <LogoutIcon className='h-5 w-5' />
-              <span>Logout</span>
+              {isLoggingOut ? (
+                <Loader2 className='h-5 w-5 animate-spin' />
+              ) : (
+                <LogoutIcon className='h-5 w-5' />
+              )}
+              <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
             </button>
           </div>
         </nav>
