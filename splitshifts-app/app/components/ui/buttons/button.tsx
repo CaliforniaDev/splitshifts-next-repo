@@ -4,7 +4,7 @@ import React, { ElementType, ReactNode } from 'react';
 import Link from 'next/link';
 import { twMerge } from 'tailwind-merge';
 import type { VariantProps } from 'class-variance-authority';
-import { Loader } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { buttonVariants } from './variants';
 import {
   useRipple,
@@ -78,7 +78,7 @@ export default function Button<T extends ElementType = 'button'>({
   );
 
   const displayIcon = loading ? (
-    <Loader className='h-4 w-4 animate-spin' aria-hidden='true' />
+    <Loader2 className='h-4 w-4 animate-spin' aria-hidden='true' />
   ) : (
     icon
   );
