@@ -261,7 +261,7 @@ const MenuItem: React.FC<{
     >
       <span className='relative z-10'>{option.label}</span>
 
-      {ripples.map((ripple) => (
+      {ripples.map(ripple => (
         <RippleEffect
           key={ripple.id}
           {...ripple}
@@ -417,7 +417,13 @@ export default function SelectMenu({
       onBlur={handleBlur}
       {...props}
     >
-      <input type='hidden' name={name} value={currentValue} id={selectId} />
+      <input
+        type='hidden'
+        name={name}
+        value={currentValue}
+        id={selectId}
+        aria-invalid={!!error}
+      />
 
       <label
         htmlFor={selectId}
@@ -438,7 +444,6 @@ export default function SelectMenu({
           aria-haspopup='listbox'
           aria-expanded={isOpen}
           aria-labelledby={selectId}
-          aria-invalid={!!error}
           aria-describedby={describedBy}
           className={cn(
             selectVariants({

@@ -2,7 +2,7 @@
 
 /**
  * Input & Textarea Components
- * 
+ *
  * Architecture based on MUI's FilledInput implementation:
  * - Label positioned outside the input container (prevents scroll underlap)
  * - Three-layer border system: base border (::before), animated underline (::after), hover overlay
@@ -16,7 +16,7 @@ import { cn } from '@/app/lib/utils';
 
 // Input/Textarea field styles
 const inputVariants = cva(
-  'relative w-full rounded-t-[4px] bg-surface-container-highest px-4 pb-2 text-on-surface focus:outline-none transition-colors duration-200 ease-emphasized',
+  'relative w-full rounded-t-[4px] bg-surface-container-highest px-4 pb-2 text-on-surface focus:outline-none transition-colors duration-200 ease-emphasized selection:bg-primary/80 selection:text-on-primary',
   {
     variants: {
       multiline: {
@@ -79,7 +79,8 @@ const labelVariants = cva(
     variants: {
       floating: {
         true: 'typescale-body-small pt-[8px] transition-all duration-200 ease-in-out',
-        false: 'typescale-body-large pt-4 transition-all duration-200 ease-in-out',
+        false:
+          'typescale-body-large pt-4 transition-all duration-200 ease-in-out',
       },
       focused: {
         true: 'typescale-body-small pt-[8px]',
@@ -179,7 +180,7 @@ export default function Input({
   disabled = false,
   required = false,
   className = '',
-  "data-testid": dataTestId = 'input',
+  'data-testid': dataTestId = 'input',
 
   // Callbacks
   onChange,
@@ -187,13 +188,29 @@ export default function Input({
 
   // Rest props
   ...props
-}: InputProps & { "data-testid"?: string; required?: boolean }) {
+}: InputProps & { 'data-testid'?: string; required?: boolean }) {
   const [isFocused, setIsFocused] = useState(false);
+  const [uncontrolledValue, setUncontrolledValue] = useState('');
   const uncontrolledValueRef = useRef<HTMLInputElement>(null);
 
   const isControlled = value !== undefined;
-  const inputValue = isControlled ? value : uncontrolledValueRef.current?.value;
-  const hasValue = Boolean(inputValue?.length);
+  const inputValue = isControlled ? value : uncontrolledValue;
+
+  // Types that should always float the label (they always have a visual value)
+  const alwaysFloatTypes = [
+    'date',
+    'time',
+    'datetime-local',
+    'month',
+    'week',
+    'color',
+  ];
+  const shouldAlwaysFloat = props.type && alwaysFloatTypes.includes(props.type);
+
+  const hasValue =
+    Boolean(inputValue?.length) ||
+    Boolean(defaultValue?.length) ||
+    shouldAlwaysFloat;
   const generatedId = useId();
   const inputId = id || generatedId;
 
@@ -207,8 +224,8 @@ export default function Input({
       : undefined;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!isControlled && uncontrolledValueRef.current) {
-      uncontrolledValueRef.current.value = e.target.value;
+    if (!isControlled) {
+      setUncontrolledValue(e.target.value);
     }
     onChange?.(e);
   };
@@ -255,10 +272,7 @@ export default function Input({
         />
         {/* Base border (::before) - 1px with color transitions */}
         {!disabled && (
-          <div
-            aria-hidden='true'
-            className={baseBorder({ error: !!error })}
-          />
+          <div aria-hidden='true' className={baseBorder({ error: !!error })} />
         )}
         {/* Animated underline (::after) that expands from center */}
         {!disabled && (
@@ -339,7 +353,7 @@ export function Textarea({
   disabled = false,
   required = false,
   className = '',
-  "data-testid": dataTestId = 'textarea',
+  'data-testid': dataTestId = 'textarea',
 
   // Callbacks
   onChange,
@@ -347,13 +361,16 @@ export function Textarea({
 
   // Rest props
   ...props
-}: TextareaProps & { "data-testid"?: string; required?: boolean }) {
+}: TextareaProps & { 'data-testid'?: string; required?: boolean }) {
   const [isFocused, setIsFocused] = useState(false);
+  const [uncontrolledValue, setUncontrolledValue] = useState('');
   const uncontrolledValueRef = useRef<HTMLTextAreaElement>(null);
 
   const isControlled = value !== undefined;
-  const textareaValue = isControlled ? value : uncontrolledValueRef.current?.value;
-  const hasValue = Boolean(textareaValue?.length);
+  const textareaValue = isControlled ? value : uncontrolledValue;
+  // Check for value, defaultValue, or actual textarea value
+  const hasValue =
+    Boolean(textareaValue?.length) || Boolean(defaultValue?.length);
   const generatedId = useId();
   const textareaId = id || generatedId;
 
@@ -367,8 +384,8 @@ export function Textarea({
       : undefined;
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (!isControlled && uncontrolledValueRef.current) {
-      uncontrolledValueRef.current.value = e.target.value;
+    if (!isControlled) {
+      setUncontrolledValue(e.target.value);
     }
     onChange?.(e);
   };
@@ -391,11 +408,13 @@ export function Textarea({
         {label}
       </label>
       {/* Container with textarea - container provides padding */}
-      <div className={cn(
-        'relative block w-full rounded-t-[4px] bg-surface-container-highest',
-        'px-4 pb-2 pt-[25px]', // Container padding for multiline
-        disabled && 'bg-on-surface opacity-[0.04] cursor-not-allowed'
-      )}>
+      <div
+        className={cn(
+          'relative block w-full rounded-t-[4px] bg-surface-container-highest',
+          'px-4 pb-2 pt-[25px]', // Container padding for multiline
+          disabled && 'cursor-not-allowed bg-on-surface opacity-[0.04]',
+        )}
+      >
         <textarea
           id={textareaId}
           disabled={disabled}
@@ -404,9 +423,15 @@ export function Textarea({
           aria-required={required}
           rows={rows}
           className={cn(
-            'w-full bg-transparent text-on-surface resize-none border-none focus:outline-none p-0',
+            // Base styles - fixed order
+            'w-full bg-transparent text-on-surface',
+            'resize-none border-none p-0',
+            'focus:outline-none',
+            'selection:bg-primary/30 selection:text-on-primary',
+            // Conditional styles
             error ? 'caret-error' : 'caret-primary',
             disabled && 'cursor-not-allowed',
+            // User overrides last
             className,
           )}
           onFocus={handleFocus}
@@ -419,10 +444,7 @@ export function Textarea({
         />
         {/* Base border (::before) - 1px with color transitions */}
         {!disabled && (
-          <div
-            aria-hidden='true'
-            className={baseBorder({ error: !!error })}
-          />
+          <div aria-hidden='true' className={baseBorder({ error: !!error })} />
         )}
         {/* Animated underline (::after) that expands from center */}
         {!disabled && (
