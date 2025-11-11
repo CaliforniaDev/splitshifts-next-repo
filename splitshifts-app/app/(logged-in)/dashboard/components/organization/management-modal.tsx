@@ -32,7 +32,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/app/components/ui/form';
-import { Input } from '@/app/components/ui/inputs';
+import { Input, SelectMenu } from '@/app/components/ui/inputs';
 import { Button } from '@/app/components/ui/buttons';
 
 interface ModalProps {
@@ -155,158 +155,163 @@ export default function OrganizationManagementModal({
                 disabled={isSubmitting || isDeleting}
                 className='space-y-4'
               >
-              <FormField
-                name='name'
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        label='Organization Name *'
-                        type='text'
-                        onBlur={field.onBlur}
-                        error={!!fieldState.error}
-                        errorMessage={fieldState.error?.message}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name='description'
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        label='Description (Optional)'
-                        type='text'
-                        onBlur={field.onBlur}
-                        error={!!fieldState.error}
-                        errorMessage={fieldState.error?.message}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name='weekStartDay'
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormControl>
-                      <div className='space-y-2'>
-                        <label className='typescale-body-small text-on-surface'>
-                          Week Start Day *
-                        </label>
-                        <select
+                <FormField
+                  name='name'
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
                           {...field}
-                          className='w-full rounded-md border border-outline bg-surface-container px-3 py-2 text-on-surface focus:border-primary focus:outline-none'
-                        >
-                          <option value='monday'>Monday</option>
-                          <option value='sunday'>Sunday</option>
-                        </select>
-                        {fieldState.error && (
-                          <FormMessage>{fieldState.error.message}</FormMessage>
-                        )}
-                      </div>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </fieldset>
-          </form>
-        </Form>
+                          label='Organization Name *'
+                          type='text'
+                          onBlur={field.onBlur}
+                          error={!!fieldState.error}
+                          errorMessage={fieldState.error?.message}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
 
-        <DialogFooter className='gap-4 pt-4'>
-          <DialogClose asChild>
-            <Button variant='text' disabled={isSubmitting || isDeleting}>
-              Cancel
+                <FormField
+                  name='description'
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          label='Description (Optional)'
+                          type='text'
+                          onBlur={field.onBlur}
+                          error={!!fieldState.error}
+                          errorMessage={fieldState.error?.message}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name='weekStartDay'
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormControl>
+                        <SelectMenu
+                          name={field.name}
+                          value={field.value}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          label='Week Starts On'
+                          options={[
+                            { value: 'monday', label: 'Monday' },
+                            { value: 'sunday', label: 'Sunday' },
+                          ]}
+                          error={!!fieldState.error}
+                          errorMessage={fieldState.error?.message}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </fieldset>
+            </form>
+          </Form>
+
+          <DialogFooter className='gap-4 pt-4'>
+            <DialogClose asChild>
+              <Button variant='text' disabled={isSubmitting || isDeleting}>
+                Cancel
+              </Button>
+            </DialogClose>
+
+            <Button
+              onClick={form.handleSubmit(handleUpdate)}
+              variant='filled'
+              loading={isSubmitting}
+              loadingText='Updating...'
+              disabled={isDeleting}
+              className='flex-1'
+            >
+              Update Organization
             </Button>
-          </DialogClose>
+            <Button
+              type='button'
+              variant='destructive'
+              loading={isDeleting}
+              loadingText='Deleting...'
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={isSubmitting}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-          <Button
-            onClick={form.handleSubmit(handleUpdate)}
-            variant='filled'
-            loading={isSubmitting}
-            loadingText='Updating...'
-            disabled={isDeleting}
-            className='flex-1'
-          >
-            Update Organization
-          </Button>
-          <Button
-            type='button'
-            variant='destructive'
-            loading={isDeleting}
-            loadingText='Deleting...'
-            onClick={() => setShowDeleteConfirm(true)}
-            disabled={isSubmitting}
-          >
-            Delete
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-
-    {/* Delete Confirmation Dialog */}
-    <Dialog open={showDeleteConfirm} onOpenChange={(open) => {
-      setShowDeleteConfirm(open);
-      if (!open) setDeleteConfirmText('');
-    }}>
-      <DialogContent className='max-w-md'>
-        <DialogHeader>
-          <DialogTitle className='text-error'>Delete Organization?</DialogTitle>
-        </DialogHeader>
-        <div className='space-y-4 py-4'>
-          <p className='font-semibold text-on-surface typescale-body-medium'>
-            Are you sure you want to delete &ldquo;{organization.name}&rdquo;?
-          </p>
-          <p className='text-on-surface-variant typescale-body-medium'>
-            This will permanently remove the organization and all associated
-            data. You will need to create a new organization or join an
-            existing one.
-          </p>
-          <p className='font-semibold text-error typescale-body-medium'>
-            This action cannot be undone.
-          </p>
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={showDeleteConfirm}
+        onOpenChange={open => {
+          setShowDeleteConfirm(open);
+          if (!open) setDeleteConfirmText('');
+        }}
+      >
+        <DialogContent className='max-w-md'>
+          <DialogHeader>
+            <DialogTitle className='text-error'>
+              Delete Organization?
+            </DialogTitle>
+          </DialogHeader>
+          <div className='space-y-4 py-4'>
+            <p className='typescale-body-medium font-semibold text-on-surface'>
+              Are you sure you want to delete &ldquo;{organization.name}&rdquo;?
+            </p>
+            <p className='typescale-body-medium text-on-surface-variant'>
+              This will permanently remove the organization and all associated
+              data. You will need to create a new organization or join an
+              existing one.
+            </p>
+            <p className='typescale-body-medium font-semibold text-error'>
+              This action cannot be undone.
+            </p>
 
             <Input
               label='Type DELETE to confirm*'
               type='text'
               value={deleteConfirmText}
-              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              onChange={e => setDeleteConfirmText(e.target.value)}
               disabled={isDeleting}
-              error={deleteConfirmText.length > 0 && deleteConfirmText !== 'DELETE'}
+              error={
+                deleteConfirmText.length > 0 && deleteConfirmText !== 'DELETE'
+              }
             />
           </div>
-        <DialogFooter className='gap-2'>
-          <Button
-            variant='text'
-            onClick={() => {
-              setShowDeleteConfirm(false);
-              setDeleteConfirmText('');
-            }}
-            disabled={isDeleting}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant='destructive'
-            onClick={handleDelete}
-            loading={isDeleting}
-            loadingText='Deleting...'
-            disabled={deleteConfirmText !== 'DELETE'}
-          >
-            Delete Organization
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter className='gap-2'>
+            <Button
+              variant='text'
+              onClick={() => {
+                setShowDeleteConfirm(false);
+                setDeleteConfirmText('');
+              }}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={handleDelete}
+              loading={isDeleting}
+              loadingText='Deleting...'
+              disabled={deleteConfirmText !== 'DELETE'}
+            >
+              Delete Organization
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
