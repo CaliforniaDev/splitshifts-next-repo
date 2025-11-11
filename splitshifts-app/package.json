@@ -2,6 +2,7 @@
   "name": "splitshifts-app",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.18.2",
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:network": "next dev -H 0.0.0.0 -p 3000",
@@ -49,6 +50,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@next/eslint-plugin-next": "15.1.7",
     "@types/node": "^20.19.17",
     "@types/nodemailer": "^6.4.19",
     "@types/react": "19.0.8",
@@ -56,6 +58,7 @@
     "drizzle-kit": "^0.31.4",
     "eslint": "^9.36.0",
     "eslint-config-next": "15.1.7",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
