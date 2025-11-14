@@ -1,5 +1,8 @@
 // Re-export all dashboard server actions by domain
 
+// Onboarding actions
+export * from './onboarding';
+
 // Organization management
 export * from './organization';
 
