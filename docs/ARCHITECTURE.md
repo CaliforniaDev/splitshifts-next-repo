@@ -15,6 +15,7 @@ SplitShifts follows a modern, component-based architecture using Next.js 15 with
 - **Server State** - Next.js App Router with RSC (React Server Components)
 - **Client State** - React Hook Form for form state
 - **Authentication State** - NextAuth.js session management
+- **Onboarding State** - Database-persisted user progress with server actions
 
 ### Styling Architecture
 - **Tailwind CSS** - Utility-first styling
@@ -91,6 +92,32 @@ const listItemVariants = cva(baseStyles, {
 });
 ```
 
+### 4. Onboarding System
+**Pattern**: Multi-step wizard with progress persistence and flexible navigation
+
+```tsx
+// Database state tracking
+const [user] = await db.select({ onboardingStep: users.onboardingStep })
+  .from(users)
+  .where(eq(users.id, session.user.id!));
+
+// Resume from saved step
+if (!userOrg || user?.onboardingStep) {
+  return <OnboardingWizard initialStep={user?.onboardingStep} />;
+}
+
+// Auto-save progress
+const handleStepChange = async (newStep: number) => {
+  setCurrentStep(newStep);
+  await saveOnboardingProgress(OnboardingStep[newStep]);
+};
+
+// Skip functionality - bypass validation
+<Button variant="text" onClick={onSuccess}>
+  Skip for Now
+</Button>
+```
+
 ## Data Flow
 
 ### Authentication Flow
@@ -110,6 +137,7 @@ const listItemVariants = cva(baseStyles, {
 2. Zod validation schemas
 3. Server actions for form submission
 4. Toast notifications for feedback
+5. Onboarding progress auto-saved to database
 
 ## Performance Considerations
 
@@ -162,4 +190,4 @@ const listItemVariants = cva(baseStyles, {
 
 ---
 
-**Last Updated**: August 2025
+**Last Updated**: November 2025

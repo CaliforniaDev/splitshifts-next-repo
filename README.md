@@ -97,6 +97,22 @@ SplitShifts is a web application designed to streamline the scheduling process f
   - **Performance Optimized**: CSS-based animations with proper animation delays and durations
   - **Reusable Components**: Extracted AnimatedCheckIcon with size variants (small/medium/large)
 - **TypeScript Support**: Full TypeScript implementation for type safety and better developer experience
+- **Onboarding Wizard**: Multi-step organization setup with progress persistence
+  - **Three-Step Flow**: Organization creation → Work sites → Employees → Roles
+  - **Progress Persistence**: Resume onboarding after page refresh or session interruption
+  - **Database State Tracking**: User onboarding progress saved in database with `onboarding_step` column
+  - **Auto-Save Navigation**: Automatic progress saving on every step change via server action
+  - **Skip Functionality**: Optional "Skip for Now" button on all forms to bypass non-critical steps
+  - **Smart Resume Logic**: Dashboard conditionally shows wizard based on organization membership AND onboarding status
+  - **Flexible User Flow**: Users can add items later instead of forced completion
+  - **Enhanced Button Layout**: Logical visual hierarchy with primary → secondary → navigation actions
+  - **Form Validation**: Zod schemas with React Hook Form for all onboarding steps
+  - **Material Design 3 UI**: Consistent button variants (filled, outlined, tonal, text) across all forms
+- **Test Infrastructure**: Comprehensive visual testing system at `/tests`
+  - **Component Showcase**: Visual testing ground for all UI components with interactive examples
+  - **Form Testing Suite**: Isolated testing environment for onboarding forms
+  - **Custom Test Navigation**: Separate icon system and navigation independent of main dashboard
+  - **Testing Checklist**: Built-in checklist for validating component behavior
 
 ### Planned Features
 

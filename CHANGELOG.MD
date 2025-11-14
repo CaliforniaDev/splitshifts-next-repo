@@ -3,6 +3,53 @@
 ## [Unreleased]
 
 ### Added
+- **Test Infrastructure**: Comprehensive visual testing system for UI development
+  - **Component Test Page**: Visual showcase of all UI components in one place (`/tests/components`)
+    - Button variants (filled, outlined, tonal, text, elevated) with loading states
+    - Input/Textarea with placeholder floating behavior testing
+    - SelectMenu integration examples
+    - Form components with validation
+    - Card layouts and typography scales
+    - Interactive testing checklist
+  - **Form Test Page**: Dedicated onboarding form testing suite (`/tests/forms`)
+    - Individual form testing (Worksite, Employee, Role)
+    - Skip functionality validation
+    - Button hierarchy verification
+    - Menu-driven test selection
+  - **Custom Test Navigation**: Separate navigation system for test pages
+    - Custom icon system (puzzle, document-text) independent of dashboard icons
+    - Uses same List/ListItemLink pattern as dashboard
+    - Mobile-responsive drawer with proper ARIA labels
+  - **Test Layout**: Dedicated layout outside `(logged-in)` directory for clean separation
+- **Onboarding Wizard Progress Persistence**: Resume onboarding after page refresh or session interruption
+  - **Database State Tracking**: Added `onboarding_step` varchar(50) column to users table for persistent state storage
+  - **Auto-Save on Navigation**: OnboardingWizard automatically saves progress on every step change via server action
+  - **Smart Resume Logic**: Dashboard checks both organization membership AND onboarding status to conditionally show wizard
+  - **Progress Clearing**: Onboarding step nullified upon wizard completion, preventing re-entry
+  - **Migration Support**: Database migration 0002_pretty_komodo adds onboarding_step column
+- **Onboarding Skip Functionality**: Allow users to bypass optional onboarding steps
+  - **Skip for Now Button**: Added to all onboarding forms (worksite, employee, role) with text button styling
+  - **Validation Bypass**: Skip button calls onSuccess() directly without triggering form validation
+  - **Flexible User Flow**: Users can add items later instead of being forced to complete forms
+  - **Fixes Form Trap**: Resolves issue where clicking "Add Another" required form completion even if user changed their mind
+  - **Fixes Back Button Trap**: Resolves issue where back navigation forced completing current form to proceed
+- **Onboarding Button Layout Improvements**: Enhanced visual hierarchy and user experience
+  - **Logical Button Order**: Reordered to Save & Continue → Add Another → Back | Skip for Now
+  - **Visual Hierarchy**: Primary action (filled) → Secondary action (outlined/tonal) → Navigation (text)
+  - **Horizontal Navigation Layout**: Back and Skip buttons in flex row for better space utilization
+  - **Consistent Patterns**: Unified button layout across all three onboarding forms
+  - **Material Design 3 Compliance**: Proper button variant usage (filled, outlined, tonal, text)
+- **Input Component Enhancements**: Fixed label floating behavior and improved UX
+  - **Placeholder Float Fix**: Labels now properly float when placeholder is present, preventing overlap
+  - **hasValue Logic**: Updated to check for both value AND placeholder (`Boolean(props.placeholder)`)
+  - **Consistent Behavior**: Applies to both Input and Textarea components
+  - **Visual Polish**: Eliminated label/placeholder collision issues
+- **Form Error Handling Standardization**: Unified error display across all forms
+  - **FormErrorDisplay Component**: Centralized error component replacing custom implementations
+  - **Consistent Typography**: Added `typescale-body-medium` class for proper text sizing
+  - **Reduced Duplication**: Removed custom ErrorDisplay components from individual forms
+  - **Warning Icon Integration**: Consistent error icon usage across application
+  - **Applied to All Onboarding Forms**: Employee, Role, and Worksite forms use FormErrorDisplay
 - **Complete Database Schema Migration to UUID**: Implemented comprehensive 20-table database schema with UUID primary keys for scalability and multi-tenancy
   - **UUID Primary Keys**: Migrated all tables from serial integers to UUID for better distributed system support and security
   - **Organization-Based Multi-Tenancy**: Complete organization isolation with proper user-organization relationships

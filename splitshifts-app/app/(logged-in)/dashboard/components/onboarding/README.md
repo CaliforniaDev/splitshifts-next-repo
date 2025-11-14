@@ -78,17 +78,48 @@ import {
   onSuccess={() => setStep(OnboardingStep.WORKSITE)}
   onBack={() => setStep(OnboardingStep.WELCOME)}
 />
+
+// Skip button bypasses validation
+<Button variant="text" onClick={onSuccess}>
+  Skip for Now
+</Button>
+```
+
+### Progress Persistence
+```tsx
+// Server action saves progress
+export async function saveOnboardingProgress(step: string | null) {
+  'use server';
+  const session = await requireAuth();
+  await db.update(users)
+    .set({ onboardingStep: step })
+    .where(eq(users.id, session.user.id!));
+}
+
+// Dashboard resumes from saved step
+const [user] = await db.select({ onboardingStep: users.onboardingStep })
+  .from(users)
+  .where(eq(users.id, session.user.id!));
+
+if (!userOrg || user?.onboardingStep) {
+  return <OnboardingWizard initialStep={user?.onboardingStep} />;
+}
 ```
 
 ## Features
 
-✅ **Self-contained forms** with internal state management
+✅ **Self-contained forms** with internal state management  
+✅ **Progress persistence** with database state tracking  
+✅ **Auto-save navigation** via server actions  
+✅ **Skip functionality** with validation bypass  
+✅ **Resume capability** after page refresh or logout  
 ✅ **Proper timezone support** with @vvo/tzdb integration  
-✅ **Material Design 3** styling with CVA variants
-✅ **TypeScript** interfaces and type safety
-✅ **Accessibility** with proper ARIA labels
-✅ **Error handling** with form-level error states
-✅ **Loading states** with proper UI feedback
+✅ **Material Design 3** styling with CVA variants  
+✅ **Button hierarchy** with filled/outlined/tonal/text variants  
+✅ **TypeScript** interfaces and type safety  
+✅ **Accessibility** with proper ARIA labels  
+✅ **Error handling** with form-level error states  
+✅ **Loading states** with proper UI feedback  
 ✅ **Responsive design** with mobile-first approach
 
 ## Extending

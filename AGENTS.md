@@ -197,6 +197,43 @@ import {
 </Card>
 \`\`\`
 
+### Onboarding Wizard Pattern
+
+**Multi-step forms with progress persistence:**
+\`\`\`tsx
+// 1. Add onboardingStep column to user schema (varchar 50)
+onboardingStep: varchar('onboarding_step', { length: 50 })
+
+// 2. Create server action to save progress
+export async function saveOnboardingProgress(step: string | null) {
+  'use server';
+  const session = await requireAuth();
+  await db.update(users)
+    .set({ onboardingStep: step })
+    .where(eq(users.id, session.user.id!));
+}
+
+// 3. Dashboard checks for incomplete onboarding
+const [user] = await db.select({ onboardingStep: users.onboardingStep })
+  .from(users)
+  .where(eq(users.id, session.user.id!));
+
+if (!userOrg || user?.onboardingStep) {
+  return <OnboardingWizard initialStep={user?.onboardingStep} />;
+}
+
+// 4. Wizard component auto-saves on step change
+const handleStepChange = async (newStep: number) => {
+  setCurrentStep(newStep);
+  await saveOnboardingProgress(OnboardingStep[newStep]);
+};
+\`\`\`
+
+**Button hierarchy for multi-action forms:**
+- Primary action: `variant="filled"` (Save & Continue)
+- Secondary action: `variant="outlined"` or `"tonal"` (Add Another)
+- Navigation/Skip: `variant="text"` in horizontal layout (Back | Skip for Now)
+
 ## Database Best Practices
 
 ### Query Patterns
@@ -456,6 +493,76 @@ Before committing, verify:
 - ✅ No lint errors (\`pnpm lint\`)
 - ✅ TypeScript compiles (\`pnpm build\` or check for errors)
 
+### Commit Message Generation for Multi-File Changes
+When an agent is asked to "review code for commit" or "generate commit messages," follow this process:
+
+**User Preference: Use GitHub Plugin format by default (no git commands)**
+
+**Step 1: Review Changed Files**
+\`\`\`bash
+# Review all changes
+git status
+git diff
+\`\`\`
+
+**Step 2: Group Changes Logically**
+Group files into atomic commits by:
+- **Feature boundary**: UI changes separate from database changes
+- **Layer separation**: Schema → Migration → Server Action → Component
+- **Dependency order**: Database changes before code that uses them
+- **Subsystem**: Auth changes separate from onboarding changes
+
+**Step 3: Generate Commit Message Groups**
+Format output for easy copy-paste into GitHub plugin or terminal:
+
+**For GitHub Plugin Users (VS Code Source Control):**
+\`\`\`markdown
+### Commit 1: [Descriptive Name]
+
+**Files to stage:**
+- path/to/file1.ts
+- path/to/file2.ts
+
+**Commit Message:**
+type(scope): subject line
+
+- Bullet point detail 1
+- Bullet point detail 2
+- Bullet point detail 3
+
+Impact: [Performance/UX/Security improvement description]
+\`\`\`
+
+**For Terminal Users:**
+\`\`\`bash
+git add path/to/file1.ts path/to/file2.ts
+git commit -m "type(scope): subject line
+
+- Bullet point detail 1
+- Bullet point detail 2"
+\`\`\`
+
+**Step 4: Provide Context**
+After commit groups, explain:
+- Why changes were grouped this way
+- What each commit accomplishes
+- Dependencies between commits (if any)
+- Recommended commit order
+
+**Example Grouping Strategy:**
+For a feature with DB changes, server actions, and UI components:
+1. **Database schema** (e.g., add column to table)
+2. **Database migration** (generated SQL + metadata)
+3. **Server action** (new API endpoint using schema)
+4. **UI component** (form/page using server action)
+5. **Integration** (connect components together)
+6. **Documentation** (README, CHANGELOG updates)
+
+**Never Generate:**
+- Single mega-commit with all changes
+- Commits mixing unrelated features
+- Commits with both code and docs (separate them)
+
 ## Repository Conventions
 
 - Use \`TwoFactorAuthForm\` naming (not "From"); fix typos when touching related files
@@ -509,3 +616,5 @@ pnpm db:studio        # Open Drizzle Studio (database GUI)
 - ❌ Don't trust client-side validation alone - always validate on server
 - ❌ Don't query the database in the session callback (performance)
 - ❌ Don't forget to filter soft-deleted records with \`isNull(deletedAt)\`
+- ❌ Don't use \`git add .\` or commit all files at once - use atomic commits
+- ❌ Don't check only \`!userOrg\` for onboarding - also check \`user?.onboardingStep\` to handle in-progress state
