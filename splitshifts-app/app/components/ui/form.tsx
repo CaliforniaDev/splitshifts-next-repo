@@ -186,7 +186,7 @@ const FormErrorDisplay: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
           <WarningIcon className='h-5 w-5 text-error' />
         </div>
         <div className='flex-1'>
-          <FormMessage className='text-on-error-container'>
+          <FormMessage className='typescale-body-medium text-on-error-container'>
             {children}
           </FormMessage>
         </div>
