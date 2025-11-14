@@ -21,4 +21,5 @@ export const users = pgTable('users', {
   lastLogin: timestamp('last_login'),
   emailVerified: boolean('email_verified').notNull().default(false),
   emailVerifiedAt: timestamp('email_verified_at'),
+  onboardingStep: varchar('onboarding_step', { length: 50 }),
 });
