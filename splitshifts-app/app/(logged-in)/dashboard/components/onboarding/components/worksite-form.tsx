@@ -175,17 +175,6 @@ export default function WorksiteForm({
               )}
               <div className='flex flex-col space-y-4 pt-4'>
                 <Button
-                  type='button'
-                  variant='outlined'
-                  className='w-full'
-                  onClick={form.handleSubmit((data) => handleSubmit(data, true))}
-                  loading={isAddingAnother}
-                  loadingText='Adding Worksite...'
-                  disabled={isSubmitting || isAddingAnother}
-                >
-                  Add Another Worksite
-                </Button>
-                <Button
                   type='submit'
                   variant='filled'
                   className='w-full'
@@ -197,13 +186,35 @@ export default function WorksiteForm({
                 </Button>
                 <Button
                   type='button'
-                  variant='text'
+                  variant='outlined'
                   className='w-full'
-                  onClick={onBack}
+                  onClick={form.handleSubmit((data) => handleSubmit(data, true))}
+                  loading={isAddingAnother}
+                  loadingText='Adding Worksite...'
                   disabled={isSubmitting || isAddingAnother}
                 >
-                  Back
+                  Add Another Worksite
                 </Button>
+                <div className='flex gap-4'>
+                  <Button
+                    type='button'
+                    variant='text'
+                    className='flex-1'
+                    onClick={onBack}
+                    disabled={isSubmitting || isAddingAnother}
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    type='button'
+                    variant='text'
+                    className='flex-1'
+                    onClick={onSuccess}
+                    disabled={isSubmitting || isAddingAnother}
+                  >
+                    Skip for Now
+                  </Button>
+                </div>
               </div>
             </fieldset>
           </form>

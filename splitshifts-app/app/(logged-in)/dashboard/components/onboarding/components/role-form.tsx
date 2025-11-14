@@ -19,6 +19,7 @@ import {
 import {
   Form,
   FormControl,
+  FormErrorDisplay,
   FormField,
   FormItem,
   FormMessage,
@@ -63,11 +64,14 @@ export default function RoleForm({ onSuccess, onBack }: RoleFormProps) {
     return () => cancelAnimationFrame(timer);
   }, []);
 
-  const handleSubmit = async (data: CreateRolesFormData, addAnother = false) => {
+  const handleSubmit = async (
+    data: CreateRolesFormData,
+    addAnother = false,
+  ) => {
     if (addAnother) {
       setIsAddingAnother(true);
     }
-    
+
     try {
       const response = await addRoles(data);
       if (!response.success) {
@@ -111,11 +115,11 @@ export default function RoleForm({ onSuccess, onBack }: RoleFormProps) {
       <CardContent>
         <Form {...form}>
           {form.formState.errors.root?.message && (
-            <div className='mb-4'>
-              <ErrorDisplay message={form.formState.errors.root.message} />
-            </div>
+            <FormErrorDisplay className='mb-4'>
+              {form.formState.errors.root.message}
+            </FormErrorDisplay>
           )}
-          <form onSubmit={form.handleSubmit((data) => handleSubmit(data, false))}>
+          <form onSubmit={form.handleSubmit(data => handleSubmit(data, false))}>
             <fieldset disabled={isSubmitting} className='space-y-6'>
               <FormField
                 name='title'
@@ -155,17 +159,6 @@ export default function RoleForm({ onSuccess, onBack }: RoleFormProps) {
               />
               <div className='flex flex-col space-y-4 pt-4'>
                 <Button
-                  type='button'
-                  variant='outlined'
-                  className='w-full'
-                  onClick={form.handleSubmit((data) => handleSubmit(data, true))}
-                  loading={isAddingAnother}
-                  loadingText='Adding Role...'
-                  disabled={isSubmitting || isAddingAnother}
-                >
-                  Add Another Role
-                </Button>
-                <Button
                   type='submit'
                   variant='filled'
                   className='w-full'
@@ -177,35 +170,40 @@ export default function RoleForm({ onSuccess, onBack }: RoleFormProps) {
                 </Button>
                 <Button
                   type='button'
-                  variant='text'
+                  variant='outlined'
                   className='w-full'
-                  onClick={onBack}
+                  onClick={form.handleSubmit(data => handleSubmit(data, true))}
+                  loading={isAddingAnother}
+                  loadingText='Adding Role...'
                   disabled={isSubmitting || isAddingAnother}
                 >
-                  Back
+                  Add Another Role
                 </Button>
+                <div className='flex gap-4'>
+                  <Button
+                    type='button'
+                    variant='text'
+                    className='flex-1'
+                    onClick={onBack}
+                    disabled={isSubmitting || isAddingAnother}
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    type='button'
+                    variant='text'
+                    className='flex-1'
+                    onClick={onSuccess}
+                    disabled={isSubmitting || isAddingAnother}
+                  >
+                    Skip for Now
+                  </Button>
+                </div>
               </div>
             </fieldset>
           </form>
         </Form>
       </CardContent>
     </Card>
-  );
-}
-
-function ErrorDisplay({ message }: { message: string }) {
-  return (
-    <div className='rounded-lg border border-error bg-error-container p-4'>
-      <div className='flex items-center space-x-3'>
-        <div className='flex-shrink-0'>
-          <WarningIcon className='h-5 w-5 text-error' />
-        </div>
-        <div className='flex-1'>
-          <p className='typescale-body-medium text-on-error-container'>
-            {message}
-          </p>
-        </div>
-      </div>
-    </div>
   );
 }
