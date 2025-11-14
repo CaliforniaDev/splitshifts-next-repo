@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { saveOnboardingProgress } from '../actions/onboarding';
+
 import {
   WelcomeCard,
   OrganizationForm,
@@ -11,17 +13,39 @@ import {
   EmployeeForm,
   StepProgress,
   CompletionCard,
-  OnboardingStep
+  OnboardingStep,
 } from './onboarding';
 
 import AnimatedTransition from '@/app/components/ui/animations/animated-transition';
 
-export function OnboardingWizard() {
+interface OnboardingWizardProps {
+  initialStep?: OnboardingStep | null;
+}
+
+export function OnboardingWizard({ initialStep }: OnboardingWizardProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(
-    OnboardingStep.WELCOME,
+    initialStep || OnboardingStep.WELCOME,
   );
 
+  // Save progress whenever step changes
+  const handleStepChange = async (newStep: OnboardingStep) => {
+    setCurrentStep(newStep);
+    await saveOnboardingProgress(newStep);
+  };
+
+  const handleComplete = async () => {
+    await saveOnboardingProgress(null); // Clear onboarding progress
+    router.refresh();
+  };
+
+  /**
+   * Map onboarding steps to progress indicator numbers (1-4)
+   * 
+   * Note: Welcome and Organization both show step 1 active because
+   * the organization form is the first actual data collection step.
+   * The welcome screen is just an introduction.
+   */
   const getStepNumber = () => {
     switch (currentStep) {
       case OnboardingStep.WELCOME:
@@ -41,7 +65,8 @@ export function OnboardingWizard() {
     }
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
+    await saveOnboardingProgress(null); // Clear onboarding progress
     router.refresh();
   };
 
@@ -49,7 +74,7 @@ export function OnboardingWizard() {
     return (
       <AnimatedTransition animationKey='welcome'>
         <WelcomeCard
-          onContinue={() => setCurrentStep(OnboardingStep.ORGANIZATION)}
+          onContinue={() => handleStepChange(OnboardingStep.ORGANIZATION)}
           onSkip={handleSkip}
           currentStepNumber={getStepNumber()}
         />
@@ -63,8 +88,8 @@ export function OnboardingWizard() {
       {currentStep === OnboardingStep.ORGANIZATION && (
         <AnimatedTransition animationKey='organization'>
           <OrganizationForm
-            onSuccess={() => setCurrentStep(OnboardingStep.WORKSITE)}
-            onBack={() => setCurrentStep(OnboardingStep.WELCOME)}
+            onSuccess={() => handleStepChange(OnboardingStep.WORKSITE)}
+            onBack={() => handleStepChange(OnboardingStep.WELCOME)}
           />
         </AnimatedTransition>
       )}
@@ -72,8 +97,8 @@ export function OnboardingWizard() {
       {currentStep === OnboardingStep.WORKSITE && (
         <AnimatedTransition animationKey='worksite'>
           <WorksiteForm
-            onSuccess={() => setCurrentStep(OnboardingStep.ROLES)}
-            onBack={() => setCurrentStep(OnboardingStep.ORGANIZATION)}
+            onSuccess={() => handleStepChange(OnboardingStep.ROLES)}
+            onBack={() => handleStepChange(OnboardingStep.ORGANIZATION)}
           />
         </AnimatedTransition>
       )}
@@ -81,8 +106,8 @@ export function OnboardingWizard() {
       {currentStep === OnboardingStep.ROLES && (
         <AnimatedTransition animationKey='roles'>
           <RoleForm
-            onSuccess={() => setCurrentStep(OnboardingStep.EMPLOYEES)}
-            onBack={() => setCurrentStep(OnboardingStep.WORKSITE)}
+            onSuccess={() => handleStepChange(OnboardingStep.EMPLOYEES)}
+            onBack={() => handleStepChange(OnboardingStep.WORKSITE)}
           />
         </AnimatedTransition>
       )}
@@ -90,18 +115,17 @@ export function OnboardingWizard() {
       {currentStep === OnboardingStep.EMPLOYEES && (
         <AnimatedTransition animationKey='employees'>
           <EmployeeForm
-            onSuccess={() => setCurrentStep(OnboardingStep.COMPLETED)}
-            onBack={() => setCurrentStep(OnboardingStep.ROLES)}
+            onSuccess={() => handleStepChange(OnboardingStep.COMPLETED)}
+            onBack={() => handleStepChange(OnboardingStep.ROLES)}
           />
         </AnimatedTransition>
       )}
 
       {currentStep === OnboardingStep.COMPLETED && (
         <AnimatedTransition animationKey='completed'>
-          <CompletionCard onContinue={() => router.refresh()} />
+          <CompletionCard onContinue={handleComplete} />
         </AnimatedTransition>
       )}
     </div>
   );
 }
-

@@ -1,10 +1,11 @@
 import db from '@/db/drizzle';
 import { eq, and, isNull } from 'drizzle-orm';
-import { organizationUsers, organizations } from '@/db/schema';
+import { organizationUsers, organizations, users } from '@/db/schema';
 
 import OrganizationManagementClient from './components/organization/management-client';
 import { OnboardingWizard } from './components/onboarding-wizard';
 import { validateUserSession } from '@/app/lib/auth-utils';
+import { OnboardingStep } from './components/onboarding';
 
 import {
   Card,
@@ -29,6 +30,12 @@ export default async function Dashboard() {
   // Validate session and ensure user exists in database
   const session = await validateUserSession();
 
+  // Get user's onboarding step
+  const [user] = await db
+    .select({ onboardingStep: users.onboardingStep })
+    .from(users)
+    .where(eq(users.id, session.user.id!));
+
   // Check if user has an organization (excluding deleted ones)
   const [userOrg] = await db
     .select({
@@ -47,17 +54,18 @@ export default async function Dashboard() {
       )
     );
 
-  // No organization - show onboarding wizard
-  if (!userOrg) {
+  // No organization OR onboarding in progress - show onboarding wizard with saved progress
+  if (!userOrg || user?.onboardingStep) {
     return (
       <div className='flex items-start justify-center p-4'>
-        <OnboardingWizard />
+        <OnboardingWizard 
+          initialStep={user?.onboardingStep as OnboardingStep | null} 
+        />
       </div>
     );
   }
 
-  // Has organization - show dashboard
-  // TODO: Check for incomplete setup (locations, roles, employees)
+  // Has organization AND onboarding complete - show dashboard
   return (
     <Card className='w-[350px]'>
       <CardHeader>
