@@ -207,9 +207,14 @@ export default function Input({
   ];
   const shouldAlwaysFloat = props.type && alwaysFloatTypes.includes(props.type);
 
+  // Label should float if:
+  // 1. Input has a value or defaultValue
+  // 2. Input type always shows content (date pickers, etc.)
+  // 3. Input has a placeholder (prevents label/placeholder overlap)
   const hasValue =
     Boolean(inputValue?.length) ||
     Boolean(defaultValue?.length) ||
+    Boolean(props.placeholder) ||
     shouldAlwaysFloat;
   const generatedId = useId();
   const inputId = id || generatedId;
@@ -368,9 +373,14 @@ export function Textarea({
 
   const isControlled = value !== undefined;
   const textareaValue = isControlled ? value : uncontrolledValue;
-  // Check for value, defaultValue, or actual textarea value
+  
+  // Label should float if:
+  // 1. Textarea has a value or defaultValue
+  // 2. Textarea has a placeholder (prevents label/placeholder overlap)
   const hasValue =
-    Boolean(textareaValue?.length) || Boolean(defaultValue?.length);
+    Boolean(textareaValue?.length) || 
+    Boolean(defaultValue?.length) ||
+    Boolean(props.placeholder);
   const generatedId = useId();
   const textareaId = id || generatedId;
 
