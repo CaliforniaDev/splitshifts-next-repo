@@ -1,75 +1,92 @@
 // File: app/(logged-in)/dashboard/calendar/page.tsx
 
-export default function CalendarPage() {
+import { validateUserSession } from '@/app/lib/auth-utils';
+import { getShifts } from '../actions/shift';
+import CalendarWeekView from './components/calendar-week-view';
+import Button from '@/app/components/ui/buttons/button';
+
+export default async function CalendarPage() {
+  await validateUserSession();
+
+  // Get current week's date range
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 7);
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  // Fetch shifts for the current week
+  const result = await getShifts({
+    startDate: startOfWeek.toISOString(),
+    endDate: endOfWeek.toISOString(),
+  });
+
+  const shifts = result.success ? result.shifts : [];
+
   return (
-    <section className="p-6 space-y-6">
+    <section className='space-y-6 p-6'>
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-on-surface">Calendar</h1>
-        <p className="mt-2 text-sm text-on-surface-variant">
+        <h1 className='text-2xl font-semibold text-on-surface'>Calendar</h1>
+        <p className='mt-2 text-sm text-on-surface-variant'>
           View and manage your schedule across all locations and employees.
         </p>
       </div>
 
       {/* Calendar Controls */}
-      <div className="flex items-center justify-between">
-        <div className="flex gap-2">
-          <button className="px-4 py-2 bg-surface-container hover:bg-surface-container-high rounded-lg text-sm font-medium transition-colors">
-            Today
-          </button>
-          <button className="px-4 py-2 bg-surface-container hover:bg-surface-container-high rounded-lg text-sm font-medium transition-colors">
+      <div className='flex items-center justify-between'>
+        <div className='flex gap-2'>
+          <Button variant='filled' size='small'>
             Week
-          </button>
-          <button className="px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-medium">
+          </Button>
+          <Button variant='outlined' size='small'>
             Month
-          </button>
+          </Button>
         </div>
-        
-        <div className="flex gap-2">
-          <button className="px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-medium">
+
+        <div className='flex gap-2'>
+          <Button variant='filled' size='small'>
             Add Shift
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Calendar View */}
-      <div className="bg-surface-container rounded-xl p-6 min-h-[500px]">
-        <div className="text-center py-20">
-          <h3 className="text-lg font-medium text-on-surface mb-2">Calendar Coming Soon</h3>
-          <p className="text-on-surface-variant">
-            Interactive schedule calendar with drag-and-drop shift management will be available here.
-          </p>
-        </div>
-      </div>
+      <CalendarWeekView shifts={shifts} currentDate={now} />
 
       {/* Quick Actions */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <div className="bg-surface-container rounded-xl p-4">
-          <h3 className="font-medium text-on-surface mb-2">Schedule Template</h3>
-          <p className="text-sm text-on-surface-variant mb-3">
+      <div className='grid gap-4 md:grid-cols-3'>
+        <div className='rounded-xl bg-surface-container p-4'>
+          <h3 className='mb-2 font-medium text-on-surface'>
+            Schedule Template
+          </h3>
+          <p className='mb-3 text-sm text-on-surface-variant'>
             Create recurring shift patterns
           </p>
-          <button className="text-sm text-primary hover:underline">
+          <button className='text-sm text-primary hover:underline'>
             Create Template
           </button>
         </div>
-        
-        <div className="bg-surface-container rounded-xl p-4">
-          <h3 className="font-medium text-on-surface mb-2">Bulk Actions</h3>
-          <p className="text-sm text-on-surface-variant mb-3">
+
+        <div className='rounded-xl bg-surface-container p-4'>
+          <h3 className='mb-2 font-medium text-on-surface'>Bulk Actions</h3>
+          <p className='mb-3 text-sm text-on-surface-variant'>
             Assign multiple shifts at once
           </p>
-          <button className="text-sm text-primary hover:underline">
+          <button className='text-sm text-primary hover:underline'>
             Bulk Assign
           </button>
         </div>
-        
-        <div className="bg-surface-container rounded-xl p-4">
-          <h3 className="font-medium text-on-surface mb-2">Export Schedule</h3>
-          <p className="text-sm text-on-surface-variant mb-3">
+
+        <div className='rounded-xl bg-surface-container p-4'>
+          <h3 className='mb-2 font-medium text-on-surface'>Export Schedule</h3>
+          <p className='mb-3 text-sm text-on-surface-variant'>
             Download schedule as PDF or CSV
           </p>
-          <button className="text-sm text-primary hover:underline">
+          <button className='text-sm text-primary hover:underline'>
             Export
           </button>
         </div>
