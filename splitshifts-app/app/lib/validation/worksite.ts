@@ -80,3 +80,17 @@ export const createWorksiteSchema = z.object({
 });
 
 export type CreateWorksiteFormData = z.infer<typeof createWorksiteSchema>;
+
+// Schema for updating a worksite - extends create schema with ID
+export const updateWorksiteSchema = createWorksiteSchema.extend({
+  id: z.string().uuid('Invalid worksite ID format'),
+});
+
+export type UpdateWorksiteFormData = z.infer<typeof updateWorksiteSchema>;
+
+// Schema for deleting a worksite - only requires ID
+export const deleteWorksiteSchema = z.object({
+  id: z.string().uuid('Invalid worksite ID format'),
+});
+
+export type DeleteWorksiteData = z.infer<typeof deleteWorksiteSchema>;

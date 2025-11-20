@@ -41,3 +41,17 @@ export const createEmployeeSchema = z.object({
 });
 
 export type CreateEmployeeFormData = z.infer<typeof createEmployeeSchema>;
+
+// Schema for updating an employee - extends create schema with ID
+export const updateEmployeeSchema = createEmployeeSchema.extend({
+  id: z.string().uuid('Invalid employee ID format'),
+});
+
+export type UpdateEmployeeFormData = z.infer<typeof updateEmployeeSchema>;
+
+// Schema for deleting an employee - only requires ID
+export const deleteEmployeeSchema = z.object({
+  id: z.string().uuid('Invalid employee ID format'),
+});
+
+export type DeleteEmployeeData = z.infer<typeof deleteEmployeeSchema>;
