@@ -1,6 +1,16 @@
 // File: app/(logged-in)/dashboard/employees/page.tsx
 
-export default function EmployeesPage() {
+import { validateUserSession } from '@/app/lib/auth-utils';
+import { getEmployees } from '../actions/employee';
+import Button from '@/app/components/ui/buttons/button';
+import Input from '@/app/components/ui/inputs/input';
+
+export default async function EmployeesPage() {
+  await validateUserSession();
+
+  // Fetch real employees from database
+  const result = await getEmployees();
+  const employees = result.success ? result.employees : [];
   return (
     <section className="p-6 space-y-6">
       {/* Header */}
@@ -12,26 +22,26 @@ export default function EmployeesPage() {
           </p>
         </div>
         
-        <button className="px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+        <Button variant="filled">
           Add Employee
-        </button>
+        </Button>
       </div>
 
       {/* Search and Filter */}
       <div className="flex gap-4">
         <div className="flex-1">
-          <input 
+          <Input 
             type="text" 
             placeholder="Search employees..." 
-            className="w-full px-4 py-2 bg-surface-container rounded-lg border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary"
+            label="Search"
           />
         </div>
-        <button className="px-4 py-2 bg-surface-container hover:bg-surface-container-high rounded-lg text-sm font-medium transition-colors border border-outline-variant">
+        <Button variant="outlined" >
           Filter
-        </button>
-        <button className="px-4 py-2 bg-surface-container hover:bg-surface-container-high rounded-lg text-sm font-medium transition-colors border border-outline-variant">
+        </Button>
+        <Button variant="outlined">
           Sort
-        </button>
+        </Button>
       </div>
 
       {/* Employee List */}
@@ -46,50 +56,50 @@ export default function EmployeesPage() {
           </div>
         </div>
 
-        {/* Sample Employee Rows */}
+        {/* Employee Rows */}
         <div className="divide-y divide-outline-variant">
-          {[
-            { name: 'John Smith', email: 'john@example.com', role: 'Manager', status: 'Active' },
-            { name: 'Sarah Johnson', email: 'sarah@example.com', role: 'Staff', status: 'Active' },
-            { name: 'Mike Davis', email: 'mike@example.com', role: 'Staff', status: 'Inactive' },
-          ].map((employee, index) => (
-            <div key={index} className="px-6 py-4">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium text-primary">
-                      {employee.name.split(' ').map(n => n[0]).join('')}
+          {employees.length === 0 ? (
+            <div className="px-6 py-8 text-center text-on-surface-variant">
+              No employees found. Add your first employee to get started.
+            </div>
+          ) : (
+            employees.map((employee) => (
+              <div key={employee.id} className="px-6 py-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-medium text-primary">
+                        {employee.firstName[0]}{employee.lastName[0]}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-on-surface">{employee.fullName}</p>
+                      <p className="text-sm text-on-surface-variant">{employee.email || 'No email'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="hidden md:block">
+                    <span className="px-2 py-1 bg-surface-container-high rounded text-sm">
+                      {employee.phone || 'No phone'}
                     </span>
                   </div>
-                  <div>
-                    <p className="font-medium text-on-surface">{employee.name}</p>
-                    <p className="text-sm text-on-surface-variant">{employee.email}</p>
+                  
+                  <div className="hidden md:block">
+                    <span className="px-2 py-1 rounded text-sm bg-green-100 text-green-800">
+                      Active
+                    </span>
+                  </div>
+                  
+                  <div className="hidden md:flex gap-2">
+                    <Button variant="text">Edit</Button>
+                    <Button variant="text" className="text-error">
+                      Remove
+                    </Button>
                   </div>
                 </div>
-                
-                <div className="hidden md:block">
-                  <span className="px-2 py-1 bg-surface-container-high rounded text-sm">
-                    {employee.role}
-                  </span>
-                </div>
-                
-                <div className="hidden md:block">
-                  <span className={`px-2 py-1 rounded text-sm ${
-                    employee.status === 'Active' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-gray-100 text-gray-600'
-                  }`}>
-                    {employee.status}
-                  </span>
-                </div>
-                
-                <div className="hidden md:flex gap-2">
-                  <button className="text-sm text-primary hover:underline">Edit</button>
-                  <button className="text-sm text-red-600 hover:underline">Remove</button>
-                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -97,7 +107,7 @@ export default function EmployeesPage() {
       <div className="grid gap-4 md:grid-cols-3">
         <div className="bg-surface-container rounded-xl p-4">
           <h3 className="font-medium text-on-surface mb-2">Total Employees</h3>
-          <p className="text-2xl font-bold text-primary">24</p>
+          <p className="text-2xl font-bold text-primary">{employees.length}</p>
           <p className="text-sm text-on-surface-variant">+2 this month</p>
         </div>
         
