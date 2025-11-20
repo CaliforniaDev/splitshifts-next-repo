@@ -37,8 +37,8 @@ const isExternalLink = (href?: string): boolean => {
 export default function Button<T extends ElementType = 'button'>({
   as,
   href,
-  variant = 'filled',
-  size = 'default',
+  variant,
+  size,
   children,
   icon,
   className,
@@ -69,9 +69,8 @@ export default function Button<T extends ElementType = 'button'>({
   // Callback ref for polymorphic component support
   const setRippleRef = React.useCallback(
     (node: HTMLElement | null) => {
-      if (rippleRef && 'current' in rippleRef) {
-        (rippleRef as React.MutableRefObject<HTMLElement | null>).current =
-          node;
+      if (rippleRef && typeof rippleRef === 'object' && 'current' in rippleRef) {
+        rippleRef.current = node;
       }
     },
     [rippleRef],

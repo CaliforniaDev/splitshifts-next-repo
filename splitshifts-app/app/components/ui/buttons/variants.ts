@@ -13,9 +13,11 @@ import { clsx } from 'clsx';
 // Base class definitions - computed once at module level
 const baseClasses = clsx([
   // Layout & Structure
-  'relative overflow-hidden whitespace-nowrap rounded-[10px]',
+  'relative overflow-hidden whitespace-nowrap',
   // Hover Overlay System
   'before:absolute before:inset-0 before:transition-all before:duration-200',
+  // Border radius transition on press
+  'transition-[border-radius] duration-300 ease-out',
   // Accessibility
   'focus:outline-none',
   // Performance - Force GPU layer for ripple animations
@@ -40,8 +42,11 @@ export const buttonVariants = cva(baseClasses, {
     },
     
     size: {
-      default: 'typescale-label-large px-6 py-2.5',
-      large: 'typescale-title-large-prominent font px-8 py-2'
+      xs: 'typescale-label-large px-3 h-8 flex items-center justify-center rounded-[16px] active:rounded-[8px]',
+      small: 'typescale-label-large px-4 h-10 flex items-center justify-center rounded-[20px] active:rounded-[8px]',
+      medium: 'typescale-title-medium px-6 h-14 flex items-center justify-center rounded-[28px] active:rounded-[12px]',
+      large: 'typescale-headline-small px-12 h-24 flex items-center justify-center rounded-[48px] active:rounded-[16px]',
+      xl: 'typescale-headline-large px-16 h-[136px] flex items-center justify-center rounded-[68px] active:rounded-[16px]'
     },
     
     disabled: {
@@ -60,7 +65,7 @@ export const buttonVariants = cva(baseClasses, {
 
   defaultVariants: {
     variant: 'filled',
-    size: 'default',
+    size: 'small',
     disabled: false
   }
 });
