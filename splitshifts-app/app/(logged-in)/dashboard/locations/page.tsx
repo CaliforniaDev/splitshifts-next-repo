@@ -1,6 +1,15 @@
 // File: app/(logged-in)/dashboard/locations/page.tsx
 
-export default function LocationsPage() {
+import { validateUserSession } from '@/app/lib/auth-utils';
+import { getWorksites } from '../actions/worksite';
+import Button from '@/app/components/ui/buttons/button';
+
+export default async function LocationsPage() {
+  await validateUserSession();
+
+  // Fetch real worksites from database
+  const result = await getWorksites();
+  const worksites = result.success ? result.worksites : [];
   return (
     <section className="p-6 space-y-6">
       {/* Header */}
@@ -12,9 +21,9 @@ export default function LocationsPage() {
           </p>
         </div>
         
-        <button className="px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+        <Button variant="filled" size='small'>
           Add Location
-        </button>
+        </Button>
       </div>
 
       {/* Quick Actions */}
@@ -22,85 +31,75 @@ export default function LocationsPage() {
         <div className="bg-surface-container rounded-xl p-4 hover:bg-surface-container-high transition-colors cursor-pointer">
           <h3 className="font-medium text-on-surface mb-2">Bulk Operations</h3>
           <p className="text-sm text-on-surface-variant mb-3">Update multiple locations at once</p>
-          <button className="text-sm text-primary hover:underline">Manage Hours</button>
+          <Button variant="text">Manage Hours</Button>
         </div>
         
         <div className="bg-surface-container rounded-xl p-4 hover:bg-surface-container-high transition-colors cursor-pointer">
           <h3 className="font-medium text-on-surface mb-2">Import/Export</h3>
           <p className="text-sm text-on-surface-variant mb-3">Sync location data with external systems</p>
-          <button className="text-sm text-primary hover:underline">Import Data</button>
+          <Button variant="text">Import Data</Button>
         </div>
         
         <div className="bg-surface-container rounded-xl p-4 hover:bg-surface-container-high transition-colors cursor-pointer">
           <h3 className="font-medium text-on-surface mb-2">Location Analytics</h3>
           <p className="text-sm text-on-surface-variant mb-3">Performance metrics by location</p>
-          <button className="text-sm text-primary hover:underline">View Reports</button>
+          <Button variant="text">View Reports</Button>
         </div>
       </div>
 
       {/* Location Cards */}
       <div className="grid gap-6 md:grid-cols-2">
-        {[
-          {
-            name: 'Downtown Store',
-            address: '123 Main Street, Downtown',
-            hours: 'Mon-Fri: 9 AM - 9 PM',
-            employees: 12,
-            status: 'Active'
-          },
-          {
-            name: 'Westside Branch',
-            address: '456 Oak Avenue, Westside',
-            hours: 'Mon-Sun: 8 AM - 10 PM',
-            employees: 8,
-            status: 'Active'
-          },
-          {
-            name: 'Mall Location',
-            address: '789 Shopping Center, Mall District',
-            hours: 'Mon-Sun: 10 AM - 9 PM',
-            employees: 15,
-            status: 'Under Renovation'
-          }
-        ].map((location, index) => (
-          <div key={index} className="bg-surface-container rounded-xl p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-semibold text-on-surface">{location.name}</h3>
-                <p className="text-sm text-on-surface-variant mt-1">{location.address}</p>
-              </div>
-              
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                location.status === 'Active' 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-orange-100 text-orange-800'
-              }`}>
-                {location.status}
-              </span>
-            </div>
-
-            <div className="space-y-3 mb-4">
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-on-surface-variant">Hours:</span>
-                <span className="text-on-surface">{location.hours}</span>
-              </div>
-              
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-on-surface-variant">Employees:</span>
-                <span className="text-on-surface">{location.employees} staff members</span>
-              </div>
-            </div>
-
-            <div className="flex gap-2 pt-4 border-t border-outline-variant">
-              <button className="flex-1 px-3 py-2 text-sm text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors">
-                Edit Details
-              </button>
-              <button className="flex-1 px-3 py-2 text-sm bg-primary text-on-primary rounded-lg hover:bg-primary/90 transition-colors">
-                Manage Staff
-              </button>
-            </div>
+        {worksites.length === 0 ? (
+          <div className="col-span-2 bg-surface-container rounded-xl p-8 text-center">
+            <p className="text-on-surface-variant mb-4">No locations found. Add your first location to get started.</p>
+            <Button variant="filled" size='small'>
+              Add Location
+            </Button>
           </div>
-        ))}
+        ) : (
+          worksites.map((location) => (
+            <div key={location.id} className="bg-surface-container rounded-xl p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-on-surface">{location.name}</h3>
+                  <p className="text-sm text-on-surface-variant mt-1">{location.address}</p>
+                </div>
+                
+                <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  Active
+                </span>
+              </div>
+
+              <div className="space-y-3 mb-4">
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-on-surface-variant">Timezone:</span>
+                  <span className="text-on-surface">{location.timezone}</span>
+                </div>
+                
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-on-surface-variant">24/7 Operation:</span>
+                  <span className="text-on-surface">{location.is247 ? 'Yes' : 'No'}</span>
+                </div>
+                
+                {location.contactInfo?.phone && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-on-surface-variant">Phone:</span>
+                    <span className="text-on-surface">{location.contactInfo.phone}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2 pt-4 border-t border-outline-variant">
+                <Button variant="outlined" size='small' className="flex-1">
+                  Edit Details
+                </Button>
+                <Button variant="filled" size='small' className="flex-1">
+                  Manage Staff
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Summary Stats */}
