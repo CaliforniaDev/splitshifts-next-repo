@@ -31,6 +31,7 @@ import {
   FormField,
   FormItem,
   FormMessage,
+  FormErrorDisplay,
 } from '@/app/components/ui/form';
 import { Input, SelectMenu } from '@/app/components/ui/inputs';
 import { Button } from '@/app/components/ui/buttons';
@@ -138,15 +139,14 @@ export default function OrganizationManagementModal({
               Update your organization details or delete it entirely.
             </DialogDescription>
           </DialogHeader>
-          {/* Display form-level errors */}
-          {form.formState.errors.root && (
-            <div className='bg-destructive/10 mb-4 rounded-md p-3'>
-              <FormMessage className='text-destructive'>
-                {form.formState.errors.root.message}
-              </FormMessage>
-            </div>
-          )}
+          
           <Form {...form}>
+            {/* Display form-level errors */}
+            {form.formState.errors.root && (
+              <FormErrorDisplay className='mb-4'>
+                {form.formState.errors.root.message}
+              </FormErrorDisplay>
+            )}
             <form
               onSubmit={form.handleSubmit(handleUpdate)}
               className='space-y-4'
