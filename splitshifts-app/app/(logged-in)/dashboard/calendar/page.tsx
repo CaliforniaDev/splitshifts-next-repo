@@ -2,8 +2,9 @@
 
 import { validateUserSession } from '@/app/lib/auth-utils';
 import { getShifts } from '../actions/shift';
+import { getWorksites, getRoles } from '../actions/worksite';
 import CalendarWeekView from './components/calendar-week-view';
-import Button from '@/app/components/ui/buttons/button';
+import CalendarControls from './components/calendar-controls';
 
 export default async function CalendarPage() {
   await validateUserSession();
@@ -18,13 +19,19 @@ export default async function CalendarPage() {
   endOfWeek.setDate(startOfWeek.getDate() + 7);
   endOfWeek.setHours(23, 59, 59, 999);
 
-  // Fetch shifts for the current week
-  const result = await getShifts({
-    startDate: startOfWeek.toISOString(),
-    endDate: endOfWeek.toISOString(),
-  });
+  // Fetch data for calendar and shift creation
+  const [shiftsResult, worksitesResult, rolesResult] = await Promise.all([
+    getShifts({
+      startDate: startOfWeek.toISOString(),
+      endDate: endOfWeek.toISOString(),
+    }),
+    getWorksites(),
+    getRoles(),
+  ]);
 
-  const shifts = result.success ? result.shifts : [];
+  const shifts = shiftsResult.success ? shiftsResult.shifts : [];
+  const worksites = worksitesResult.success ? worksitesResult.worksites : [];
+  const roles = rolesResult.success ? rolesResult.roles : [];
 
   return (
     <section className='space-y-6 p-6'>
@@ -37,22 +44,11 @@ export default async function CalendarPage() {
       </div>
 
       {/* Calendar Controls */}
-      <div className='flex items-center justify-between'>
-        <div className='flex gap-2'>
-          <Button variant='filled' size='small'>
-            Week
-          </Button>
-          <Button variant='outlined' size='small'>
-            Month
-          </Button>
-        </div>
-
-        <div className='flex gap-2'>
-          <Button variant='filled' size='small'>
-            Add Shift
-          </Button>
-        </div>
-      </div>
+      <CalendarControls 
+        worksites={worksites}
+        roles={roles}
+        currentDate={now}
+      />
 
       {/* Calendar View */}
       <CalendarWeekView shifts={shifts} currentDate={now} />
