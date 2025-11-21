@@ -40,6 +40,29 @@
 - **20+ Tables**: Users, organizations, employees, shifts, work sites, roles, certifications, etc.
 - **Migration Commands**: `pnpm db:generate && pnpm db:push` (Drizzle Kit)
 
+#### Neon Database Configuration
+
+- **Database Name**: `splitshifts` (NOT the default `neondb`)
+- **Project ID**: `blue-heart-80946792` (splitshifts_db)
+- **Organization**: CaliforniaDev (`org-polished-king-88815294`) - Vercel-managed
+- **Branch**: `br-hidden-haze-a64oddd1` (main)
+
+**CRITICAL for Neon MCP queries:**
+Always specify `databaseName: "splitshifts"` when using Neon MCP tools. The default database will only show legacy tables (accounts, sessions, users, verification_token). To see all 20 tables, you MUST include the database name parameter.
+
+**Example:**
+\`\`\`typescript
+// ❌ WRONG - Shows only 4 legacy tables
+mcp_neon_get_database_tables({ projectId: "blue-heart-80946792" })
+
+// ✅ CORRECT - Shows all 20 tables
+mcp_neon_run_sql({ 
+  projectId: "blue-heart-80946792", 
+  databaseName: "splitshifts",
+  sql: "SELECT tablename FROM pg_tables WHERE schemaname = 'public';"
+})
+\`\`\`
+
 ## Authentication & Session Management
 
 ### Auth Guard Boundaries
