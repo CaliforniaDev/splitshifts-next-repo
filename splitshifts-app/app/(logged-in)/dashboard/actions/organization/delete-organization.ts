@@ -2,7 +2,7 @@
 
 import db from '@/db/drizzle';
 import { eq } from 'drizzle-orm';
-import { organizations } from '@/db/schema';
+import { organizations, worksites, roles, employees, shifts } from '@/db/schema';
 import {
   deleteOrganizationSchema,
   type DeleteOrganizationData,
@@ -47,15 +47,41 @@ export async function deleteOrganization(
       };
     }
 
-    // Soft Delete Operation
+    // Cascade Soft Delete Operation
+    // Delete all related data in a transaction to ensure atomicity
     const now = new Date();
-    await db
-      .update(organizations)
-      .set({ deletedAt: now, updatedAt: now })
-      .where(eq(organizations.id, validatedData.id));
     
+    await db.transaction(async (tx) => {
+      // Order matters: delete dependent data first
+      await tx
+        .update(shifts)
+        .set({ deletedAt: now, updatedAt: now })
+        .where(eq(shifts.orgId, validatedData.id));
+      
+      await tx
+        .update(employees)
+        .set({ deletedAt: now, updatedAt: now })
+        .where(eq(employees.orgId, validatedData.id));
+      
+      await tx
+        .update(roles)
+        .set({ deletedAt: now, updatedAt: now })
+        .where(eq(roles.orgId, validatedData.id));
+      
+      await tx
+        .update(worksites)
+        .set({ deletedAt: now, updatedAt: now })
+        .where(eq(worksites.orgId, validatedData.id));
+      
+      await tx
+        .update(organizations)
+        .set({ deletedAt: now, updatedAt: now })
+        .where(eq(organizations.id, validatedData.id));
+    });
+
     return { success: true };
   } catch (error) {
+    console.error('Delete organization error:', error);
     return {
       success: false,
       error: 'Failed to delete organization. Please try again.',
