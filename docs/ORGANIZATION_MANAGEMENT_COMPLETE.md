@@ -525,23 +525,122 @@ return { success: true };
 
 ### 5.3 Delete Organization Server Action
 
-**File**: `app/(logged-in)/dashboard/actions/delete-organization.ts`
+**File**: `app/(logged-in)/dashboard/actions/organization/delete-organization.ts`
 
-#### Soft Delete Implementation
+#### Transaction-Based Cascade Soft Delete Implementation
+
+**Critical Requirement**: This implementation requires the **neon-serverless (WebSocket) driver** for transaction support. The neon-http driver does NOT support transactions.
+
 ```typescript
-// Don't actually delete - set deletedAt timestamp
-const now = new Date();
-await db
-  .update(organizations)
-  .set({ deletedAt: now, updatedAt: now })
-  .where(eq(organizations.id, validatedData.id));
+'use server';
+
+import db from '@/db/drizzle';
+import { eq } from 'drizzle-orm';
+import { organizations, worksites, roles, employees, shifts } from '@/db/schema';
+import { authorizeOrganizationAction } from './organization-auth-utils';
+
+export async function deleteOrganization(organizationId: DeleteOrganizationData) {
+  try {
+    // SECURITY LAYER 1 & 2: Validate input data
+    const validatedData = deleteOrganizationSchema.parse(organizationId);
+
+    // SECURITY LAYER 3 & 4: Combined authorization and existence check
+    const authResult = await authorizeOrganizationAction(validatedData.id);
+    
+    if (!authResult.success) {
+      return {
+        success: false,
+        error: authResult.error,
+      };
+    }
+
+    // SECURITY LAYER 5: Deletion Guard
+    if (authResult.organizationStatus?.isDeleted) {
+      return {
+        success: false,
+        error: 'Cannot delete an organization that is already deleted',
+      };
+    }
+
+    // Cascade Soft Delete Operation
+    // Delete all related data in a transaction to ensure atomicity
+    const now = new Date();
+    
+    await db.transaction(async (tx) => {
+      // Order matters: delete dependent data first
+      await tx
+        .update(shifts)
+        .set({ deletedAt: now, updatedAt: now })
+        .where(eq(shifts.orgId, validatedData.id));
+      
+      await tx
+        .update(employees)
+        .set({ deletedAt: now, updatedAt: now })
+        .where(eq(employees.orgId, validatedData.id));
+      
+      await tx
+        .update(roles)
+        .set({ deletedAt: now, updatedAt: now })
+        .where(eq(roles.orgId, validatedData.id));
+      
+      await tx
+        .update(worksites)
+        .set({ deletedAt: now, updatedAt: now })
+        .where(eq(worksites.orgId, validatedData.id));
+      
+      await tx
+        .update(organizations)
+        .set({ deletedAt: now, updatedAt: now })
+        .where(eq(organizations.id, validatedData.id));
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Delete organization error:', error);
+    return {
+      success: false,
+      error: 'Failed to delete organization. Please try again.',
+    };
+  }
+}
 ```
 
-**Why Soft Delete**:
-- **Data preservation**: Keep historical records
-- **Audit trail**: Know when and what was deleted  
-- **Recovery**: Can "undelete" if needed
-- **Relationships**: Prevents cascade delete issues
+**Why Transaction-Based Cascade Soft Delete**:
+- **Atomicity**: All updates succeed or all fail (ACID compliance)
+- **Data Integrity**: Related data is deleted in proper order
+- **Multi-tenant Safety**: All org-scoped data is marked as deleted
+- **Audit Trail**: Preserves historical records with timestamps
+- **Recovery**: Can "undelete" entire organization hierarchy
+- **Relationship Safety**: Maintains foreign key constraints
+
+**Database Driver Requirements**:
+```typescript
+// ❌ WRONG - neon-http driver (no transaction support)
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
+const sql = neon(process.env.DATABASE_URL!);
+const db = drizzle({ client: sql });
+
+// ✅ CORRECT - neon-serverless driver (full transaction support)
+import { Pool } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
+const db = drizzle(pool);
+```
+
+**Tables Affected by Cascade Delete**:
+1. **shifts** - All shifts for the organization
+2. **employees** - All employees in the organization
+3. **roles** - All roles defined by the organization
+4. **worksites** - All work sites belonging to the organization
+5. **organizations** - The organization itself (last)
+
+**Security Layers**:
+1. **Authentication** - User must be logged in
+2. **Input Validation** - UUID format check via Zod
+3. **Authorization** - User must be admin of THIS organization
+4. **Existence Check** - Organization must exist in database
+5. **Deletion Guard** - Prevent double-deletion
 
 ---
 

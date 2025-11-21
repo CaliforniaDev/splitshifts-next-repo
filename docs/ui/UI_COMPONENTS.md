@@ -346,6 +346,61 @@ This section outlines the custom type scale defined using Tailwind CSS for consi
 
 - Apply classes such as `.typescale-display-large`, `.typescale-headline-medium`, `.typescale-title-small`, etc., directly to HTML elements to ensure they adhere to the defined type scale.
 
+## Form Components & Dialog Integration
+
+### React Hook Form with Radix Dialog
+
+When using React Hook Form components inside Radix UI Dialog components, special attention must be paid to context management due to Dialog's portal rendering behavior.
+
+#### Common Issue: Form Context Errors
+
+**Error:** `Cannot destructure property 'getFieldState' of 'useFormContext()' as it is null`
+
+**Cause:** Radix Dialog uses React portals which can break React context chains. If a Form component tries to render before the Dialog is mounted, the Form context won't be available.
+
+**Solution:** Add an early return guard to prevent rendering Form components before the Dialog is fully mounted:
+
+```tsx
+import { Dialog, DialogContent, DialogTrigger } from '@/app/components/ui/dialog';
+import { Form, FormField, FormControl, FormItem } from '@/app/components/ui/form';
+
+export function MyFormModal({ isOpen, onClose }) {
+  // Early return prevents Form from rendering outside Dialog context
+  if (!isOpen) return null;
+  
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField
+              name="fieldName"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+**Key Pattern:**
+- Always check modal/dialog open state before rendering Form components
+- Use `if (!isOpen) return null;` at component start
+- This ensures Form context is only accessed when Dialog portal is mounted
+
+**Related Components:**
+- `shift-form-modal.tsx` - Uses this pattern for shift creation
+- `management-modal.tsx` - Uses this pattern for organization management
+
 ## Performance & Code Quality Standards
 
 The SplitShifts component library follows modern performance optimization patterns:
@@ -354,6 +409,7 @@ The SplitShifts component library follows modern performance optimization patter
 - **Design Token Constants**: Magic numbers are extracted into semantic constants (e.g., `SVG_ICON_ACTIVE_STROKE_WIDTH`) for maintainability
 - **Consistent Patterns**: All variant files use the same `clsx([...])` pattern for predictable code structure
 - **CVA Integration**: Class Variance Authority (CVA) provides type-safe variant systems with optimal performance characteristics
+- **Form Context Safety**: Early return guards prevent context errors in portal-rendered components
 
 These optimizations ensure consistent performance across the application while maintaining clean, maintainable code.
 

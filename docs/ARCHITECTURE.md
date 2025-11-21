@@ -44,8 +44,14 @@ splitshifts-app/
 │   ├── (public)/                    # Public route group
 │   └── api/                         # API routes
 ├── db/                              # Database layer
-│   ├── schema.ts                   # Drizzle schemas
-│   └── drizzle.ts                  # Database connection
+│   ├── schema/                     # Drizzle schema definitions
+│   │   ├── index.ts               # Schema exports
+│   │   ├── usersSchema.ts         # User authentication
+│   │   ├── organizationsSchema.ts # Multi-tenant organizations
+│   │   ├── employeesSchema.ts     # Employee management
+│   │   ├── shiftsSchema.ts        # Shift scheduling
+│   │   └── workSitesAndRolesSchema.ts # Work locations & roles
+│   └── drizzle.ts                  # Database connection (Neon WebSocket)
 └── public/                          # Static assets
 ```
 
@@ -125,6 +131,35 @@ const handleStepChange = async (newStep: number) => {
 2. Session management with JWT/database sessions
 3. Route protection using middleware
 4. 2FA integration with QR codes
+
+### Database Architecture
+**Driver**: Neon Serverless (WebSocket-based for transaction support)
+```typescript
+import { Pool } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const db = drizzle(pool);
+```
+
+**Key Features**:
+- **Transaction Support**: ACID-compliant transactions for data integrity
+- **Cascade Soft-Deletes**: Organization deletion cascades to all related records
+- **Multi-Tenant**: Organization-scoped data isolation via `orgId` foreign keys
+- **Soft Deletes**: Records marked with `deletedAt` timestamp instead of hard deletion
+- **UUIDv7 Primary Keys**: All tables use time-sortable UUIDs
+
+**Cascade Delete Pattern**:
+```typescript
+await db.transaction(async (tx) => {
+  // Delete in dependency order
+  await tx.update(shifts).set({ deletedAt: now }).where(eq(shifts.orgId, orgId));
+  await tx.update(employees).set({ deletedAt: now }).where(eq(employees.orgId, orgId));
+  await tx.update(roles).set({ deletedAt: now }).where(eq(roles.orgId, orgId));
+  await tx.update(worksites).set({ deletedAt: now }).where(eq(worksites.orgId, orgId));
+  await tx.update(organizations).set({ deletedAt: now }).where(eq(organizations.id, orgId));
+});
+```
 
 ### Navigation Flow
 1. Route changes trigger pathname updates

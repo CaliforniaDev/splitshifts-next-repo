@@ -3,6 +3,19 @@
 ## [Unreleased]
 
 ### Added
+- **Cascade Soft-Delete for Organizations**: Complete cascade deletion system for organization removal
+  - **Transaction-Based Deletion**: All related records (shifts, employees, roles, worksites) soft-deleted atomically
+  - **Database Driver Upgrade**: Switched from `neon-http` to `neon-serverless` (WebSocket) for transaction support
+  - **Data Integrity**: Uses `db.transaction()` to ensure all-or-nothing deletion (ACID guarantees)
+  - **Audit Trail**: All deleted records share same timestamp for proper audit logging
+  - **Clean Slate**: Deleting organization now properly removes all associated data from UI
+- **Shift Creation Modal**: Full shift scheduling interface with validation
+  - **Native DateTime Inputs**: HTML5 datetime-local inputs for cross-browser compatibility
+  - **Worksite & Role Selection**: Dropdown menus populated from database
+  - **Optional Fields**: Hourly rate and notes fields for additional context
+  - **Status Management**: Draft vs Published status for shift workflow
+  - **Form Validation**: Zod schema validation with React Hook Form integration
+  - **Error Handling**: Context-aware error display with FormErrorDisplay component
 - **Test Infrastructure**: Comprehensive visual testing system for UI development
   - **Component Test Page**: Visual showcase of all UI components in one place (`/tests/components`)
     - Button variants (filled, outlined, tonal, text, elevated) with loading states

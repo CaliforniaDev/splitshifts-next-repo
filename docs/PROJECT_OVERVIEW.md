@@ -140,13 +140,30 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - React Hook Form with Zod validation
 - Type-safe form handling
 - Accessible form components
+- **Dialog Integration**: Proper context handling with Radix Dialog portals
+- **Form Context Safety**: Early return guards prevent context errors in modals
+
+### ✅ Organization Management
+- **CRUD Operations**: Full create, read, update, delete functionality
+- **Transaction-Based Cascade Deletes**: Atomic multi-table soft-deletes
+- **Modal System**: Radix Dialog with React Hook Form integration
+- **Security Layers**: 5-layer authentication/authorization system
+- **Soft Delete Pattern**: Preserves data integrity and audit trails
+- **Database Driver**: neon-serverless (WebSocket) for transaction support
+
+### ✅ Calendar & Shift Management
+- **Shift Creation Modal**: Form-based shift scheduling interface
+- **Form Context Handling**: Proper React Hook Form integration with Radix Dialog
+- **Validation**: Zod schemas for type-safe shift data
+- **Multi-Tenant**: Organization-scoped shift management
 
 ### ✅ Database Integration
 - **UUID-Based Schema**: 20-table system with UUIDv7 primary keys
 - **Drizzle ORM**: TypeScript-first ORM with complete type safety
+- **Transaction Support**: Full ACID compliance with neon-serverless driver
 - **Migration System**: Clean migration workflow with UUID consistency
 - **Multi-Tenant Architecture**: Organization-based data isolation
-- **Serverless PostgreSQL**: Neon database with advanced features
+- **Serverless PostgreSQL**: Neon database with WebSocket connectivity
 
 ### ✅ Accessibility Features
 - Proper ARIA roles and labels

@@ -7,6 +7,13 @@ Welcome to the SplitShifts documentation! This directory contains comprehensive 
 ### Core Documentation
 - **[Project Overview](./PROJECT_OVERVIEW.md)** - Complete tech stack, dependencies, and project structure
 - **[Architecture Guide](./ARCHITECTURE.md)** - System design patterns, data flow, and architectural decisions
+- **[Organization Management Complete](./ORGANIZATION_MANAGEMENT_COMPLETE.md)** - Comprehensive guide to organization CRUD operations, cascade deletes, and modal system
+
+### Database & Backend
+- **[Complete ERD](./database/complete-erd.md)** - Entity relationship diagram for all database tables
+- **[Schema Design](./database/entities-and-design.md)** - Table schemas, relationships, and design decisions
+- **[Migration Plan](./database/migration-plan.md)** - Database migration strategy and guidelines
+- **[Cleanup Strategy](./database/CLEANUP_STRATEGY.md)** - Soft delete patterns and data retention policies
 
 ### Security & Auth
 - **[Security Policy](./security/SECURITY.md)** - Password, token, and environment hardening guidelines
@@ -14,7 +21,7 @@ Welcome to the SplitShifts documentation! This directory contains comprehensive 
 - **[Email Verification Improvements](./auth/EMAIL_VERIFICATION_IMPROVEMENT.md)** - Structured error handling and UX upgrades for login
 
 ### UI Reference
-- **[UI Components](./ui/UI_COMPONENTS.md)** - Button, link, layout, and skeleton usage patterns
+- **[UI Components](./ui/UI_COMPONENTS.md)** - Button, Input, Form components with React Hook Form + Radix Dialog integration patterns
 - **[Dashboard Icons Guide](./ui/DASHBOARD_ICONS_GUIDE.md)** - Icon exports, variants, and navigation integration examples
 
 ### Development Guides *(Coming Soon)*

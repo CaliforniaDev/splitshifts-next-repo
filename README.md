@@ -70,6 +70,11 @@ SplitShifts is a web application designed to streamline the scheduling process f
   - **Resend Functionality**: User-friendly resend options with proper rate limiting
   - **Email Templates**: Professional email templates for all authentication flows
 - **Database Integration**: PostgreSQL with Drizzle ORM for secure user data storage
+  - **Neon Serverless Driver**: WebSocket-based connection for full transaction support
+  - **Cascade Soft-Deletes**: Organization deletion atomically removes all related data (shifts, employees, roles, worksites)
+  - **Transaction Safety**: ACID-compliant operations ensure data integrity
+  - **Multi-Tenant Architecture**: Organization-scoped data isolation via foreign keys
+  - **UUIDv7 Primary Keys**: Time-sortable unique identifiers across all tables
 - **Enhanced Security Features**: 
   - **Password Hashing**: Secure password storage with bcrypt
   - **Email Verification**: Mandatory email verification for account activation with secure token-based validation
@@ -131,7 +136,7 @@ SplitShifts is a web application designed to streamline the scheduling process f
 - **Tailwind CSS**: Utility-first CSS framework for responsive design
 - **Sharp**: High-performance image processing for blur placeholders and optimization
 - **PostgreSQL**: Relational database via Neon serverless platform
-- **Drizzle ORM**: Type-safe database operations and schema management
+- **Drizzle ORM**: Type-safe database operations with full transaction support (neon-serverless driver)
 - **NextAuth.js**: Authentication and session management
 - **Zod**: Schema validation for forms and API endpoints
 - **React Hook Form**: Performant forms with minimal re-renders
