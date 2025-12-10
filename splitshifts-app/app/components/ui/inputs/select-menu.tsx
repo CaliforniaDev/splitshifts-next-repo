@@ -5,7 +5,7 @@
  * Implements Material Design 3 specifications with three-layer border system.
  */
 
-import { useId, useState, useRef, useEffect } from 'react';
+import { useId, useState, useRef, useEffect, useCallback } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/app/lib/utils';
 import {
@@ -15,6 +15,9 @@ import {
   RIPPLE_DEFAULTS,
   type RippleConfig,
 } from '@/app/lib/utils/ripple';
+
+// Constants
+const DROPDOWN_MAX_HEIGHT = 260; // max-h-60 (240px) + padding/margin
 
 const selectVariants = cva(
   'relative w-full rounded-t-[4px] bg-surface-container-highest px-4 pb-2 pt-6 text-on-surface focus:outline-none transition-colors duration-200 ease-emphasized h-14 cursor-pointer',
@@ -162,16 +165,33 @@ const dropdownArrow = cva(
 );
 
 const menuVariants = cva(
-  'absolute z-50 w-full mt-1 bg-surface-container rounded-[4px] shadow-elevation-2 max-h-60 overflow-y-auto origin-top',
+  'absolute z-50 w-full bg-surface-container rounded-[4px] shadow-elevation-2 max-h-60 overflow-y-auto',
   {
     variants: {
       open: {
-        true: 'animate-dropdown-fade-in',
+        true: '',
         false: 'opacity-0 pointer-events-none invisible',
       },
+      direction: {
+        down: 'top-full mt-1 origin-top',
+        up: 'bottom-full mb-1 origin-bottom',
+      },
     },
+    compoundVariants: [
+      {
+        open: true,
+        direction: 'down',
+        className: 'animate-dropdown-fade-in',
+      },
+      {
+        open: true,
+        direction: 'up',
+        className: 'animate-dropdown-fade-in-up',
+      },
+    ],
     defaultVariants: {
       open: false,
+      direction: 'down',
     },
   },
 );
@@ -318,8 +338,22 @@ export default function SelectMenu({
   const [selectedValue, setSelectedValue] = useState<string>(
     defaultValue || value || '',
   );
+  const [dropdownDirection, setDropdownDirection] = useState<'down' | 'up'>('down');
   const containerRef = useRef<HTMLDivElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
+  
+  // Extract ref from props if it exists (from React Hook Form)
+  // Type assertion needed because ref can be callback or object, and props typing doesn't expose it
+  const { ref: externalRef, ...restProps } = props as React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
+  
+  // Merge refs: set both internal ref (for positioning) and external ref (for React Hook Form)
+  const setRefs = useCallback((node: HTMLDivElement | null) => {
+    containerRef.current = node;
+    
+    // React Hook Form uses callback refs
+    if (typeof externalRef === 'function') {
+      externalRef(node);
+    }
+  }, [externalRef]);
 
   const isControlled = value !== undefined;
   const currentValue = isControlled ? value : selectedValue;
@@ -389,7 +423,63 @@ export default function SelectMenu({
 
   const handleToggle = () => {
     if (!disabled) {
-      setIsOpen(!isOpen);
+      const willBeOpen = !isOpen;
+      
+      // Set open state first
+      setIsOpen(willBeOpen);
+      
+      // Calculate dropdown direction when opening
+      // Use requestAnimationFrame to ensure DOM has updated
+      if (willBeOpen) {
+        requestAnimationFrame(() => {
+          if (!containerRef.current) {
+            return;
+          }
+          
+          const rect = containerRef.current.getBoundingClientRect();
+          
+          // Find the closest scrollable ancestor
+          let scrollParent = containerRef.current.parentElement;
+          while (scrollParent) {
+            const style = window.getComputedStyle(scrollParent);
+            const overflowY = style.overflowY;
+            if (overflowY === 'auto' || overflowY === 'scroll') {
+              break;
+            }
+            scrollParent = scrollParent.parentElement;
+          }
+          
+          // Calculate available space considering both scroll container and viewport
+          let spaceBelow: number;
+          let spaceAbove: number;
+          
+          if (scrollParent) {
+            // Calculate space within the scroll container
+            const scrollParentRect = scrollParent.getBoundingClientRect();
+            const spaceInContainerBelow = scrollParentRect.bottom - rect.bottom;
+            const spaceInContainerAbove = rect.top - scrollParentRect.top;
+            
+            // Also consider viewport boundaries
+            const spaceInViewportBelow = window.innerHeight - rect.bottom;
+            const spaceInViewportAbove = rect.top;
+            
+            // Use the more restrictive boundary (minimum available space)
+            spaceBelow = Math.min(spaceInContainerBelow, spaceInViewportBelow);
+            spaceAbove = Math.min(spaceInContainerAbove, spaceInViewportAbove);
+          } else {
+            // No scroll container, use viewport
+            spaceBelow = window.innerHeight - rect.bottom;
+            spaceAbove = rect.top;
+          }
+          
+          // Position menu to avoid being cut off:
+          // - Open upward if not enough space below AND more space above
+          // - Otherwise open downward (default)
+          const direction = spaceBelow < DROPDOWN_MAX_HEIGHT && spaceAbove > spaceBelow ? 'up' : 'down';
+          
+          setDropdownDirection(direction);
+        });
+      }
     }
   };
 
@@ -411,11 +501,11 @@ export default function SelectMenu({
 
   return (
     <div
-      ref={containerRef}
+      ref={setRefs}
       className='group relative'
       data-testid={dataTestId}
       onBlur={handleBlur}
-      {...props}
+      {...restProps}
     >
       <input
         type='hidden'
@@ -509,9 +599,8 @@ export default function SelectMenu({
         )}
 
         <div
-          ref={menuRef}
           role='listbox'
-          className={menuVariants({ open: isOpen })}
+          className={menuVariants({ open: isOpen, direction: dropdownDirection })}
         >
           {options.map(option => (
             <MenuItem
