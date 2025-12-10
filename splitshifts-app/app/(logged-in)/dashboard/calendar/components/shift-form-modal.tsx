@@ -56,11 +56,14 @@ export default function ShiftFormModal({
 }: ShiftFormModalProps) {
   const router = useRouter();
 
-  // Format default date for datetime-local input (YYYY-MM-DDTHH:MM)
-  const getDefaultDateTime = (hoursOffset = 0) => {
+  // Format default date and time values
+  const getDefaultDate = () => {
     const date = defaultDate || new Date();
-    date.setHours(9 + hoursOffset, 0, 0, 0); // Default to 9 AM start, 5 PM end
-    return date.toISOString().slice(0, 16);
+    return date.toISOString().slice(0, 10); // YYYY-MM-DD
+  };
+
+  const getDefaultTime = (hours: number) => {
+    return `${hours.toString().padStart(2, '0')}:00`; // HH:MM
   };
 
   const form = useForm<CreateShiftFormData>({
@@ -68,8 +71,10 @@ export default function ShiftFormModal({
     defaultValues: {
       workSiteId: '',
       roleId: '',
-      shiftStart: getDefaultDateTime(0),
-      shiftEnd: getDefaultDateTime(8),
+      startDate: getDefaultDate(),
+      startTime: getDefaultTime(9), // 9 AM
+      endDate: getDefaultDate(),
+      endTime: getDefaultTime(17), // 5 PM
       hourlyRate: '',
       notes: '',
       status: 'draft',
@@ -109,6 +114,11 @@ export default function ShiftFormModal({
   // Don't render form until dialog is open (fixes context issue)
   if (!isOpen) return null;
 
+  // Check if prerequisites are met
+  const hasWorksites = worksites.length > 0;
+  const hasRoles = roles.length > 0;
+  const canCreateShift = hasWorksites && hasRoles;
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -119,9 +129,42 @@ export default function ShiftFormModal({
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <fieldset disabled={isSubmitting} className="space-y-6">
+        {/* Empty State - Show when prerequisites are missing */}
+        {!canCreateShift && (
+          <div className="py-8 px-6">
+            <div className="rounded-lg bg-secondary-container p-6 text-center">
+              <h3 className="typescale-title-medium text-on-secondary-container mb-2">
+                Complete Setup to Create Shifts
+              </h3>
+              <p className="typescale-body-medium text-on-secondary-container/80 mb-4">
+                Before you can create shifts, you need to:
+              </p>
+              <ul className="typescale-body-medium text-on-secondary-container/80 text-left space-y-2 mb-6 max-w-md mx-auto">
+                {!hasWorksites && (
+                  <li className="flex items-start gap-2">
+                    <span className="text-error">•</span>
+                    <span>Add at least one worksite (location)</span>
+                  </li>
+                )}
+                {!hasRoles && (
+                  <li className="flex items-start gap-2">
+                    <span className="text-error">•</span>
+                    <span>Add at least one role</span>
+                  </li>
+                )}
+              </ul>
+              <p className="typescale-body-small text-on-secondary-container/60">
+                Return to the dashboard and complete the onboarding steps to add these items.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Only show form if prerequisites are met */}
+        {canCreateShift && (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+              <fieldset disabled={isSubmitting} className="space-y-6">
               {/* Error Display */}
               {form.formState.errors.root && (
                 <div className="rounded-lg bg-error-container p-4 text-sm text-on-error-container">
@@ -173,43 +216,83 @@ export default function ShiftFormModal({
                 )}
               />
 
-              {/* Shift Start */}
-              <FormField
-                name="shiftStart"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        label="Start Date & Time *"
-                        type="datetime-local"
-                        error={!!fieldState.error}
-                        errorMessage={fieldState.error?.message}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+              {/* Start Date & Time */}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  name="startDate"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          label="Start Date *"
+                          type="date"
+                          error={!!fieldState.error}
+                          errorMessage={fieldState.error?.message}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
 
-              {/* Shift End */}
-              <FormField
-                name="shiftEnd"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        label="End Date & Time *"
-                        type="datetime-local"
-                        error={!!fieldState.error}
-                        errorMessage={fieldState.error?.message}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  name="startTime"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          label="Start Time *"
+                          type="time"
+                          error={!!fieldState.error}
+                          errorMessage={fieldState.error?.message}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* End Date & Time */}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  name="endDate"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          label="End Date *"
+                          type="date"
+                          error={!!fieldState.error}
+                          errorMessage={fieldState.error?.message}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="endTime"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          label="End Time *"
+                          type="time"
+                          error={!!fieldState.error}
+                          errorMessage={fieldState.error?.message}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* Hourly Rate (Optional) */}
               <FormField
@@ -291,9 +374,10 @@ export default function ShiftFormModal({
               >
                 Create Shift
               </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+              </DialogFooter>
+            </form>
+          </Form>
+        )}
       </DialogContent>
     </Dialog>
   );
