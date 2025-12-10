@@ -33,6 +33,14 @@ export const ALPHANUMERIC_REGEX = /^[a-zA-Z0-9]+$/;
 export const TIME_24H_REGEX = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
 export const TIME_12H_REGEX = /^(1[0-2]|0?[1-9]):[0-5][0-9]\s?(AM|PM)$/i;
 
+// Date and time format patterns (ISO 8601)
+export const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD
+export const TIME_REGEX = /^\d{2}:\d{2}$/; // HH:MM
+
+// Numeric patterns
+export const DECIMAL_TWO_PLACES_REGEX = /^\d+(\.\d{1,2})?$/; // For currency/rates (e.g., 15.50)
+export const INTEGER_REGEX = /^\d+$/; // Whole numbers only
+
 /**
  * Validation helper functions with descriptive error messages
  */
@@ -68,5 +76,21 @@ export const ValidationPatterns = {
   accessCode: {
     pattern: ACCESS_CODE_REGEX,
     message: 'Access code can only contain letters, numbers, # and *.',
+  },
+  date: {
+    pattern: DATE_REGEX,
+    message: 'Invalid date format. Use YYYY-MM-DD.',
+  },
+  time: {
+    pattern: TIME_REGEX,
+    message: 'Invalid time format. Use HH:MM.',
+  },
+  hourlyRate: {
+    pattern: DECIMAL_TWO_PLACES_REGEX,
+    message: 'Hourly rate must be a valid number with up to 2 decimal places.',
+  },
+  currency: {
+    pattern: DECIMAL_TWO_PLACES_REGEX,
+    message: 'Amount must be a valid number with up to 2 decimal places.',
   },
 } as const;
