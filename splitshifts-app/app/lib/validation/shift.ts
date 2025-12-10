@@ -1,86 +1,159 @@
 import { z } from 'zod';
+import { ValidationPatterns } from '@/app/lib/utils/validation-patterns';
 
 /**
  * Validation schemas for shift CRUD operations
  * Centralized location for shift-related Zod schemas
  */
 
-// Schema for creating a new shift
-export const createShiftSchema = z.object({
+// Constants
+const SEVEN_DAYS_IN_MS = 7 * 24 * 60 * 60 * 1000;
+
+// Helper to combine date and time strings into ISO datetime
+const combineDateAndTime = (date: string, time: string): string => {
+  return `${date}T${time}`;
+};
+
+// Destructure validation patterns for cleaner usage
+const {
+  date: dateValidation,
+  time: timeValidation,
+  hourlyRate: hourlyRateValidation,
+} = ValidationPatterns;
+
+// Shared shift fields used by create and update schemas
+const shiftFieldsSchema = z.object({
   workSiteId: z.string().uuid('Invalid worksite ID format'),
   roleId: z.string().uuid('Invalid role ID format'),
-  shiftStart: z.string().datetime('Invalid start date/time format'),
-  shiftEnd: z.string().datetime('Invalid end date/time format'),
+  // Separate date and time fields for better UX
+  startDate: z.string().regex(dateValidation.pattern, dateValidation.message),
+  startTime: z.string().regex(timeValidation.pattern, timeValidation.message),
+  endDate: z.string().regex(dateValidation.pattern, dateValidation.message),
+  endTime: z.string().regex(timeValidation.pattern, timeValidation.message),
   hourlyRate: z
     .string()
-    .regex(/^\d+(\.\d{1,2})?$/, 'Hourly rate must be a valid number with up to 2 decimal places')
-    .optional()
-    .or(z.literal('')),
+    .refine(
+      val => val === '' || hourlyRateValidation.pattern.test(val),
+      hourlyRateValidation.message,
+    )
+    .optional(),
   notes: z
     .string()
-    .max(1000, 'Notes must be at most 1000 characters long')
+    .refine(
+      val => val === '' || val.length <= 1000,
+      'Notes must be at most 1000 characters long',
+    )
+    .optional(),
+  status: z
+    .enum(['draft', 'published', 'cancelled'])
     .optional()
-    .or(z.literal('')),
-  status: z.enum(['draft', 'published', 'cancelled']).optional().default('draft'),
+    .default('draft'),
   shiftGroupId: z
     .string()
-    .uuid('Invalid shift group ID format')
-    .optional()
-    .or(z.literal('')),
-}).refine(
-  (data) => {
-    const start = new Date(data.shiftStart);
-    const end = new Date(data.shiftEnd);
-    return end > start;
-  },
-  {
-    message: 'Shift end time must be after start time',
-    path: ['shiftEnd'],
-  }
-).refine(
-  (data) => {
-    const start = new Date(data.shiftStart);
-    const now = new Date();
-    // Allow creating shifts in the past for up to 7 days (for corrections)
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    return start >= sevenDaysAgo;
-  },
-  {
-    message: 'Shift start time cannot be more than 7 days in the past',
-    path: ['shiftStart'],
-  }
-);
+    .refine(
+      val =>
+        val === '' ||
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          val,
+        ),
+      'Invalid shift group ID format',
+    )
+    .optional(),
+});
+
+// Schema for creating a new shift - adds validation refinements
+export const createShiftSchema = shiftFieldsSchema
+  .refine(
+    data => {
+      const start = new Date(
+        combineDateAndTime(data.startDate, data.startTime),
+      );
+      const end = new Date(combineDateAndTime(data.endDate, data.endTime));
+      return end > start;
+    },
+    {
+      message: 'Shift end time must be after start time',
+      path: ['endTime'],
+    },
+  )
+  .refine(
+    data => {
+      const start = new Date(
+        combineDateAndTime(data.startDate, data.startTime),
+      );
+      const now = new Date();
+      // Allow creating shifts in the past for up to 7 days (for corrections)
+      const sevenDaysAgo = new Date(now.getTime() - SEVEN_DAYS_IN_MS);
+      return start >= sevenDaysAgo;
+    },
+    {
+      message: 'Shift start time cannot be more than 7 days in the past',
+      path: ['startDate'],
+    },
+  )
+  .transform(data => ({
+    ...data,
+    // Combine separate fields into datetime strings for backend
+    shiftStart: combineDateAndTime(data.startDate, data.startTime),
+    shiftEnd: combineDateAndTime(data.endDate, data.endTime),
+  }));
 
 export type CreateShiftFormData = z.infer<typeof createShiftSchema>;
 
-// Base schema without refinements for update
-const baseShiftSchema = z.object({
-  workSiteId: z.string().uuid('Invalid worksite ID format'),
-  roleId: z.string().uuid('Invalid role ID format'),
-  shiftStart: z.string().datetime('Invalid start date/time format'),
-  shiftEnd: z.string().datetime('Invalid end date/time format'),
-  hourlyRate: z
-    .string()
-    .regex(/^\d+(\.\d{1,2})?$/, 'Hourly rate must be a valid number with up to 2 decimal places')
-    .optional()
-    .or(z.literal('')),
-  notes: z
-    .string()
-    .max(1000, 'Notes must be at most 1000 characters long')
-    .optional()
-    .or(z.literal('')),
-  status: z.enum(['draft', 'published', 'cancelled']).optional().default('draft'),
-  shiftGroupId: z
-    .string()
-    .uuid('Invalid shift group ID format')
-    .optional()
-    .or(z.literal('')),
-});
+// Schema for updating a shift - makes all fields optional except ID
+export const updateShiftSchema = shiftFieldsSchema
+  .extend({
+    id: z.string().uuid('Invalid shift ID format'),
+  })
+  .partial()
+  .required({ id: true })
+  .refine(
+    data => {
+      // Only validate if all date/time fields are being updated
+      if (data.startDate && data.startTime && data.endDate && data.endTime) {
+        const start = new Date(
+          combineDateAndTime(data.startDate, data.startTime),
+        );
+        const end = new Date(combineDateAndTime(data.endDate, data.endTime));
+        return end > start;
+      }
+      return true;
+    },
+    {
+      message: 'Shift end time must be after start time',
+      path: ['endTime'],
+    },
+  )
+  .refine(
+    data => {
+      if (data.startDate && data.startTime) {
+        const start = new Date(
+          combineDateAndTime(data.startDate, data.startTime),
+        );
+        const now = new Date();
+        const sevenDaysAgo = new Date(now.getTime() - SEVEN_DAYS_IN_MS);
+        return start >= sevenDaysAgo;
+      }
+      return true;
+    },
+    {
+      message: 'Shift start time cannot be more than 7 days in the past',
+      path: ['startDate'],
+    },
+  )
+  .transform(data => {
+    const result: any = { ...data };
 
-// Schema for updating a shift - extends base schema with ID
-export const updateShiftSchema = baseShiftSchema.extend({
-  id: z.string().uuid('Invalid shift ID format'),
-}).partial().required({ id: true });
+    // Combine separate fields into datetime strings if all parts are present
+    if (data.startDate && data.startTime) {
+      result.shiftStart = combineDateAndTime(data.startDate, data.startTime);
+    }
+    if (data.endDate && data.endTime) {
+      result.shiftEnd = combineDateAndTime(data.endDate, data.endTime);
+    }
+
+    return result;
+  });
 
 export type UpdateShiftFormData = z.infer<typeof updateShiftSchema>;
 
@@ -97,8 +170,14 @@ export const getShiftsSchema = z.object({
   roleId: z.string().uuid('Invalid role ID format').optional(),
   employeeId: z.string().uuid('Invalid employee ID format').optional(),
   status: z.enum(['draft', 'published', 'cancelled']).optional(),
-  startDate: z.string().datetime('Invalid start date format').optional(),
-  endDate: z.string().datetime('Invalid end date format').optional(),
+  startDate: z
+    .string()
+    .datetime({ message: 'Invalid start date format' })
+    .optional(),
+  endDate: z
+    .string()
+    .datetime({ message: 'Invalid end date format' })
+    .optional(),
 });
 
 export type GetShiftsFilters = z.infer<typeof getShiftsSchema>;
