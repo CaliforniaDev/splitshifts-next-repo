@@ -3,6 +3,13 @@
 ## [Unreleased]
 
 ### Added
+- Implementation plan documentation with 5-phase MVP roadmap (`docs/IMPLEMENTATION_PLAN.md`)
+  - Phase 1: Foundation & Core CRUD (Week 1-2, 60% complete)
+  - Phase 2: Shift Assignment & Notifications (Week 3)
+  - Phase 3: Dashboard Home & Advanced Calendar (Week 4)
+  - Phase 4: Security, Authz & Polish (Week 5)
+  - Phase 5: Advanced Scheduling Features (Week 6+, post-MVP)
+  - Includes acceptance criteria, risk assessment, and current progress tracking
 - **Cascade Soft-Delete for Organizations**: Complete cascade deletion system for organization removal
   - **Transaction-Based Deletion**: All related records (shifts, employees, roles, worksites) soft-deleted atomically
   - **Database Driver Upgrade**: Switched from `neon-http` to `neon-serverless` (WebSocket) for transaction support

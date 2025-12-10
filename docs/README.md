@@ -7,6 +7,7 @@ Welcome to the SplitShifts documentation! This directory contains comprehensive 
 ### Core Documentation
 - **[Project Overview](./PROJECT_OVERVIEW.md)** - Complete tech stack, dependencies, and project structure
 - **[Architecture Guide](./ARCHITECTURE.md)** - System design patterns, data flow, and architectural decisions
+- **[Implementation Plan](./IMPLEMENTATION_PLAN.md)** - 5-phase MVP roadmap with timelines, acceptance criteria, and current progress (Week 1-2: Phase 1 in progress)
 - **[Organization Management Complete](./ORGANIZATION_MANAGEMENT_COMPLETE.md)** - Comprehensive guide to organization CRUD operations, cascade deletes, and modal system
 
 ### Database & Backend
