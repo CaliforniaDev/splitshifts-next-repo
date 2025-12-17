@@ -26,7 +26,6 @@ export default function Logo({
         alt='SplitShifts Logo'
         width={width}
         height={height}
-        quality={100}
         priority
       />
       <span
