@@ -3,12 +3,13 @@ import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
 
 import db from './db/drizzle';
-import { eq } from 'drizzle-orm';
+import { eq, and, isNull, desc } from 'drizzle-orm';
 import { compare } from 'bcryptjs';
 import { authenticator } from 'otplib';
 
 import { users } from './db/schema/usersSchema';
 import { organizationUsers } from './db/schema/organizationUsersSchema';
+import { organizations } from './db/schema/organizationsSchema';
 
 // Server-side credentials schema for validation
 const credentialsSchema = z.object({
@@ -117,11 +118,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           // Don't block login if timestamp update fails
         }
 
-        // Get user's organization for session
+        // Get user's most recent active (non-deleted) organization for session
         const [orgUser] = await db
           .select({ orgId: organizationUsers.orgId })
           .from(organizationUsers)
-          .where(eq(organizationUsers.userId, user.id))
+          .innerJoin(organizations, eq(organizationUsers.orgId, organizations.id))
+          .where(
+            and(
+              eq(organizationUsers.userId, user.id),
+              isNull(organizations.deletedAt)
+            )
+          )
+          .orderBy(desc(organizationUsers.createdAt))
           .limit(1);
 
         return {
