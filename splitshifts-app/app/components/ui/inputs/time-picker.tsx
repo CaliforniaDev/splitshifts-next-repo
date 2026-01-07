@@ -257,7 +257,7 @@ export default function TimePicker({
   const hoursArray = Array.from({ length: 12 }, (_, i) => i + 1);
   const minutesArray = Array.from({ length: 12 }, (_, i) => i * 5);
 
-  // Check if a number position is under the circle
+  // Check if a number is under the selector knob (for color change to text-on-primary)
   const isNumberUnderCircle = (numberValue: number, isHourMode: boolean) => {
     if (isHourMode) {
       return (numberValue % 12) === (hours % 12);
