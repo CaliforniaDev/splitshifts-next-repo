@@ -56,10 +56,10 @@ Always specify `databaseName: "splitshifts"` when using Neon MCP tools. The defa
 mcp_neon_get_database_tables({ projectId: "blue-heart-80946792" })
 
 // ✅ CORRECT - Shows all 20 tables
-mcp_neon_run_sql({ 
-  projectId: "blue-heart-80946792", 
-  databaseName: "splitshifts",
-  sql: "SELECT tablename FROM pg_tables WHERE schemaname = 'public';"
+mcp_neon_run_sql({
+projectId: "blue-heart-80946792",
+databaseName: "splitshifts",
+sql: "SELECT tablename FROM pg_tables WHERE schemaname = 'public';"
 })
 \`\`\`
 
@@ -69,15 +69,18 @@ mcp_neon_run_sql({
 
 Use the appropriate guard function based on context:
 
-1. **Layout Level** (`app/(logged-in)/layout.tsx`): 
+1. **Layout Level** (`app/(logged-in)/layout.tsx`):
+
    - Uses `requireSession()` for fast JWT-only validation
    - Performance: < 1ms (no DB query)
 
 2. **Page Level** (pages rendering user data):
+
    - MUST call `validateUserSession()` at the top to ensure user exists in DB
    - Performance: 50-100ms (includes DB check)
 
 3. **Server Actions** (data-mutating actions):
+
    - MUST use `requireAuth()` for authentication check
    - Redirects if not authenticated
 
@@ -90,30 +93,30 @@ Use the appropriate guard function based on context:
 \`\`\`typescript
 // Fast layout protection (no DB check)
 export default async function Layout() {
-  await requireSession(); // < 1ms
-  // ...
+await requireSession(); // < 1ms
+// ...
 }
 
 // Page with user data (DB validation required)
 export default async function UserPage() {
-  await validateUserSession(); // Checks DB, ~50-100ms
-  // ...
+await validateUserSession(); // Checks DB, ~50-100ms
+// ...
 }
 
 // Server action (authentication required)
 export async function updateData(data) {
-  'use server';
-  const session = await requireAuth(); // Redirects if not authenticated
-  // ... mutation logic
+'use server';
+const session = await requireAuth(); // Redirects if not authenticated
+// ... mutation logic
 }
 
 // Organization action (full authorization)
 export async function editOrg(orgId, data) {
-  'use server';
-  const session = await requireAuth();
-  const isAdmin = await isOrganizationAdmin(session.user.id, orgId);
-  if (!isAdmin) return { error: 'Unauthorized' };
-  // ... mutation logic
+'use server';
+const session = await requireAuth();
+const isAdmin = await isOrganizationAdmin(session.user.id, orgId);
+if (!isAdmin) return { error: 'Unauthorized' };
+// ... mutation logic
 }
 \`\`\`
 
@@ -142,19 +145,19 @@ Deleted users with valid JWT can navigate between pages until hitting a \`valida
 **Standard form setup:**
 \`\`\`typescript
 const form = useForm<FormData>({
-  resolver: zodResolver(schema),
-  defaultValues: { /* ... */ }
+resolver: zodResolver(schema),
+defaultValues: { /_ ... _/ }
 });
 \`\`\`
 
 **Always follow this exact pattern for forms:**
 \`\`\`tsx
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
+Form,
+FormControl,
+FormField,
+FormItem,
+FormMessage,
 } from '@/app/components/ui/form';
 import Input from '@/app/components/ui/inputs/input';
 import Button from '@/app/components/ui/buttons/button';
@@ -194,14 +197,15 @@ import Button from '@/app/components/ui/buttons/button';
 \`\`\`
 
 ### Card Layout Pattern
+
 \`\`\`tsx
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+Card,
+CardContent,
+CardDescription,
+CardFooter,
+CardHeader,
+CardTitle,
 } from '@/app/components/ui/card';
 
 <Card className='w-full border-none shadow-elevation-0'>
@@ -229,30 +233,31 @@ onboardingStep: varchar('onboarding_step', { length: 50 })
 
 // 2. Create server action to save progress
 export async function saveOnboardingProgress(step: string | null) {
-  'use server';
-  const session = await requireAuth();
-  await db.update(users)
-    .set({ onboardingStep: step })
-    .where(eq(users.id, session.user.id!));
+'use server';
+const session = await requireAuth();
+await db.update(users)
+.set({ onboardingStep: step })
+.where(eq(users.id, session.user.id!));
 }
 
 // 3. Dashboard checks for incomplete onboarding
 const [user] = await db.select({ onboardingStep: users.onboardingStep })
-  .from(users)
-  .where(eq(users.id, session.user.id!));
+.from(users)
+.where(eq(users.id, session.user.id!));
 
 if (!userOrg || user?.onboardingStep) {
-  return <OnboardingWizard initialStep={user?.onboardingStep} />;
+return <OnboardingWizard initialStep={user?.onboardingStep} />;
 }
 
 // 4. Wizard component auto-saves on step change
 const handleStepChange = async (newStep: number) => {
-  setCurrentStep(newStep);
-  await saveOnboardingProgress(OnboardingStep[newStep]);
+setCurrentStep(newStep);
+await saveOnboardingProgress(OnboardingStep[newStep]);
 };
 \`\`\`
 
 **Button hierarchy for multi-action forms:**
+
 - Primary action: `variant="filled"` (Save & Continue)
 - Secondary action: `variant="outlined"` or `"tonal"` (Add Another)
 - Navigation/Skip: `variant="text"` in horizontal layout (Back | Skip for Now)
@@ -260,31 +265,33 @@ const handleStepChange = async (newStep: number) => {
 ## Database Best Practices
 
 ### Query Patterns
+
 \`\`\`typescript
 // Always use UUID fields - never serial IDs
 const [organization] = await db
-  .select()
-  .from(organizations) 
-  .where(eq(organizations.id, organizationId)); // organizationId is UUID string
+.select()
+.from(organizations)
+.where(eq(organizations.id, organizationId)); // organizationId is UUID string
 
 // Multi-tenant queries MUST include organization scope
 const employees = await db
-  .select()
-  .from(employees)
-  .where(eq(employees.organizationId, organizationId));
+.select()
+.from(employees)
+.where(eq(employees.organizationId, organizationId));
 
 // Use explicit column projections to minimize data transfer
 const [userOrg] = await db
-  .select({
-    orgId: organizationUsers.orgId,
-    orgName: organizations.name,
-  })
-  .from(organizationUsers)
-  .innerJoin(organizations, eq(organizationUsers.orgId, organizations.id))
-  .where(eq(organizationUsers.userId, userId));
+.select({
+orgId: organizationUsers.orgId,
+orgName: organizations.name,
+})
+.from(organizationUsers)
+.innerJoin(organizations, eq(organizationUsers.orgId, organizations.id))
+.where(eq(organizationUsers.userId, userId));
 \`\`\`
 
 ### Data Integrity
+
 - Filter out soft-deleted records (e.g., \`deletedAt IS NULL\`) in queries that surface user-visible data
 - Wrap multi-step mutations in a single server action when possible
 - Never expose secrets, tokens, or internal IDs to the client beyond what's already used
@@ -336,13 +343,16 @@ const [userOrg] = await db
 ## Documentation
 
 ### Code Comments
+
 - Update or add short comments near changed code only when it improves understanding
 - If a change affects security or performance, add a note to \`docs/security/NAVIGATION_PERFORMANCE_FIX.md\` or a relevant doc under \`docs/\`
 - **Do NOT create summary documents** for each change unless specifically requested by the user
 - **Consolidate existing docs** when you find duplicate or overlapping content
 
 ### README Updates (Critical)
+
 **ALWAYS update README.md files when:**
+
 - Adding new features or components
 - Changing authentication flows or APIs
 - Adding new dependencies or technologies
@@ -350,11 +360,13 @@ const [userOrg] = await db
 - Changing project structure
 
 **README files to maintain:**
+
 - \`/README.md\` - Main project README with features, setup, and documentation links
 - \`/docs/README.md\` - Documentation index
 - Component-specific READMEs in their directories
 
 **Update process:**
+
 1. Read the existing README to understand current structure
 2. Add new content in the appropriate section
 3. Update table of contents if present
@@ -362,7 +374,9 @@ const [userOrg] = await db
 5. Commit README updates separately with descriptive message
 
 ### CHANGELOG Updates (Critical)
+
 **ALWAYS update CHANGELOG.MD when:**
+
 - Adding new features (### Added)
 - Changing existing functionality (### Changed)
 - Deprecating features (### Deprecated)
@@ -372,22 +386,28 @@ const [userOrg] = await db
 
 **CHANGELOG format:**
 \`\`\`markdown
+
 ## [Unreleased]
 
 ### Added
+
 - New feature description with issue reference if applicable
 
 ### Changed
+
 - Description of changes to existing functionality
 
 ### Fixed
+
 - Bug fix description with issue reference
 
 ### Security
+
 - Security improvement description
-\`\`\`
+  \`\`\`
 
 **Update process:**
+
 1. Add entries to \`[Unreleased]\` section at the top
 2. Use present tense ("Add" not "Added")
 3. Include enough detail for users to understand impact
@@ -397,6 +417,7 @@ const [userOrg] = await db
 ## Commit Guidance
 
 ### Atomic Commits (Critical)
+
 **NEVER commit everything at once.** Each commit should represent ONE logical change.
 
 **How to create atomic commits:**
@@ -404,53 +425,67 @@ const [userOrg] = await db
 1. **Make changes across multiple files**
 2. **Stage files by logical grouping:**
    \`\`\`bash
+
    # Stage only files related to one change
+
    git add path/to/file1.ts path/to/file2.ts
    git commit -m "feat: descriptive message"
-   
+
    # Repeat for each logical change
+
    git add path/to/file3.ts
    git commit -m "fix: another change"
    \`\`\`
 
 3. **If you accidentally stage everything:**
    \`\`\`bash
+
    # Unstage all files
+
    git reset HEAD
-   
+
    # Stage and commit one change at a time
+
    git add specific/files
    git commit -m "specific change message"
    \`\`\`
 
 **Example workflow (from recent work):**
 \`\`\`bash
+
 # 1. Add new utility file first
+
 git add app/lib/auth-utils.ts
 git commit -m "auth: add central authentication utility functions"
 
 # 2. Then update session callback
+
 git add auth.ts next.config.mjs
 git commit -m "perf: remove database query from session callback"
 
 # 3. Update layout
+
 git add app/(logged-in)/layout.tsx
 git commit -m "auth: use requireSession() in layout"
 
 # 4. Update pages
-git add app/(logged-in)/dashboard/page.tsx app/(logged-in)/settings/*/page.tsx
+
+git add app/(logged-in)/dashboard/page.tsx app/(logged-in)/settings/\*/page.tsx
 git commit -m "auth: add validateUserSession() to pages"
 
 # 5. Fix lint issues
+
 git add components/modal.tsx
 git commit -m "fix: escape quotes in JSX"
 
 # 6. Update documentation
+
 git add README.md CHANGELOG.MD
 git commit -m "docs: update README and CHANGELOG for auth changes"
 \`\`\`
 
 ### Commit Message Format
+
 **Use conventional commits format:**
 
 \`\`\`
@@ -460,6 +495,7 @@ git commit -m "docs: update README and CHANGELOG for auth changes"
 \`\`\`
 
 **Types:**
+
 - \`feat\`: New feature
 - \`fix\`: Bug fix
 - \`perf\`: Performance improvement
@@ -495,19 +531,24 @@ Performance: 4-10x faster navigation (200-500ms → <50ms)"
 \`\`\`
 
 ### When to Combine Commits
+
 **Only combine commits if:**
+
 - They are truly inseparable (e.g., adding a file and its test)
 - The change is trivial (< 5 lines in one file)
 - You're fixing a typo in comments/docs
 
 **Never combine:**
+
 - Feature additions with bug fixes
 - Multiple feature additions
 - Code changes with documentation updates
 - Different subsystems (auth + UI + database)
 
 ### Commit Review Checklist
+
 Before committing, verify:
+
 - ✅ Only related files are staged
 - ✅ Commit message follows conventional format
 - ✅ No debug code, console.logs, or commented code
@@ -517,19 +558,23 @@ Before committing, verify:
 - ✅ TypeScript compiles (\`pnpm build\` or check for errors)
 
 ### Commit Message Generation for Multi-File Changes
+
 When an agent is asked to "review code for commit" or "generate commit messages," follow this process:
 
 **User Preference: Use GitHub Plugin format by default (no git commands)**
 
 **Step 1: Review Changed Files**
 \`\`\`bash
+
 # Review all changes
+
 git status
 git diff
 \`\`\`
 
 **Step 2: Group Changes Logically**
 Group files into atomic commits by:
+
 - **Feature boundary**: UI changes separate from database changes
 - **Layer separation**: Schema → Migration → Server Action → Component
 - **Dependency order**: Database changes before code that uses them
@@ -540,9 +585,11 @@ Format output for easy copy-paste into GitHub plugin or terminal:
 
 **For GitHub Plugin Users (VS Code Source Control):**
 \`\`\`markdown
+
 ### Commit 1: [Descriptive Name]
 
 **Files to stage:**
+
 - path/to/file1.ts
 - path/to/file2.ts
 
@@ -563,10 +610,11 @@ git commit -m "type(scope): subject line
 
 - Bullet point detail 1
 - Bullet point detail 2"
-\`\`\`
+  \`\`\`
 
 **Step 4: Provide Context**
 After commit groups, explain:
+
 - Why changes were grouped this way
 - What each commit accomplishes
 - Dependencies between commits (if any)
@@ -574,6 +622,7 @@ After commit groups, explain:
 
 **Example Grouping Strategy:**
 For a feature with DB changes, server actions, and UI components:
+
 1. **Database schema** (e.g., add column to table)
 2. **Database migration** (generated SQL + metadata)
 3. **Server action** (new API endpoint using schema)
@@ -582,6 +631,7 @@ For a feature with DB changes, server actions, and UI components:
 6. **Documentation** (README, CHANGELOG updates)
 
 **Never Generate:**
+
 - Single mega-commit with all changes
 - Commits mixing unrelated features
 - Commits with both code and docs (separate them)
@@ -595,37 +645,42 @@ For a feature with DB changes, server actions, and UI components:
 ## Environment & Setup
 
 ### Required Environment Variables
+
 \`\`\`bash
-DATABASE_URL="postgresql://..."           # Neon serverless PostgreSQL
-NEXTAUTH_SECRET="your-secret"             # Cryptographically secure secret
-NEXTAUTH_URL="http://localhost:3000"      # Auth callback URL
-RESEND_API_KEY="re_..."                   # For email verification
-SITE_BASE_URL="http://localhost:3000"     # Required for email links
+DATABASE*URL="postgresql://..." # Neon serverless PostgreSQL
+NEXTAUTH_SECRET="your-secret" # Cryptographically secure secret
+NEXTAUTH_URL="http://localhost:3000" # Auth callback URL
+RESEND_API_KEY="re*..." # For email verification
+SITE_BASE_URL="http://localhost:3000" # Required for email links
 \`\`\`
 
 ### Development Commands
+
 \`\`\`bash
-pnpm dev              # Start development server with Turbopack
-pnpm lint             # Run ESLint
-pnpm db:generate      # Generate migrations from schema changes
-pnpm db:push          # Push schema to database
-pnpm db:studio        # Open Drizzle Studio (database GUI)
+pnpm dev # Start development server with Turbopack
+pnpm lint # Run ESLint
+pnpm db:generate # Generate migrations from schema changes
+pnpm db:push # Push schema to database
+pnpm db:studio # Open Drizzle Studio (database GUI)
 \`\`\`
 
 ## Key Files Reference
 
 ### Schema & Database
+
 - \`db/schema/index.ts\` - All table exports and relationships
 - \`db/schema/usersSchema.ts\` - User auth table with UUID primary key
 - \`db/schema/organizationsSchema.ts\` - Multi-tenant organization structure
 
 ### Authentication
+
 - \`auth.ts\` - NextAuth configuration with 2FA support
 - \`app/lib/auth-utils.ts\` - Authentication utility functions (\`validateUserSession\`, \`requireSession\`, \`requireAuth\`)
 - \`middleware.ts\` - Route protection configuration
 - \`app/(public)/(auth)/login/page.tsx\` - Multi-step login with OTP
 
 ### Components
+
 - \`app/components/ui/nav/dashboard/nav-drawer.tsx\` - Navigation implementation
 - \`app/components/ui/icons/dashboard/dashboard-icon-picker.tsx\` - Icon system usage
 - \`app/(logged-in)/settings/security/page.tsx\` - Example: Database query pattern with auth
