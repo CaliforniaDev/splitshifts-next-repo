@@ -31,11 +31,11 @@ type Period = 'AM' | 'PM';
 // Clock face constants
 const CLOCK_DIAMETER = 256;
 const CLOCK_CENTER = CLOCK_DIAMETER / 2; // 128
-const CENTER_DOT_RADIUS = 4; // 8px diameter
-const SELECTOR_KNOB_RADIUS = 24; // 48px diameter - the circle at end of hand
+const DIAL_SELECTOR_CENTER_RADIUS = 4; // 8px diameter
+const DIAL_SELECTOR_CONTAINER_RADIUS = 24; // 48px diameter - the circle at end of track
 const NUMBER_BUTTON_SIZE = 48;
 const EDGE_GAP = 2;
-const HAND_THICKNESS = 2;
+const SELECTOR_TRACK_THICKNESS = 2;
 
 // Calculate number position: dial radius - button half-width - gap
 const NUMBER_RADIUS = CLOCK_CENTER - NUMBER_BUTTON_SIZE / 2 - EDGE_GAP; // 102px
@@ -257,8 +257,8 @@ export default function TimePicker({
   const hoursArray = Array.from({ length: 12 }, (_, i) => i + 1);
   const minutesArray = Array.from({ length: 12 }, (_, i) => i * 5);
 
-  // Check if a number is under the selector knob (for color change to text-on-primary)
-  const isNumberUnderCircle = (numberValue: number, isHourMode: boolean) => {
+  // Check if a number is under the dial selector container (for color change to text-on-primary)
+  const isNumberUnderSelectorContainer = (numberValue: number, isHourMode: boolean) => {
     if (isHourMode) {
       return (numberValue % 12) === (hours % 12);
     } else {
@@ -314,7 +314,7 @@ export default function TimePicker({
                   className={cn(
                     'text-5xl font-normal transition-colors',
                     mode === 'hours'
-                      ? 'text-primary'
+                      ? 'text-on-primary-container bg-primary-container'
                       : 'text-on-surface-variant hover:text-on-surface'
                   )}
                 >
@@ -371,57 +371,57 @@ export default function TimePicker({
               onClick={handleClockInteraction}
             >
               <svg className="absolute inset-0 pointer-events-none" viewBox={`0 0 ${CLOCK_DIAMETER} ${CLOCK_DIAMETER}`}>
-                {/* Center dot */}
+                {/* Dial selector center */}
                 <circle 
                   cx={CLOCK_CENTER} 
                   cy={CLOCK_CENTER} 
-                  r={CENTER_DOT_RADIUS} 
+                  r={DIAL_SELECTOR_CENTER_RADIUS} 
                   fill="currentColor" 
                   className="text-primary" 
                 />
 
-                {/* Hours mode: Clock hand and selector knob */}
+                {/* Hours mode: Dial selector track and container */}
                 {mode === 'hours' && (
                   <>
-                    {/* Hand line */}
+                    {/* Dial selector track */}
                     <line
                       x1={CLOCK_CENTER}
                       y1={CLOCK_CENTER}
                       x2={getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).x}
                       y2={getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).y}
                       stroke="currentColor"
-                      strokeWidth={HAND_THICKNESS}
+                      strokeWidth={SELECTOR_TRACK_THICKNESS}
                       className="text-primary"
                     />
-                    {/* Selector knob */}
+                    {/* Dial selector container */}
                     <circle
                       cx={getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).x}
                       cy={getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).y}
-                      r={SELECTOR_KNOB_RADIUS}
+                      r={DIAL_SELECTOR_CONTAINER_RADIUS}
                       fill="currentColor"
                       className="text-primary"
                     />
                   </>
                 )}
                 
-                {/* Minutes mode: Clock hand and selector knob */}
+                {/* Minutes mode: Dial selector track and container */}
                 {mode === 'minutes' && (
                   <>
-                    {/* Hand line */}
+                    {/* Dial selector track */}
                     <line
                       x1={CLOCK_CENTER}
                       y1={CLOCK_CENTER}
                       x2={getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).x}
                       y2={getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).y}
                       stroke="currentColor"
-                      strokeWidth={HAND_THICKNESS}
+                      strokeWidth={SELECTOR_TRACK_THICKNESS}
                       className="text-primary"
                     />
-                    {/* Selector knob */}
+                    {/* Dial selector container */}
                     <circle
                       cx={getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).x}
                       cy={getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).y}
-                      r={SELECTOR_KNOB_RADIUS}
+                      r={DIAL_SELECTOR_CONTAINER_RADIUS}
                       fill="currentColor"
                       className="text-primary"
                     />
@@ -434,7 +434,7 @@ export default function TimePicker({
                 hoursArray.map((hour) => {
                   const angle = getAngle(hour % 12, 12);
                   const pos = getPosition(angle, NUMBER_RADIUS);
-                  const isUnderSelectorKnob = isNumberUnderCircle(hour, true);
+                  const isUnderSelectorContainer = isNumberUnderSelectorContainer(hour, true);
                   return (
                     <button
                       key={hour}
@@ -464,7 +464,7 @@ export default function TimePicker({
                       }}
                       className={cn(
                         "absolute flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full typescale-body-large transition-all duration-200",
-                        isUnderSelectorKnob ? "text-on-primary" : "text-on-surface"
+                        isUnderSelectorContainer ? "text-on-primary" : "text-on-surface"
                       )}
                       style={{ left: pos.x, top: pos.y }}
                     >
@@ -478,7 +478,7 @@ export default function TimePicker({
                 minutesArray.map((minute) => {
                   const angle = getAngle(minute / 5, 12);
                   const pos = getPosition(angle, NUMBER_RADIUS);
-                  const isUnderSelectorKnob = isNumberUnderCircle(minute, false);
+                  const isUnderSelectorContainer = isNumberUnderSelectorContainer(minute, false);
                   return (
                     <button
                       key={minute}
@@ -508,7 +508,7 @@ export default function TimePicker({
                       }}
                       className={cn(
                         "absolute flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full typescale-body-large transition-all duration-200",
-                        isUnderSelectorKnob ? "text-on-primary" : "text-on-surface"
+                        isUnderSelectorContainer ? "text-on-primary" : "text-on-surface"
                       )}
                       style={{ left: pos.x, top: pos.y }}
                     >
