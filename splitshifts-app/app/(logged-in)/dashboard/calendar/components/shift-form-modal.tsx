@@ -246,6 +246,7 @@ export default function ShiftFormModal({
                           {...field}
                           label="Start Time *"
                           type="time"
+                          onBlur={field.onBlur}
                           error={!!fieldState.error}
                           errorMessage={fieldState.error?.message}
                         />
@@ -285,6 +286,7 @@ export default function ShiftFormModal({
                           {...field}
                           label="End Time *"
                           type="time"
+                          onBlur={field.onBlur}
                           error={!!fieldState.error}
                           errorMessage={fieldState.error?.message}
                         />
