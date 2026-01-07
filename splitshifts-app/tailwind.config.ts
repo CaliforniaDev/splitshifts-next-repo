@@ -115,6 +115,7 @@ const config: Config = {
       },
       transitionTimingFunction: {
         emphasized: 'cubic-bezier(0.2, 0, 0, 1)',
+        'emphasized-decelerate': 'cubic-bezier(0.05, 0.7, 0.1, 1)',
       },
       keyframes: {
         'caret-blink': {
