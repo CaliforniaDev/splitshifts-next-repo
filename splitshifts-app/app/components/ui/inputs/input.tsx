@@ -273,6 +273,7 @@ export default function Input({
           defaultValue={defaultValue}
           ref={uncontrolledValueRef}
           onChange={handleChange}
+          step={props.type === 'time' ? 60 : undefined}
           {...props}
         />
         {/* Base border (::before) - 1px with color transitions */}
