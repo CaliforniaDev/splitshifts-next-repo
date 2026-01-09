@@ -75,7 +75,7 @@ function TimeSelectorLabel({
       className={cn(
         'typescale-display-large relative h-20 w-24 rounded-lg !font-normal transition-colors',
         isActive
-          ? 'bg-primary-container text-on-primary-container border-primary border-solid border-2'
+          ? 'border-2 border-solid border-primary bg-primary-container text-on-primary-container'
           : 'bg-surface-container-highest text-on-surface-variant hover:text-on-surface',
       )}
     >
@@ -89,7 +89,7 @@ function TimeSelectorLabel({
           onBlur={onBlur}
           onKeyDown={onKeyDown}
           autoFocus
-          className='h-full w-full rounded-lg bg-transparent text-center outline-none typescale-display-large !font-normal caret-primary'
+          className='typescale-display-large h-full w-full rounded-lg bg-transparent text-center !font-normal caret-primary outline-none'
         />
       ) : (
         <button
@@ -141,7 +141,7 @@ export default function TimePicker({
   const [editingMinutes, setEditingMinutes] = useState(false);
   const [tempHoursValue, setTempHoursValue] = useState('');
   const [tempMinutesValue, setTempMinutesValue] = useState('');
-  
+
   const hoursInputRef = useRef<HTMLInputElement>(null);
   const minutesInputRef = useRef<HTMLInputElement>(null);
 
@@ -188,15 +188,15 @@ export default function TimePicker({
     const cx = 3 * 0.05;
     const bx = 3 * (0.1 - 0.05) - cx;
     const ax = 1 - cx - bx;
-    
+
     const cy = 3 * 0.7;
     const by = 3 * (1 - 0.7) - cy;
     const ay = 1 - cy - by;
-    
+
     // Calculate bezier curve value
     const t2 = t * t;
     const t3 = t2 * t;
-    
+
     return ay * t3 + by * t2 + cy * t;
   };
 
@@ -211,7 +211,7 @@ export default function TimePicker({
     const value = e.target.value.replace(/\D/g, ''); // Only digits
     if (value.length <= 2) {
       setTempHoursValue(value);
-      
+
       // Auto-advance to minutes after 2 digits
       if (value.length === 2) {
         setTimeout(() => {
@@ -230,16 +230,16 @@ export default function TimePicker({
       setEditingHours(false);
       return;
     }
-    
+
     let numValue = parseInt(tempHoursValue, 10);
-    
+
     // Validate hours (1-12)
     if (isNaN(numValue) || numValue < 1) {
       numValue = 1;
     } else if (numValue > 12) {
       numValue = 12;
     }
-    
+
     setHours(numValue);
     setEditingHours(false);
     setTempHoursValue('');
@@ -266,7 +266,7 @@ export default function TimePicker({
     const value = e.target.value.replace(/\D/g, ''); // Only digits
     if (value.length <= 2) {
       setTempMinutesValue(value);
-      
+
       // Auto-complete after 2 digits
       if (value.length === 2) {
         // Use the current value directly to avoid state timing issues
@@ -289,16 +289,16 @@ export default function TimePicker({
       setEditingMinutes(false);
       return;
     }
-    
+
     let numValue = parseInt(tempMinutesValue, 10);
-    
+
     // Validate minutes (0-59)
     if (isNaN(numValue) || numValue < 0) {
       numValue = 0;
     } else if (numValue > 59) {
       numValue = 59;
     }
-    
+
     setMinutes(numValue);
     setEditingMinutes(false);
     setTempMinutesValue('');
@@ -314,33 +314,33 @@ export default function TimePicker({
   // Handle hour selection and transition to minutes mode
   const handleHourSelect = (hour: number) => {
     setHours(hour);
-    
+
     // Start at the corresponding minute position for smooth visual transition
     const startMinute = (hour % 12) * 5;
     setMinutes(startMinute);
     setMode('minutes');
-    
+
     // Animate hand from current position to 30-minute mark
     setTimeout(() => {
       const targetMinute = 30;
       const stepDuration = TRANSITION_TO_MINUTES_DURATION / TRANSITION_STEPS;
       let currentStep = 0;
-      
+
       const animationInterval = setInterval(() => {
         currentStep++;
         const progress = currentStep / TRANSITION_STEPS;
-        
+
         // Emphasized decelerate easing for smooth, natural motion
         const easedProgress = emphasizedDecelerate(progress);
-        
+
         // Calculate shortest path around clock
         let diff = targetMinute - startMinute;
         if (diff > 30) diff -= 60;
         if (diff < -30) diff += 60;
-        
+
         const currentMinute = Math.round(startMinute + diff * easedProgress);
         setMinutes(currentMinute >= 0 ? currentMinute : currentMinute + 60);
-        
+
         if (currentStep >= TRANSITION_STEPS) {
           clearInterval(animationInterval);
           setMinutes(targetMinute);
@@ -381,10 +381,10 @@ export default function TimePicker({
   // Start dragging
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
-    
+
     // Exit input editing mode and blur inputs when interacting with dial
     closeInputs();
-    
+
     setJustFinishedDrag(false);
     setIsDragging(true);
     handleClockInteraction(e);
@@ -404,7 +404,7 @@ export default function TimePicker({
       e.stopPropagation();
       setJustFinishedDrag(true);
       setTimeout(() => setJustFinishedDrag(false), DRAG_BLOCK_DURATION);
-      
+
       // Auto-transition to minutes after dragging in hours mode
       if (mode === 'hours') {
         handleHourSelect(hours);
@@ -422,11 +422,11 @@ export default function TimePicker({
   const handleConfirm = () => {
     const date = new Date();
     let hrs = hours;
-    
+
     // Convert 12-hour to 24-hour format
     if (period === 'PM' && hrs !== 12) hrs += 12;
     if (period === 'AM' && hrs === 12) hrs = 0;
-    
+
     date.setHours(hrs, minutes, 0, 0);
     onChange?.(date);
     setIsOpen(false);
@@ -451,9 +451,12 @@ export default function TimePicker({
   const minutesArray = Array.from({ length: 12 }, (_, i) => i * 5);
 
   // Check if a number is under the dial selector container (for color change to text-on-primary)
-  const isNumberUnderSelectorContainer = (numberValue: number, isHourMode: boolean) => {
+  const isNumberUnderSelectorContainer = (
+    numberValue: number,
+    isHourMode: boolean,
+  ) => {
     if (isHourMode) {
-      return (numberValue % 12) === (hours % 12);
+      return numberValue % 12 === hours % 12;
     } else {
       // For minutes, check if the minute value is close to the current selection
       const selectedAngle = (minutes / 60) * 360;
@@ -479,6 +482,7 @@ export default function TimePicker({
               setMinutes(mins);
               setPeriod(hrs >= 12 ? 'PM' : 'AM');
             }
+            setMode('hours'); // Always start with hours mode
             setIsOpen(true);
           }
         }}
@@ -514,9 +518,11 @@ export default function TimePicker({
                   onKeyDown={handleHoursKeyDown}
                   inputRef={hoursInputRef}
                 />
-                
-                <span className='typescale-display-large !font-normal text-on-surface'>:</span>
-                
+
+                <span className='typescale-display-large !font-normal text-on-surface'>
+                  :
+                </span>
+
                 {/* Time Selector Label - Minutes */}
                 <TimeSelectorLabel
                   value={minutes}
@@ -658,10 +664,10 @@ export default function TimePicker({
                       onMouseDown={e => {
                         e.stopPropagation();
                         e.preventDefault();
-                        
+
                         // Exit input editing mode
                         closeInputs();
-                        
+
                         setJustFinishedDrag(false);
                         setIsDragging(true);
                         const target = e.currentTarget.parentElement;
@@ -680,10 +686,10 @@ export default function TimePicker({
                       }}
                       onClick={e => {
                         e.stopPropagation();
-                        
+
                         // Exit input editing mode
                         closeInputs();
-                        
+
                         if (!justFinishedDrag) {
                           handleHourSelect(hour);
                         }
@@ -714,10 +720,10 @@ export default function TimePicker({
                       onMouseDown={e => {
                         e.stopPropagation();
                         e.preventDefault();
-                        
+
                         // Exit input editing mode
                         closeInputs();
-                        
+
                         setJustFinishedDrag(false);
                         setIsDragging(true);
                         const target = e.currentTarget.parentElement;
@@ -736,10 +742,10 @@ export default function TimePicker({
                       }}
                       onClick={e => {
                         e.stopPropagation();
-                        
+
                         // Exit input editing mode
                         closeInputs();
-                        
+
                         if (!justFinishedDrag) {
                           handleMinuteSelect(minute);
                         }
@@ -772,4 +778,3 @@ export default function TimePicker({
     </>
   );
 }
-
