@@ -48,7 +48,7 @@
   .typescale-display-large,
   .typescale-display-medium,
   .typescale-display-small {
-    @apply font-inter;
+    @apply font-space-grotesk;
     font-weight: 800;
   }
   .typescale-display-large {
