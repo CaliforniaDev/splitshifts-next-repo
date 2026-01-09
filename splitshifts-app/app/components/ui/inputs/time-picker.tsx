@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Input } from '@/app/components/ui/inputs';
 import {
   Dialog,
@@ -46,6 +46,63 @@ const TRANSITION_STEPS = 20;
 const TRANSITION_DELAY = 50; // Delay before starting transition animation
 const DRAG_BLOCK_DURATION = 100;
 
+// Time Selector Label Component (editable hours/minutes display)
+interface TimeSelectorLabelProps {
+  value: number;
+  isActive: boolean;
+  isEditing: boolean;
+  tempValue: string;
+  onEdit: () => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur: () => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+}
+
+function TimeSelectorLabel({
+  value,
+  isActive,
+  isEditing,
+  tempValue,
+  onEdit,
+  onChange,
+  onBlur,
+  onKeyDown,
+  inputRef,
+}: TimeSelectorLabelProps) {
+  return (
+    <div
+      className={cn(
+        'typescale-display-large relative h-20 w-24 rounded-lg !font-normal transition-colors',
+        isActive
+          ? 'bg-primary-container text-on-primary-container border-primary border-solid border-2'
+          : 'bg-surface-container-highest text-on-surface-variant hover:text-on-surface',
+      )}
+    >
+      {isEditing ? (
+        <input
+          ref={inputRef}
+          type='text'
+          inputMode='numeric'
+          value={tempValue}
+          onChange={onChange}
+          onBlur={onBlur}
+          onKeyDown={onKeyDown}
+          autoFocus
+          className='h-full w-full rounded-lg bg-transparent text-center outline-none typescale-display-large !font-normal caret-primary'
+        />
+      ) : (
+        <button
+          onClick={onEdit}
+          className='h-full w-full rounded-lg text-center'
+        >
+          {String(value).padStart(2, '0')}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export default function TimePicker({
   label,
   value,
@@ -80,6 +137,27 @@ export default function TimePicker({
   });
   const [isDragging, setIsDragging] = useState(false);
   const [justFinishedDrag, setJustFinishedDrag] = useState(false);
+  const [editingHours, setEditingHours] = useState(false);
+  const [editingMinutes, setEditingMinutes] = useState(false);
+  const [tempHoursValue, setTempHoursValue] = useState('');
+  const [tempMinutesValue, setTempMinutesValue] = useState('');
+  
+  const hoursInputRef = useRef<HTMLInputElement>(null);
+  const minutesInputRef = useRef<HTMLInputElement>(null);
+
+  // Helper function to close any open inputs
+  const closeInputs = () => {
+    if (editingHours && hoursInputRef.current) {
+      hoursInputRef.current.blur();
+    }
+    if (editingMinutes && minutesInputRef.current) {
+      minutesInputRef.current.blur();
+    }
+    setEditingHours(false);
+    setEditingMinutes(false);
+    setTempHoursValue('');
+    setTempMinutesValue('');
+  };
 
   // Format time for display in input field
   const formatTime = () => {
@@ -120,6 +198,117 @@ export default function TimePicker({
     const t3 = t2 * t;
     
     return ay * t3 + by * t2 + cy * t;
+  };
+
+  // Handle hours input editing
+  const handleHoursClick = () => {
+    setEditingHours(true);
+    setTempHoursValue('');
+    setMode('hours');
+  };
+
+  const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ''); // Only digits
+    if (value.length <= 2) {
+      setTempHoursValue(value);
+      
+      // Auto-advance to minutes after 2 digits
+      if (value.length === 2) {
+        setTimeout(() => {
+          handleHoursBlur();
+          setEditingMinutes(true);
+          setTempMinutesValue('');
+          setMode('minutes');
+        }, 0);
+      }
+    }
+  };
+
+  const handleHoursBlur = () => {
+    if (tempHoursValue === '') {
+      // User didn't type anything, keep current value
+      setEditingHours(false);
+      return;
+    }
+    
+    let numValue = parseInt(tempHoursValue, 10);
+    
+    // Validate hours (1-12)
+    if (isNaN(numValue) || numValue < 1) {
+      numValue = 1;
+    } else if (numValue > 12) {
+      numValue = 12;
+    }
+    
+    setHours(numValue);
+    setEditingHours(false);
+    setTempHoursValue('');
+  };
+
+  const handleHoursKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      handleHoursBlur();
+      setEditingMinutes(true);
+      setTempMinutesValue('');
+      setMode('minutes');
+    }
+  };
+
+  // Handle minutes input editing
+  const handleMinutesClick = () => {
+    setEditingMinutes(true);
+    setTempMinutesValue('');
+    setMode('minutes');
+  };
+
+  const handleMinutesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ''); // Only digits
+    if (value.length <= 2) {
+      setTempMinutesValue(value);
+      
+      // Auto-complete after 2 digits
+      if (value.length === 2) {
+        // Use the current value directly to avoid state timing issues
+        let numValue = parseInt(value, 10);
+        if (isNaN(numValue) || numValue < 0) {
+          numValue = 0;
+        } else if (numValue > 59) {
+          numValue = 59;
+        }
+        setMinutes(numValue);
+        setEditingMinutes(false);
+        setTempMinutesValue('');
+      }
+    }
+  };
+
+  const handleMinutesBlur = () => {
+    if (tempMinutesValue === '') {
+      // User didn't type anything, keep current value
+      setEditingMinutes(false);
+      return;
+    }
+    
+    let numValue = parseInt(tempMinutesValue, 10);
+    
+    // Validate minutes (0-59)
+    if (isNaN(numValue) || numValue < 0) {
+      numValue = 0;
+    } else if (numValue > 59) {
+      numValue = 59;
+    }
+    
+    setMinutes(numValue);
+    setEditingMinutes(false);
+    setTempMinutesValue('');
+  };
+
+  const handleMinutesKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      handleMinutesBlur();
+    }
   };
 
   // Handle hour selection and transition to minutes mode
@@ -192,6 +381,10 @@ export default function TimePicker({
   // Start dragging
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    
+    // Exit input editing mode and blur inputs when interacting with dial
+    closeInputs();
+    
     setJustFinishedDrag(false);
     setIsDragging(true);
     handleClockInteraction(e);
@@ -274,7 +467,7 @@ export default function TimePicker({
     <>
       <Input
         label={label}
-        type="text"
+        type='text'
         value={formatTime()}
         onClick={() => {
           if (!disabled) {
@@ -300,49 +493,53 @@ export default function TimePicker({
       />
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-[320px]">
+        <DialogContent className='max-w-[320px]'>
           <DialogHeader>
             <DialogTitle>Select Time</DialogTitle>
           </DialogHeader>
 
-          <div className="flex flex-col gap-4 p-2">
+          <div className='flex flex-col gap-4 p-2'>
             {/* Time Display Header */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-baseline gap-2">
-                <button
-                  onClick={() => setMode('hours')}
-                  className={cn(
-                    'text-5xl font-normal transition-colors',
-                    mode === 'hours'
-                      ? 'text-on-primary-container bg-primary-container'
-                      : 'text-on-surface-variant hover:text-on-surface'
-                  )}
-                >
-                  {String(hours).padStart(2, '0')}
-                </button>
-                <span className="text-5xl text-on-surface-variant">:</span>
-                <button
-                  onClick={() => setMode('minutes')}
-                  className={cn(
-                    'text-5xl font-normal transition-colors',
-                    mode === 'minutes'
-                      ? 'text-primary'
-                      : 'text-on-surface-variant hover:text-on-surface'
-                  )}
-                >
-                  {String(minutes).padStart(2, '0')}
-                </button>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-baseline gap-2'>
+                {/* Time Selector Label - Hours */}
+                <TimeSelectorLabel
+                  value={hours}
+                  isActive={mode === 'hours'}
+                  isEditing={editingHours}
+                  tempValue={tempHoursValue}
+                  onEdit={handleHoursClick}
+                  onChange={handleHoursChange}
+                  onBlur={handleHoursBlur}
+                  onKeyDown={handleHoursKeyDown}
+                  inputRef={hoursInputRef}
+                />
+                
+                <span className='typescale-display-large !font-normal text-on-surface'>:</span>
+                
+                {/* Time Selector Label - Minutes */}
+                <TimeSelectorLabel
+                  value={minutes}
+                  isActive={mode === 'minutes'}
+                  isEditing={editingMinutes}
+                  tempValue={tempMinutesValue}
+                  onEdit={handleMinutesClick}
+                  onChange={handleMinutesChange}
+                  onBlur={handleMinutesBlur}
+                  onKeyDown={handleMinutesKeyDown}
+                  inputRef={minutesInputRef}
+                />
               </div>
 
               {/* AM/PM Toggle */}
-              <div className="flex flex-col gap-1">
+              <div className='flex flex-col gap-1'>
                 <button
                   onClick={() => handlePeriodToggle('AM')}
                   className={cn(
                     'rounded-lg px-3 py-1 text-sm font-medium transition-colors ease-emphasized-decelerate',
                     period === 'AM'
                       ? 'bg-primary text-on-primary'
-                      : 'text-on-surface-variant hover:bg-surface-container-highest'
+                      : 'text-on-surface-variant hover:bg-surface-container-highest',
                   )}
                 >
                   AM
@@ -353,7 +550,7 @@ export default function TimePicker({
                     'rounded-lg px-3 py-1 text-sm font-medium transition-colors ease-emphasized-decelerate',
                     period === 'PM'
                       ? 'bg-primary text-on-primary'
-                      : 'text-on-surface-variant hover:bg-surface-container-highest'
+                      : 'text-on-surface-variant hover:bg-surface-container-highest',
                   )}
                 >
                   PM
@@ -362,22 +559,25 @@ export default function TimePicker({
             </div>
 
             {/* Clock Face */}
-            <div 
-              className="relative h-[256px] w-[256px] mx-auto rounded-full bg-surface-container-highest cursor-pointer select-none"
+            <div
+              className='relative mx-auto h-[256px] w-[256px] cursor-pointer select-none rounded-full bg-surface-container-highest'
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
               onClick={handleClockInteraction}
             >
-              <svg className="absolute inset-0 pointer-events-none" viewBox={`0 0 ${CLOCK_DIAMETER} ${CLOCK_DIAMETER}`}>
+              <svg
+                className='pointer-events-none absolute inset-0'
+                viewBox={`0 0 ${CLOCK_DIAMETER} ${CLOCK_DIAMETER}`}
+              >
                 {/* Dial selector center */}
-                <circle 
-                  cx={CLOCK_CENTER} 
-                  cy={CLOCK_CENTER} 
-                  r={DIAL_SELECTOR_CENTER_RADIUS} 
-                  fill="currentColor" 
-                  className="text-primary" 
+                <circle
+                  cx={CLOCK_CENTER}
+                  cy={CLOCK_CENTER}
+                  r={DIAL_SELECTOR_CENTER_RADIUS}
+                  fill='currentColor'
+                  className='text-primary'
                 />
 
                 {/* Hours mode: Dial selector track and container */}
@@ -387,23 +587,31 @@ export default function TimePicker({
                     <line
                       x1={CLOCK_CENTER}
                       y1={CLOCK_CENTER}
-                      x2={getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).x}
-                      y2={getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).y}
-                      stroke="currentColor"
+                      x2={
+                        getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).x
+                      }
+                      y2={
+                        getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).y
+                      }
+                      stroke='currentColor'
                       strokeWidth={SELECTOR_TRACK_THICKNESS}
-                      className="text-primary"
+                      className='text-primary'
                     />
                     {/* Dial selector container */}
                     <circle
-                      cx={getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).x}
-                      cy={getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).y}
+                      cx={
+                        getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).x
+                      }
+                      cy={
+                        getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).y
+                      }
                       r={DIAL_SELECTOR_CONTAINER_RADIUS}
-                      fill="currentColor"
-                      className="text-primary"
+                      fill='currentColor'
+                      className='text-primary'
                     />
                   </>
                 )}
-                
+
                 {/* Minutes mode: Dial selector track and container */}
                 {mode === 'minutes' && (
                   <>
@@ -411,19 +619,27 @@ export default function TimePicker({
                     <line
                       x1={CLOCK_CENTER}
                       y1={CLOCK_CENTER}
-                      x2={getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).x}
-                      y2={getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).y}
-                      stroke="currentColor"
+                      x2={
+                        getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).x
+                      }
+                      y2={
+                        getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).y
+                      }
+                      stroke='currentColor'
                       strokeWidth={SELECTOR_TRACK_THICKNESS}
-                      className="text-primary"
+                      className='text-primary'
                     />
                     {/* Dial selector container */}
                     <circle
-                      cx={getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).x}
-                      cy={getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).y}
+                      cx={
+                        getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).x
+                      }
+                      cy={
+                        getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).y
+                      }
                       r={DIAL_SELECTOR_CONTAINER_RADIUS}
-                      fill="currentColor"
-                      className="text-primary"
+                      fill='currentColor'
+                      className='text-primary'
                     />
                   </>
                 )}
@@ -431,16 +647,21 @@ export default function TimePicker({
 
               {/* Hour numbers */}
               {mode === 'hours' &&
-                hoursArray.map((hour) => {
+                hoursArray.map(hour => {
                   const angle = getAngle(hour % 12, 12);
                   const pos = getPosition(angle, NUMBER_RADIUS);
-                  const isUnderSelectorContainer = isNumberUnderSelectorContainer(hour, true);
+                  const isUnderSelectorContainer =
+                    isNumberUnderSelectorContainer(hour, true);
                   return (
                     <button
                       key={hour}
-                      onMouseDown={(e) => {
+                      onMouseDown={e => {
                         e.stopPropagation();
                         e.preventDefault();
+                        
+                        // Exit input editing mode
+                        closeInputs();
+                        
                         setJustFinishedDrag(false);
                         setIsDragging(true);
                         const target = e.currentTarget.parentElement;
@@ -452,19 +673,26 @@ export default function TimePicker({
                           const y = e.clientY - rect.top - centerY;
                           let angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
                           if (angle < 0) angle += 360;
-                          const calculatedHour = Math.round((angle / 360) * 12) || 12;
+                          const calculatedHour =
+                            Math.round((angle / 360) * 12) || 12;
                           setHours(calculatedHour);
                         }
                       }}
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
+                        
+                        // Exit input editing mode
+                        closeInputs();
+                        
                         if (!justFinishedDrag) {
                           handleHourSelect(hour);
                         }
                       }}
                       className={cn(
-                        "absolute flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full typescale-body-large transition-all duration-200",
-                        isUnderSelectorContainer ? "text-on-primary" : "text-on-surface"
+                        'typescale-body-large absolute flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-all duration-200',
+                        isUnderSelectorContainer
+                          ? 'text-on-primary'
+                          : 'text-on-surface',
                       )}
                       style={{ left: pos.x, top: pos.y }}
                     >
@@ -475,16 +703,21 @@ export default function TimePicker({
 
               {/* Minute numbers */}
               {mode === 'minutes' &&
-                minutesArray.map((minute) => {
+                minutesArray.map(minute => {
                   const angle = getAngle(minute / 5, 12);
                   const pos = getPosition(angle, NUMBER_RADIUS);
-                  const isUnderSelectorContainer = isNumberUnderSelectorContainer(minute, false);
+                  const isUnderSelectorContainer =
+                    isNumberUnderSelectorContainer(minute, false);
                   return (
                     <button
                       key={minute}
-                      onMouseDown={(e) => {
+                      onMouseDown={e => {
                         e.stopPropagation();
                         e.preventDefault();
+                        
+                        // Exit input editing mode
+                        closeInputs();
+                        
                         setJustFinishedDrag(false);
                         setIsDragging(true);
                         const target = e.currentTarget.parentElement;
@@ -496,19 +729,26 @@ export default function TimePicker({
                           const y = e.clientY - rect.top - centerY;
                           let angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
                           if (angle < 0) angle += 360;
-                          const calculatedMinute = Math.floor((angle / 360) * 60) % 60;
+                          const calculatedMinute =
+                            Math.floor((angle / 360) * 60) % 60;
                           setMinutes(calculatedMinute);
                         }
                       }}
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
+                        
+                        // Exit input editing mode
+                        closeInputs();
+                        
                         if (!justFinishedDrag) {
                           handleMinuteSelect(minute);
                         }
                       }}
                       className={cn(
-                        "absolute flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full typescale-body-large transition-all duration-200",
-                        isUnderSelectorContainer ? "text-on-primary" : "text-on-surface"
+                        'typescale-body-large absolute flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-all duration-200',
+                        isUnderSelectorContainer
+                          ? 'text-on-primary'
+                          : 'text-on-surface',
                       )}
                       style={{ left: pos.x, top: pos.y }}
                     >
@@ -520,10 +760,10 @@ export default function TimePicker({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="text" onClick={handleCancel}>
+            <Button type='button' variant='text' onClick={handleCancel}>
               Cancel
             </Button>
-            <Button type="button" variant="text" onClick={handleConfirm}>
+            <Button type='button' variant='text' onClick={handleConfirm}>
               OK
             </Button>
           </DialogFooter>
