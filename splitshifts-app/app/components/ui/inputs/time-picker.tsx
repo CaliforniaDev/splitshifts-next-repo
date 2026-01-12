@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Input } from '@/app/components/ui/inputs';
 import {
   Dialog,
@@ -11,6 +11,13 @@ import {
 } from '@/app/components/ui/dialog';
 import { Button } from '@/app/components/ui/buttons';
 import { cn } from '@/app/lib/utils';
+import {
+  useRipple,
+  RippleEffect,
+  RippleKeyframes,
+  RIPPLE_DEFAULTS,
+  type RippleConfig,
+} from '@/app/lib/utils/ripple';
 
 interface TimePickerProps {
   label: string;
@@ -46,8 +53,8 @@ const TRANSITION_STEPS = 20;
 const TRANSITION_DELAY = 50; // Delay before starting transition animation
 const DRAG_BLOCK_DURATION = 100;
 
-// Time Selector Label Component (editable hours/minutes display)
-interface TimeSelectorLabelProps {
+// Time Selector Component (editable hours/minutes display)
+interface TimeSelectorProps {
   value: number;
   isActive: boolean;
   isEditing: boolean;
@@ -59,7 +66,7 @@ interface TimeSelectorLabelProps {
   inputRef: React.RefObject<HTMLInputElement | null>;
 }
 
-function TimeSelectorLabel({
+function TimeSelector({
   value,
   isActive,
   isEditing,
@@ -69,13 +76,14 @@ function TimeSelectorLabel({
   onBlur,
   onKeyDown,
   inputRef,
-}: TimeSelectorLabelProps) {
+}: TimeSelectorProps) {
+
   return (
     <div
       className={cn(
-        'typescale-display-large relative h-20 w-24 rounded-lg !font-normal transition-colors',
+        'typescale-display-large h-20 w-24 rounded-lg !font-normal transition-colors overflow-hidden',
         isActive
-          ? 'border-2 border-solid border-primary bg-primary-container text-on-primary-container'
+          ? 'bg-primary-container text-on-primary-container'
           : 'bg-surface-container-highest text-on-surface-variant hover:text-on-surface',
       )}
     >
@@ -89,16 +97,125 @@ function TimeSelectorLabel({
           onBlur={onBlur}
           onKeyDown={onKeyDown}
           autoFocus
-          className='typescale-display-large h-full w-full rounded-lg bg-transparent text-center !font-normal caret-primary outline-none'
+          className='typescale-display-large h-20 w-24 rounded-lg bg-transparent text-center !font-normal caret-primary outline-none'
         />
       ) : (
         <button
           onClick={onEdit}
-          className='h-full w-full rounded-lg text-center'
+          className='h-20 w-24 rounded-lg text-center outline-none focus:border-[3px] focus:border-solid focus:border-secondary relative overflow-hidden before:absolute before:inset-0 before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 before:bg-current'
         >
           {String(value).padStart(2, '0')}
         </button>
       )}
+    </div>
+  );
+}
+
+// Period Selector Component (AM/PM toggle)
+interface PeriodSelectorProps {
+  period: Period;
+  onToggle: (period: Period) => void;
+}
+
+function PeriodSelector({ period, onToggle }: PeriodSelectorProps) {
+  const rippleConfigAM: RippleConfig = {
+    color: 'currentColor',
+    opacity: 0.2,
+    disabled: false,
+  };
+
+  const rippleConfigPM: RippleConfig = {
+    color: 'currentColor',
+    opacity: 0.2,
+    disabled: false,
+  };
+
+  const mergedConfigAM: Required<RippleConfig> = {
+    ...RIPPLE_DEFAULTS,
+    ...rippleConfigAM,
+  };
+
+  const mergedConfigPM: Required<RippleConfig> = {
+    ...RIPPLE_DEFAULTS,
+    ...rippleConfigPM,
+  };
+
+  const {
+    ripples: ripplesAM,
+    rippleRef: rippleRefAM,
+    handleMouseDown: handleMouseDownAM,
+    handleMouseUp: handleMouseUpAM,
+    removeRipple: removeRippleAM,
+  } = useRipple(rippleConfigAM);
+
+  const {
+    ripples: ripplesPM,
+    rippleRef: rippleRefPM,
+    handleMouseDown: handleMouseDownPM,
+    handleMouseUp: handleMouseUpPM,
+    removeRipple: removeRipplePM,
+  } = useRipple(rippleConfigPM);
+
+  return (
+    <div className='w-[52px] flex flex-col rounded-lg border border-outline'>
+      {/* Period Selector - AM */}
+      <button
+        ref={rippleRefAM as React.RefObject<HTMLButtonElement>}
+        onClick={() => onToggle('AM')}
+        onMouseDown={handleMouseDownAM}
+        onMouseUp={handleMouseUpAM}
+        onMouseLeave={handleMouseUpAM}
+        className={cn(
+          'flex-1 px-3 text-sm font-medium transition-colors ease-emphasized-decelerate rounded-t-lg outline-none relative overflow-hidden before:absolute before:inset-0 before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 focus:before:opacity-12',
+          period === 'AM'
+            ? 'bg-tertiary-container text-on-tertiary-container before:bg-on-tertiary-container'
+            : 'bg-surface-container-high text-on-surface-variant before:bg-on-surface-variant',
+        )}
+      >
+        <span className='relative z-10'>AM</span>
+
+        {ripplesAM.map(ripple => (
+          <RippleEffect
+            key={ripple.id}
+            {...ripple}
+            config={mergedConfigAM}
+            keyframeName='PeriodSelectorAM'
+            onComplete={() => removeRippleAM(ripple.id)}
+          />
+        ))}
+
+        <RippleKeyframes name='PeriodSelectorAM' config={mergedConfigAM} />
+      </button>
+      {/* Dividing line */}
+      <div className='h-px bg-outline' />
+      {/* Period Selector - PM */}
+      <button
+        ref={rippleRefPM as React.RefObject<HTMLButtonElement>}
+        onClick={() => onToggle('PM')}
+        onMouseDown={handleMouseDownPM}
+        onMouseUp={handleMouseUpPM}
+        onMouseLeave={handleMouseUpPM}
+        className={cn(
+          'flex-1 px-3 text-sm font-medium transition-colors ease-emphasized-decelerate rounded-b-lg outline-none relative overflow-hidden before:absolute before:inset-0 before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 focus:before:opacity-12',
+          period === 'PM'
+            ? 'bg-tertiary-container text-on-tertiary-container before:bg-on-tertiary-container'
+            : 'bg-surface-container-high text-on-surface-variant before:bg-on-surface-variant',
+        )}
+      >
+        <span className='relative z-10'>PM</span>
+
+        {ripplesPM.map(ripple => (
+          <RippleEffect
+            key={ripple.id}
+            {...ripple}
+            config={mergedConfigPM}
+            keyframeName='PeriodSelectorPM'
+            onComplete={() => removeRipplePM(ripple.id)}
+          />
+        ))}
+
+        <RippleKeyframes name='PeriodSelectorPM' config={mergedConfigPM} />
+      </button>
     </div>
   );
 }
@@ -497,17 +614,20 @@ export default function TimePicker({
       />
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className='max-w-[320px]'>
+        <DialogContent className='p-6 w-fit border-none'>
           <DialogHeader>
-            <DialogTitle>Select Time</DialogTitle>
+            <DialogTitle className='typescale-label-medium text-on-surface-variant'>
+              Select time
+            </DialogTitle>
           </DialogHeader>
 
-          <div className='flex flex-col gap-4 p-2'>
-            {/* Time Display Header */}
-            <div className='flex items-center justify-between'>
-              <div className='flex items-baseline gap-2'>
-                {/* Time Selector Label - Hours */}
-                <TimeSelectorLabel
+          <div className='flex flex-col mt-5'>
+            {/* Time Display Header - 80px wrapper */}
+            <div className='flex h-20 items-stretch gap-3'>
+              {/* Time Selectors */}
+              <div className='flex items-center'>
+                {/* Time Selector - Hours */}
+                <TimeSelector
                   value={hours}
                   isActive={mode === 'hours'}
                   isEditing={editingHours}
@@ -519,12 +639,13 @@ export default function TimePicker({
                   inputRef={hoursInputRef}
                 />
 
-                <span className='typescale-display-large !font-normal text-on-surface'>
+                {/* Time Selector Separator - 24px gap */}
+                <span className='typescale-display-large !font-normal text-on-surface w-6 text-center -translate-y-1'>
                   :
                 </span>
 
-                {/* Time Selector Label - Minutes */}
-                <TimeSelectorLabel
+                {/* Time Selector - Minutes */}
+                <TimeSelector
                   value={minutes}
                   isActive={mode === 'minutes'}
                   isEditing={editingMinutes}
@@ -537,36 +658,13 @@ export default function TimePicker({
                 />
               </div>
 
-              {/* AM/PM Toggle */}
-              <div className='flex flex-col gap-1'>
-                <button
-                  onClick={() => handlePeriodToggle('AM')}
-                  className={cn(
-                    'rounded-lg px-3 py-1 text-sm font-medium transition-colors ease-emphasized-decelerate',
-                    period === 'AM'
-                      ? 'bg-primary text-on-primary'
-                      : 'text-on-surface-variant hover:bg-surface-container-highest',
-                  )}
-                >
-                  AM
-                </button>
-                <button
-                  onClick={() => handlePeriodToggle('PM')}
-                  className={cn(
-                    'rounded-lg px-3 py-1 text-sm font-medium transition-colors ease-emphasized-decelerate',
-                    period === 'PM'
-                      ? 'bg-primary text-on-primary'
-                      : 'text-on-surface-variant hover:bg-surface-container-highest',
-                  )}
-                >
-                  PM
-                </button>
-              </div>
+              {/* Period Selector Container */}
+              <PeriodSelector period={period} onToggle={handlePeriodToggle} />
             </div>
 
             {/* Clock Face */}
             <div
-              className='relative mx-auto h-[256px] w-[256px] cursor-pointer select-none rounded-full bg-surface-container-highest'
+              className='relative mx-auto h-[256px] w-[256px] cursor-pointer select-none rounded-full bg-surface-container-highest mt-9'
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
@@ -765,7 +863,27 @@ export default function TimePicker({
             </div>
           </div>
 
-          <DialogFooter>
+          {/* Keyboard Icon - Bottom Left Corner */}
+          <button
+            type='button'
+            className='absolute bottom-6 left-6 flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant outline-none overflow-hidden before:absolute before:inset-0 before:rounded-full before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 focus:before:opacity-12 before:bg-current'
+            aria-label='Toggle keyboard input'
+          >
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              viewBox='0 0 24 24'
+              fill='currentColor'
+              className='h-6 w-6'
+            >
+              <path
+                fillRule='evenodd'
+                d='M2.25 6a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V6Zm3.97.97a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1 0 1.06l-2.25 2.25a.75.75 0 0 1-1.06-1.06l1.72-1.72-1.72-1.72a.75.75 0 0 1 0-1.06Zm4.28 4.28a.75.75 0 0 0 0 1.5h5.25a.75.75 0 0 0 0-1.5H10.5Z'
+                clipRule='evenodd'
+              />
+            </svg>
+          </button>
+
+          <DialogFooter className='mt-6'>
             <Button type='button' variant='text' onClick={handleCancel}>
               Cancel
             </Button>
