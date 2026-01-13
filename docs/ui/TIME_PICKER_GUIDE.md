@@ -55,20 +55,23 @@ interface TimePickerProps {
 ### 0. Sub-Components
 
 **TimeSelector Component**: Displays and edits hours or minutes (80px × 96px)
-- Dual mode: button view (default) and input view (when clicked)
-- Hover state: 8% opacity overlay on button
-- Focus state: 3px secondary border
+- Unified component: Container div wraps input, manages focus states
+- Input always present but readonly when not editing
+- Hover state: 8% opacity overlay (only when inactive)
+- Focus state: 3px secondary border (inset shadow, no text shifting)
 - Active state: Primary container background
 - Inactive state: Surface container highest background
+- Ripple effects: Available but currently disabled for time selectors
+- Focus management: Container focusable when not editing (tabIndex=0), input focusable when editing
 
 **PeriodSelector Component**: AM/PM toggle buttons (52px wide)
-- Two vertically stacked buttons with outline border
-- Ripple effects on click (0.2 opacity, currentColor)
+- Two vertically stacked buttons with 1px outline border
+- Ripple effects on click (0.2 opacity, currentColor, separate instances per button)
 - Active state: Tertiary container background
-- Inactive state: Surface container high background
+- Inactive state: Surface container high background  
 - Hover state: 8% opacity overlay
-- Focus state: 12% opacity overlay
-- 1px divider line between buttons
+- Focus state: 3px secondary outline border (outside, with 2px offset and z-10)
+- 1px divider line between buttons (bg-outline)
 
 ### 1. Time Modes
 
@@ -410,19 +413,27 @@ typescale-label-medium           /* Dialog title "Select time" */
 
 ### Interaction States
 
-**TimeSelector (Hour/Minute Buttons):**
-- Default: Transparent background
-- Hover: 8% opacity overlay (`hover:before:opacity-8`)
-- Focus: 3px secondary border (`focus:border-[3px] focus:border-secondary`)
+**TimeSelector (Hour/Minute Inputs):**
+- Default: Surface container highest background
+- Hover: 8% opacity overlay (`hover:before:opacity-8`) - only when inactive
+- Focus: 3px secondary border via inset shadow (`focus-within:shadow-[inset_0_0_0_3px_#535F70]`)
+  - No text shifting - uses box-shadow instead of border
+  - No overlay on focus (only on hover)
 - Active: Primary container background
-- No ripple effects
+- Container: Focusable when not editing (`tabIndex={!isEditing ? 0 : -1}`)
+- Input: Focusable only when editing (`tabIndex={isEditing ? 0 : -1}`)
+- Ripple effects: System integrated but disabled (`disabled: isEditing`)
 
 **PeriodSelector (AM/PM Toggles):**
 - Default: Surface container high background (inactive)
-- Hover: 8% opacity overlay
-- Focus: 12% opacity overlay
+- Hover: 8% opacity overlay (`hover:before:opacity-8`)
+- Focus: 3px secondary outline border (`focus-visible:outline-[3px] focus-visible:outline-secondary`)
+  - Outside border with 2px offset (`outline-offset-2`)
+  - Elevated on focus (`focus-visible:z-10`) to appear in front
+  - Only on keyboard focus, not mouse click (`focus-visible`)
 - Active: Tertiary container background
-- Ripple: 0.2 opacity, currentColor, custom keyframes per button
+- Ripple: 0.2 opacity, currentColor, separate instances per button (AM/PM)
+  - Unique keyframe names: `PeriodSelectorAM`, `PeriodSelectorPM`
 
 ### Custom Transitions
 
