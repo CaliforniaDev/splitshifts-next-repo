@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Input } from '@/app/components/ui/inputs';
 import {
   Dialog,
@@ -64,6 +64,7 @@ interface TimeSelectorProps {
   onBlur: () => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   inputRef: React.RefObject<HTMLInputElement | null>;
+  rippleKeyframeName: string;
 }
 
 function TimeSelector({
@@ -76,37 +77,108 @@ function TimeSelector({
   onBlur,
   onKeyDown,
   inputRef,
+  rippleKeyframeName,
 }: TimeSelectorProps) {
+  const rippleConfig: RippleConfig = {
+    color: 'currentColor',
+    opacity: 0.1,
+    disabled: isEditing,
+  };
+
+  const mergedConfig: Required<RippleConfig> = {
+    ...RIPPLE_DEFAULTS,
+    ...rippleConfig,
+    disabled: isEditing,
+  };
+
+  const { ripples, rippleRef, handleMouseDown, handleMouseUp, removeRipple } =
+    useRipple(rippleConfig);
+
+  useEffect(() => {
+    if (!isEditing) return;
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing, inputRef]);
+
+  const handleFocus = () => {
+    if (!isEditing) {
+      onEdit();
+    }
+  };
+
+  const handleKeyDownInternal = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (!isEditing) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onEdit();
+      }
+      return;
+    }
+    onKeyDown(e);
+  };
+
+  const handleMouseDownInternal = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isEditing) return;
+    handleMouseDown(e as React.MouseEvent<HTMLElement>);
+  };
+
+  const displayValue = isEditing ? tempValue : String(value).padStart(2, '0');
 
   return (
     <div
+      ref={rippleRef as React.RefObject<HTMLDivElement>}
+      onMouseDown={handleMouseDownInternal}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      onClick={!isEditing ? onEdit : undefined}
+      onKeyDown={!isEditing ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onEdit();
+        }
+      } : undefined}
+      tabIndex={!isEditing ? 0 : -1}
       className={cn(
-        'typescale-display-large h-20 w-24 rounded-lg !font-normal transition-colors overflow-hidden',
+        'typescale-display-large h-20 w-24 rounded-lg !font-normal transition-colors overflow-hidden relative outline-none before:absolute before:inset-0 before:transition-all before:duration-200 before:opacity-0 before:bg-current before:z-[1]',
         isActive
           ? 'bg-primary-container text-on-primary-container'
           : 'bg-surface-container-highest text-on-surface-variant hover:text-on-surface',
+        isEditing ? 'cursor-text' : 'cursor-pointer',
+        'focus-within:shadow-[inset_0_0_0_3px_#535F70]',
+        !isActive && 'hover:before:opacity-8',
       )}
     >
-      {isEditing ? (
-        <input
-          ref={inputRef}
-          type='text'
-          inputMode='numeric'
-          value={tempValue}
-          onChange={onChange}
-          onBlur={onBlur}
-          onKeyDown={onKeyDown}
-          autoFocus
-          className='typescale-display-large h-20 w-24 rounded-lg bg-transparent text-center !font-normal caret-primary outline-none'
+      <input
+        ref={inputRef}
+        type='text'
+        inputMode='numeric'
+        value={displayValue}
+        onChange={onChange}
+        onBlur={onBlur}
+        onKeyDown={handleKeyDownInternal}
+        readOnly={!isEditing}
+        tabIndex={isEditing ? 0 : -1}
+        className={cn(
+          'typescale-display-large h-20 w-24 rounded-lg bg-transparent text-center !font-normal outline-none relative z-[2]',
+          isEditing ? 'caret-primary cursor-text' : 'caret-transparent cursor-pointer',
+        )}
+      />
+
+      {ripples.map(ripple => (
+        <RippleEffect
+          key={ripple.id}
+          {...ripple}
+          config={mergedConfig}
+          keyframeName={rippleKeyframeName}
+          onComplete={() => removeRipple(ripple.id)}
         />
-      ) : (
-        <button
-          onClick={onEdit}
-          className='h-20 w-24 rounded-lg text-center outline-none focus:border-[3px] focus:border-solid focus:border-secondary relative overflow-hidden before:absolute before:inset-0 before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 before:bg-current'
-        >
-          {String(value).padStart(2, '0')}
-        </button>
-      )}
+      ))}
+
+      <RippleKeyframes name={rippleKeyframeName} config={mergedConfig} />
     </div>
   );
 }
@@ -120,13 +192,13 @@ interface PeriodSelectorProps {
 function PeriodSelector({ period, onToggle }: PeriodSelectorProps) {
   const rippleConfigAM: RippleConfig = {
     color: 'currentColor',
-    opacity: 0.2,
+    opacity: 0.1,
     disabled: false,
   };
 
   const rippleConfigPM: RippleConfig = {
     color: 'currentColor',
-    opacity: 0.2,
+    opacity: 0.1,
     disabled: false,
   };
 
@@ -166,7 +238,7 @@ function PeriodSelector({ period, onToggle }: PeriodSelectorProps) {
         onMouseUp={handleMouseUpAM}
         onMouseLeave={handleMouseUpAM}
         className={cn(
-          'flex-1 px-3 text-sm font-medium transition-colors ease-emphasized-decelerate rounded-t-lg outline-none relative overflow-hidden before:absolute before:inset-0 before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 focus:before:opacity-12',
+          'flex-1 px-3 text-sm font-medium transition-colors ease-emphasized-decelerate rounded-t-lg outline-none relative overflow-hidden before:absolute before:inset-0 before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-secondary focus-visible:outline-offset-2 focus-visible:z-10',
           period === 'AM'
             ? 'bg-tertiary-container text-on-tertiary-container before:bg-on-tertiary-container'
             : 'bg-surface-container-high text-on-surface-variant before:bg-on-surface-variant',
@@ -196,7 +268,7 @@ function PeriodSelector({ period, onToggle }: PeriodSelectorProps) {
         onMouseUp={handleMouseUpPM}
         onMouseLeave={handleMouseUpPM}
         className={cn(
-          'flex-1 px-3 text-sm font-medium transition-colors ease-emphasized-decelerate rounded-b-lg outline-none relative overflow-hidden before:absolute before:inset-0 before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 focus:before:opacity-12',
+          'flex-1 px-3 text-sm font-medium transition-colors ease-emphasized-decelerate rounded-b-lg outline-none relative overflow-hidden before:absolute before:inset-0 before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-secondary focus-visible:outline-offset-2 focus-visible:z-10',
           period === 'PM'
             ? 'bg-tertiary-container text-on-tertiary-container before:bg-on-tertiary-container'
             : 'bg-surface-container-high text-on-surface-variant before:bg-on-surface-variant',
@@ -600,6 +672,8 @@ export default function TimePicker({
               setPeriod(hrs >= 12 ? 'PM' : 'AM');
             }
             setMode('hours'); // Always start with hours mode
+            setEditingHours(false); // Start with hours focused but not editing
+            setEditingMinutes(false);
             setIsOpen(true);
           }
         }}
@@ -637,6 +711,7 @@ export default function TimePicker({
                   onBlur={handleHoursBlur}
                   onKeyDown={handleHoursKeyDown}
                   inputRef={hoursInputRef}
+                  rippleKeyframeName='TimeSelectorHours'
                 />
 
                 {/* Time Selector Separator - 24px gap */}
@@ -655,6 +730,7 @@ export default function TimePicker({
                   onBlur={handleMinutesBlur}
                   onKeyDown={handleMinutesKeyDown}
                   inputRef={minutesInputRef}
+                  rippleKeyframeName='TimeSelectorMinutes'
                 />
               </div>
 
