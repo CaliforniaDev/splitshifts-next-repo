@@ -3,6 +3,15 @@
 ## [Unreleased]
 
 ### Added
+- **Time Picker Component**: Custom time selector with 12-hour format, clock face dial, and editable inputs
+  - **Vertical Layout**: 24px dialog padding, 80px × 96px time selectors, 52px period selector
+  - **TimeSelector Sub-Component**: Dual-mode button/input with hover overlays (8% opacity) and focus borders (3px secondary, inset shadow)
+  - **PeriodSelector Sub-Component**: AM/PM toggle buttons with ripple effects (0.2 opacity) and keyboard navigation
+  - **Interaction States**: Hover overlays only on inactive selectors, focus borders without text shifting, no overlay on focus
+  - **Keyboard Navigation**: Tab focus without auto-editing, Enter/Space to activate editing mode
+  - **Clock Face Integration**: Interactive SVG dial with drag support and auto-transition animations
+  - **Precise Spacing**: 36px above clock, 24px below, 12px between sections, 24px separator width
+  - **Focus Management**: Container focusable when not editing, input focusable during editing
 - Implementation plan documentation with 5-phase MVP roadmap (`docs/IMPLEMENTATION_PLAN.md`)
   - Phase 1: Foundation & Core CRUD (Week 1-2, 60% complete)
   - Phase 2: Shift Assignment & Notifications (Week 3)
@@ -233,6 +242,10 @@
 - **Navigation Logic**: Refactored navigation rendering logic to use `pathname.startsWith()` instead of `pathname.includes()` for more precise route matching and better security.
 
 ### Fixed
+- Fix time selector ripple triggering after input blur by keeping the editable field stable and gating ripple to pointer edits.
+- Limit time selector focus outline to keyboard focus to avoid persistent border on pointer clicks.
+- Prevent time selector fields from auto-entering edit mode on dialog focus; editing now starts on click or Enter/Space.
+- Avoid auto-selecting time selector text on edit while still showing an editing outline state.
 - **Accessibility**: Improved accessibility features in form components and navigation elements.
 - **Peer Dependency Warnings**: Resolved peer dependency issues for `nodemailer` and other packages.
 - **Navigation on Auth Pages**: Removed navbar from authentication pages (login, signup, password-reset, update-password) while preserving it on other public pages for a cleaner authentication user experience.
