@@ -18,15 +18,16 @@ Custom time picker with 12-hour format, clock face dial, and editable inputs.
 - [ ] **Horizontal layout for landscape**: Responsive layout that switches based on viewport width/orientation
 
 ### Refactoring Backlog (After Features Complete)
-- [ ] **Extract time utilities** to `@/app/lib/utils/time.ts`:
+
+- [x] **Extract time utilities** to `@/app/lib/utils/time.ts` ✅ **COMPLETED**
   - `to12HourFormat()`, `to24HourFormat()`
   - `getPeriodFrom24Hour()`, `formatTime()`
   - `validateHours()`, `validateMinutes()`
   - `initializeTimeState()`, `createDateFromTime()`
   
-- [ ] **Group constants at top** of file:
-  - Clock constants (CLOCK_DIAMETER, CLOCK_CENTER, etc.)
-  - Animation constants (TRANSITION_DURATION, TRANSITION_STEPS, etc.)
+- [x] **Group constants at top** of file ✅ **COMPLETED**
+  - `CLOCK_CONSTANTS` object with geometry values
+  - `ANIMATION_CONSTANTS` object with timing values
 
 - [ ] **Evaluate useTimeInput hook** (after input-only mode):
   - Only if duplication becomes clear problem
@@ -43,6 +44,15 @@ Custom time picker with 12-hour format, clock face dial, and editable inputs.
   - Keep co-located until feature set is complete
 
 ## Recent Changes
+
+### Refactoring (Latest)
+- ✅ **Extracted time utilities** to `app/lib/utils/time.ts`
+  - Pure functions for conversion, validation, and formatting
+  - Type-safe Period type exported for reuse
+  - Comprehensive JSDoc documentation with examples
+- ✅ **Grouped constants** into organized objects
+  - `CLOCK_CONSTANTS`: Geometry values (diameter, center, radius, etc.)
+  - `ANIMATION_CONSTANTS`: Timing values (duration, steps, delay, etc.)
 
 ### Interaction State Refinements
 - Time selectors: 8% hover overlay, 3px secondary focus border (inset shadow)
