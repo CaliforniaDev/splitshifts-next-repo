@@ -3,6 +3,22 @@
 ## [Unreleased]
 
 ### Added
+
+- **SelectMenu Enhancements**: Material Design 3 compliant dropdown with advanced interactions
+  - **Spring Animations**: Custom `expressive-fast-spatial` cubic-bezier (0.42, 1.67, 0.21, 0.9) for bouncy menu transitions
+  - **Checkmark Icon**: Visual indicator for selected items with synchronized slide-in animation
+  - **Keyboard Navigation**: Full arrow-key support with centered auto-scroll and 10% overlay for active items
+  - **Rounded Scrollbar**: 8px width with rounded track and thumb matching menu border-radius
+  - **Menu Expansion**: ScaleY growth animation from top/bottom origin for natural opening effect
+  - **Keyboard-Only Focus**: Overlay only appears during arrow key navigation, not mouse clicks
+- **Button Active States**: Border radius transition on both keyboard and mouse press
+  - **Mouse Press Tracking**: Added state management for click interactions
+  - **Keyboard Press Tracking**: Enhanced Enter/Space key handling with visual feedback
+  - **Exported Constants**: `ACTIVE_BORDER_RADIUS` object for size-specific border values
+- **Ripple Keyboard Support**: Added keyboard interaction handlers to ripple effect system
+  - **handleKeyDown/handleKeyUp**: New handlers in useRipple hook for Enter/Space keys
+  - **Centered Ripples**: Keyboard-triggered ripples originate from element center
+  - **Repeat Protection**: Prevents ripple spam when keys are held down
 - **Time Picker Component**: Custom time selector with 12-hour format, clock face dial, and editable inputs
   - **Vertical Layout**: 24px dialog padding, 80px × 96px time selectors, 52px period selector
   - **TimeSelector Sub-Component**: Dual-mode button/input with hover overlays (8% opacity) and focus borders (3px secondary, inset shadow)
@@ -224,17 +240,18 @@
   - **Password Reset Actions**: Token generation, email sending, and password update functionality
   - **2FA Actions**: Enable/disable 2FA, secret generation, and QR code creation
   - **Session Management**: Login/logout actions with NextAuth.js integration
-- **Authentication UI Components**: 
+- **Authentication UI Components**:
   - **OTP Input**: Specialized 6-digit OTP input component with accessible design
   - **Logout Button**: Reusable logout button component with proper error handling
   - **Authentication Cards**: Consistent card-based design for all auth forms
   - **Success/Error States**: User feedback components for authentication flows
-- **Enhanced Authentication Components**: 
+- **Enhanced Authentication Components**:
   - **TOTP Forms**: Dedicated OTP input and validation components with real-time verification
   - **Authentication Hooks**: Custom hooks for managing form state and validation logic across all auth forms
 - **AppNavigation Component**: Implemented a smart navigation component (`app-navigation.tsx`) that conditionally renders the navbar based on the current route, automatically hiding navigation on authentication pages while preserving it on other public pages.
 
 ### Changed
+
 - Extracted shared Tailwind CSS styles for `Button` and `LinkButton` components into a separate file (`buttonStyles.ts`) to ensure consistency and reusability across both components.
 - **Folder Structure**: Organized the app into `(public)` and `(logged-in)` sections for better separation of concerns.
 - **Component Refactoring**: Improved the structure and readability of reusable components like `Button` and `Input` (migrated from TextField for better consistency).
@@ -242,6 +259,10 @@
 - **Navigation Logic**: Refactored navigation rendering logic to use `pathname.startsWith()` instead of `pathname.includes()` for more precise route matching and better security.
 
 ### Fixed
+
+- Align SelectMenu check icon beside the option label within menu items.
+- Match SelectMenu focus styling to Input with label color and underline animation on keyboard focus.
+- Restore SelectMenu arrow-key navigation and active item highlighting when navigating options.
 - Fix time selector ripple triggering after input blur by keeping the editable field stable and gating ripple to pointer edits.
 - Limit time selector focus outline to keyboard focus to avoid persistent border on pointer clicks.
 - Prevent time selector fields from auto-entering edit mode on dialog focus; editing now starts on click or Enter/Space.
@@ -253,6 +274,7 @@
 - **Two-Factor Authentication Flow**: Resolved multi-step authentication flow with proper state management and validation.
 
 ### Security
+
 - **Secure Route Matching**: Implemented defensive programming practices in navigation component to prevent accidental navbar hiding on non-authentication pages with similar path segments.
 - **Two-Factor Authentication**: Enhanced security with TOTP-based 2FA system providing additional protection layer for user accounts.
 - **OTP Validation**: Secure 6-digit OTP validation with time-based expiration and rate limiting considerations.
