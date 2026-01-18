@@ -116,6 +116,7 @@ const config: Config = {
       transitionTimingFunction: {
         emphasized: 'cubic-bezier(0.2, 0, 0, 1)',
         'emphasized-decelerate': 'cubic-bezier(0.05, 0.7, 0.1, 1)',
+        'expressive-fast-spatial': 'cubic-bezier(0.42, 1.67, 0.21, 0.9)',
       },
       keyframes: {
         'caret-blink': {
@@ -171,11 +172,13 @@ const config: Config = {
         'dropdown-fade-in': {
           '0%': {
             opacity: '0',
-            transform: 'translateY(-8px) scaleY(0.95)',
+            transform: 'scaleY(0)',
+            transformOrigin: 'top',
           },
           '100%': {
             opacity: '1',
-            transform: 'translateY(0) scaleY(1)',
+            transform: 'scaleY(1)',
+            transformOrigin: 'top',
           },
         },
         'dropdown-fade-out': {
@@ -191,11 +194,31 @@ const config: Config = {
         'dropdown-fade-in-up': {
           '0%': {
             opacity: '0',
-            transform: 'translateY(8px) scaleY(0.95)',
+            transform: 'scaleY(0)',
+            transformOrigin: 'bottom',
           },
           '100%': {
             opacity: '1',
-            transform: 'translateY(0) scaleY(1)',
+            transform: 'scaleY(1)',
+            transformOrigin: 'bottom',
+          },
+        },
+        'slide-in-left': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateX(-8px)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateX(0)',
+          },
+        },
+        'slide-right': {
+          '0%': {
+            transform: 'translateX(-20px)',
+          },
+          '100%': {
+            transform: 'translateX(0)',
           },
         },
       },
@@ -211,11 +234,15 @@ const config: Config = {
         'dialog-scale-out':
           'dialog-scale-out 0.2s cubic-bezier(0.36, 0.66, 0.04, 1)',
         'dropdown-fade-in':
-          'dropdown-fade-in 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+          'dropdown-fade-in 0.35s cubic-bezier(0.42, 1.67, 0.21, 0.9)',
         'dropdown-fade-in-up':
-          'dropdown-fade-in-up 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+          'dropdown-fade-in-up 0.35s cubic-bezier(0.42, 1.67, 0.21, 0.9)',
         'dropdown-fade-out':
           'dropdown-fade-out 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+        'slide-in-left':
+          'slide-in-left 0.2s cubic-bezier(0.05, 0.7, 0.1, 1) forwards',
+        'slide-right':
+          'slide-right 0.35s cubic-bezier(0.42, 1.67, 0.21, 0.9) forwards',
       },
     },
   },
