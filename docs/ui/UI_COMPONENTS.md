@@ -3,12 +3,17 @@
 This document provides detailed descriptions, usage examples, and styling information for the reusable UI components in the SplitShifts application.
 
 ## Table of Contents
+
 - [Button Component](#button-component)
   - [Props](#props)
   - [Example Usage](#example-usage)
 - [LinkButton Component](#linkbutton-component)
   - [Props](#props)
   - [Example Usage](#example-usage)
+- [SelectMenu Component](#selectmenu-component)
+  - [Props](#selectmenu-props)
+  - [Features](#selectmenu-features)
+  - [Example Usage](#selectmenu-example-usage)
 - [Input Component](#input-component)
   - [Props](#input-component-props)
   - [Example Usage](#input-component-example-usage)
@@ -16,7 +21,6 @@ This document provides detailed descriptions, usage examples, and styling inform
   - [Features](#authlayout-features)
   - [Usage](#authlayout-usage)
 - [Typography and Styling Guide](#typography-and-styling-guide)
-- [Additional Components](#additional-components)
 
 ---
 
@@ -24,7 +28,7 @@ This document provides detailed descriptions, usage examples, and styling inform
 
 The `Button` component is a reusable UI element that allows you to render buttons with various styles based on the `variant` prop and different sizes using the `size` prop. It also supports disabling the button and handling click events.
 
-### Props
+### LinkButton Props
 
 - **`variant`** (optional, `string`): Defines the style variant of the button. It can be one of the following:
   - `'elevated'`: Renders a button with an elevated shadow and background color from `surface-container-low`.
@@ -36,12 +40,19 @@ The `Button` component is a reusable UI element that allows you to render button
   **Default:** `'filled'`
 
 - **`size`** (optional, `string`): Defines the size of the button. It can be one of the following:
-  - `'default'`: Renders a button with standard padding and typographic scale.
-  - `'large'`: Renders a button with larger padding and a prominent typographic scale.
+  - `'xs'`: Extra small button (16px border radius, 8px active)
+  - `'small'`: Small button (20px border radius, 8px active)
+  - `'medium'`: Medium button (28px border radius, 12px active)
+  - `'large'`: Large button (48px border radius, 16px active)
+  - `'xl'`: Extra large button (68px border radius, 16px active)
 
-  **Default:** `'default'`
+  **Default:** `'small'`
 
 - **`disabled`** (optional, `boolean`): If `true`, the button will be disabled and non-interactive. The button will not trigger any click events.
+
+  **Default:** `false`
+
+- **`loading`** (optional, `boolean`): Shows a loading spinner and disables the button.
 
   **Default:** `false`
 
@@ -55,7 +66,29 @@ The `Button` component is a reusable UI element that allows you to render button
 
   **Default:** `'Button'`
 
-### Example Usage
+### Interactive States
+
+#### Active Border Radius
+
+- Border radius transitions to smaller value on press (300ms ease-out)
+- Works for both keyboard (Enter/Space) and mouse clicks
+- Size-specific values exported in `ACTIVE_BORDER_RADIUS` constant
+
+#### State Layers
+
+- **Hover**: 8% opacity overlay (via `before:` pseudo-element)
+- **Focus**: 10% opacity overlay (keyboard navigation only with `focus-visible`)
+- **Active**: Reduced border radius during press
+- **Ripple Effects**: GPU-accelerated ripple animations with keyboard support
+
+#### Keyboard Support
+
+- Enter/Space keys trigger button action
+- Centered ripple effects for keyboard interactions
+- Key repeat protection prevents ripple spam
+- Visual feedback matches mouse interactions
+
+### Button Example Usage
 
 Here are some examples of how to use the `Button` component in your application:
 
@@ -131,7 +164,7 @@ The `LinkButton` component is similar to the `Button` component but is used for 
 
 - **`rest`** (optional, `object`): Additional props that are passed to the underlying `Link` component from Next.js.
 
-### Example Usage
+### LinkButton Example Usage
 
 Here are some examples of how to use the `LinkButton` component in your application:
 
@@ -158,6 +191,103 @@ import LinkButton from '@/app/components/ui/buttons/LinkButton';
   Start for free
 </LinkButton>
 ```
+
+---
+
+## SelectMenu Component
+
+The `SelectMenu` component is a Material Design 3 compliant dropdown menu with advanced interactions, spring animations, and full keyboard navigation support.
+
+**Location**: `app/components/ui/inputs/select-menu.tsx`
+
+### SelectMenu Props
+
+- **`id`** (optional, `string`): Unique identifier for the select element.
+- **`label`** (required, `string`): The label text displayed above the select.
+- **`options`** (required, `SelectMenuOption[]`): Array of options with `value`, `label`, and optional `disabled` properties.
+- **`value`** (optional, `string`): Controlled component value.
+- **`defaultValue`** (optional, `string`): Uncontrolled component initial value.
+- **`placeholder`** (optional, `string`): Placeholder text shown when no value is selected.
+- **`name`** (optional, `string`): Form field name for form submissions.
+- **`error`** (optional, `boolean`): Shows error state with red border and label.
+- **`errorMessage`** (optional, `string`): Error message displayed below the select.
+- **`supportingText`** (optional, `string`): Helper text displayed below the select.
+- **`disabled`** (optional, `boolean`): Disables the select menu.
+- **`className`** (optional, `string`): Additional CSS classes.
+- **`onChange`** (optional, `(value: string) => void`): Callback fired when selection changes.
+- **`onBlur`** (optional, `(e: FocusEvent) => void`): Callback fired when select loses focus.
+
+### SelectMenu Features
+
+#### Spring Animations
+
+- Custom `expressive-fast-spatial` cubic-bezier (0.42, 1.67, 0.21, 0.9) timing function
+- Menu grows with scaleY animation from top/bottom origin (350ms duration)
+- Selected item checkmark slides in with synchronized animation
+- Smooth, bouncy feel matching Material Design 3 motion principles
+
+### Keyboard Navigation
+
+- **Arrow Keys**: Navigate through options (skips disabled items, wraps around)
+- **Enter/Space**: Select active option or open/close menu
+- **Escape**: Close menu and clear keyboard navigation state
+- **Active Overlay**: 10% opacity overlay appears only during keyboard navigation (not mouse clicks)
+- **Auto-scroll**: Active item automatically scrolls to center with smooth behavior
+
+### Visual Enhancements
+
+- **Checkmark Icon**: Visual indicator for selected items
+- **Rounded Scrollbar**: 8px width with rounded track and thumb matching menu border-radius
+- **Focus States**: Label turns primary color, underline animates on keyboard focus
+- **Smart Positioning**: Automatically opens upward or downward based on available space
+
+### Accessibility
+
+- Full ARIA attributes (`role="listbox"`, `aria-selected`, `aria-expanded`)
+- Keyboard-only focus indicators (overlay only on arrow navigation)
+- Screen reader support with proper labeling
+- Disabled option handling
+
+### SelectMenu Example Usage
+
+```tsx
+import SelectMenu from '@/app/components/ui/inputs/select-menu';
+
+const options = [
+  { value: 'option1', label: 'Option 1' },
+  { value: 'option2', label: 'Option 2', disabled: true },
+  { value: 'option3', label: 'Option 3' },
+];
+
+// Controlled SelectMenu
+<SelectMenu
+  label="Choose an option"
+  options={options}
+  value={selectedValue}
+  onChange={(value) => setSelectedValue(value)}
+  supportingText="Select one option from the list"
+/>
+
+// Uncontrolled SelectMenu with error state
+<SelectMenu
+  label="Required field"
+  options={options}
+  defaultValue="option1"
+  error={true}
+  errorMessage="This field is required"
+/>
+
+// With React Hook Form
+<SelectMenu
+  label="Status"
+  options={statusOptions}
+  {...register('status')}
+  error={!!errors.status}
+  errorMessage={errors.status?.message}
+/>
+```
+
+---
 
 ## Input Component
 
@@ -297,6 +427,7 @@ import AuthLayout, { AuthLayoutWide, AuthLayoutCompact } from '@/app/components/
 ```
 
 **Key Props:**
+
 - `imageSrc`: Custom image path (defaults to login side image)
 - `reverse`: Switch form and image sides
 - `showOverlay`: Control gradient overlay visibility
@@ -310,7 +441,7 @@ This section outlines the custom type scale defined using Tailwind CSS for consi
 
 ### Type Scale Overview
 
-- **Display Fonts:** 
+- **Display Fonts:**
   - Used for large, prominent text elements.
   - Font: **Inter**, Weight: **800**, with varying sizes (Large, Medium, Small).
 
@@ -332,7 +463,7 @@ This section outlines the custom type scale defined using Tailwind CSS for consi
 
 ### Tailwind's @layer Feature
 
-- **@layer base:** 
+- **@layer base:**
   - This layer is where the type scale classes are defined, applying the corresponding font family, weight, size, and letter spacing. It ensures typography remains consistent across all components in the application.
 
 ### Usage
@@ -393,11 +524,13 @@ export function MyFormModal({ isOpen, onClose }) {
 ```
 
 **Key Pattern:**
+
 - Always check modal/dialog open state before rendering Form components
 - Use `if (!isOpen) return null;` at component start
 - This ensures Form context is only accessed when Dialog portal is mounted
 
 **Related Components:**
+
 - `shift-form-modal.tsx` - Uses this pattern for shift creation
 - `management-modal.tsx` - Uses this pattern for organization management
 
@@ -412,4 +545,3 @@ The SplitShifts component library follows modern performance optimization patter
 - **Form Context Safety**: Early return guards prevent context errors in portal-rendered components
 
 These optimizations ensure consistent performance across the application while maintaining clean, maintainable code.
-
