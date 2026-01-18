@@ -16,6 +16,8 @@ import {
   type RippleConfig,
 } from '@/app/lib/utils/ripple';
 
+import { CheckIcon } from '@/app/components/ui/icons/check-icon';
+
 // Constants
 const DROPDOWN_MAX_HEIGHT = 260; // max-h-60 (240px) + padding/margin
 
@@ -165,7 +167,7 @@ const dropdownArrow = cva(
 );
 
 const menuVariants = cva(
-  'absolute z-50 w-full bg-surface-container rounded-[4px] shadow-elevation-2 max-h-60 overflow-y-auto',
+  'absolute z-50 w-full bg-surface-container-low text-on-surface rounded-2xl shadow-elevation-2 max-h-60 overflow-y-auto p-1 space-y-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-2xl [&::-webkit-scrollbar-thumb]:rounded-2xl [&::-webkit-scrollbar-thumb]:bg-outline-variant',
   {
     variants: {
       open: {
@@ -197,12 +199,16 @@ const menuVariants = cva(
 );
 
 const menuItemVariants = cva(
-  'relative px-4 py-3 cursor-pointer text-on-surface typescale-body-large transition-colors duration-200 ease-emphasized',
+  'relative p-3 border-radius cursor-pointer text-on-surface typescale-label-large transition-colors duration-200 ease-emphasized before:absolute before:inset-0 before:z-[1] before:transition-opacity before:duration-200 before:bg-current before:opacity-0',
   {
     variants: {
       selected: {
-        true: 'bg-secondary-container',
-        false: 'hover:bg-on-surface/8',
+        true: 'bg-tertiary-container text-on-tertiary-container hover:before:opacity-8 rounded-xl',
+        false: 'rounded hover:bg-on-surface/8',
+      },
+      active: {
+        true: 'before:opacity-8', // Show overlay when navigating with arrow keys
+        false: null,
       },
       disabled: {
         true: 'opacity-[0.38] cursor-not-allowed pointer-events-none',
@@ -211,6 +217,7 @@ const menuItemVariants = cva(
     },
     defaultVariants: {
       selected: false,
+      active: false,
       disabled: false,
     },
   },
@@ -225,8 +232,10 @@ export interface SelectMenuOption {
 const MenuItem: React.FC<{
   option: SelectMenuOption;
   isSelected: boolean;
+  isActive: boolean;
+  id?: string;
   onSelect: (value: string) => void;
-}> = ({ option, isSelected, onSelect }) => {
+}> = ({ option, isSelected, isActive, id, onSelect }) => {
   const rippleConfig: RippleConfig = {
     color: 'currentColor',
     opacity: 0.1,
@@ -263,12 +272,14 @@ const MenuItem: React.FC<{
   return (
     <div
       ref={rippleRef as React.RefObject<HTMLDivElement>}
+      id={id}
       role='option'
       aria-selected={isSelected}
       aria-disabled={option.disabled}
       className={cn(
         menuItemVariants({
           selected: isSelected,
+          active: isActive,
           disabled: option.disabled,
         }),
         'overflow-hidden',
@@ -279,7 +290,18 @@ const MenuItem: React.FC<{
       onClick={handleClick}
       onKeyDown={handleKeyDown}
     >
-      <span className='relative z-10'>{option.label}</span>
+      <div 
+        key={isSelected ? 'selected' : 'unselected'}
+        className={cn(
+          'relative z-[2] flex items-center gap-2',
+          isSelected && 'animate-slide-right'
+        )}
+      >
+        {isSelected ? (
+          <CheckIcon className='h-5 w-5 text-current' />
+        ) : null}
+        <span>{option.label}</span>
+      </div>
 
       {ripples.map(ripple => (
         <RippleEffect
@@ -335,11 +357,14 @@ export default function SelectMenu({
   ...props
 }: SelectMenuProps & { 'data-testid'?: string }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [selectedValue, setSelectedValue] = useState<string>(
     defaultValue || value || '',
   );
   const [dropdownDirection, setDropdownDirection] = useState<'down' | 'up'>('down');
   const containerRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   
   // Extract ref from props if it exists (from React Hook Form)
   // Type assertion needed because ref can be callback or object, and props typing doesn't expose it
@@ -358,6 +383,8 @@ export default function SelectMenu({
   const isControlled = value !== undefined;
   const currentValue = isControlled ? value : selectedValue;
   const hasValue = Boolean(currentValue);
+  const isActive = isOpen || isFocused;
+  const selectedIndex = options.findIndex(option => option.value === currentValue);
   const generatedId = useId();
   const selectId = id || generatedId;
 
@@ -391,6 +418,21 @@ export default function SelectMenu({
     };
   }, [isOpen]);
 
+  // Auto-scroll active item into view with extra padding
+  useEffect(() => {
+    if (activeIndex !== null && menuRef.current) {
+      const activeElement = menuRef.current.querySelector(
+        `[id="${selectId}-option-${activeIndex}"]`
+      ) as HTMLElement;
+      if (activeElement) {
+        activeElement.scrollIntoView({
+          block: 'center',
+          behavior: 'smooth',
+        });
+      }
+    }
+  }, [activeIndex, selectId]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!isOpen) return;
@@ -398,6 +440,7 @@ export default function SelectMenu({
       switch (event.key) {
         case 'Escape':
           setIsOpen(false);
+          setActiveIndex(null);
           break;
         case 'ArrowDown':
           event.preventDefault();
@@ -421,12 +464,37 @@ export default function SelectMenu({
     };
   }, [isOpen]);
 
+  const getNextEnabledIndex = (startIndex: number, direction: 1 | -1) => {
+    if (!options.length) return -1;
+    const normalizedStartIndex = startIndex < 0 ? (direction === 1 ? -1 : 0) : startIndex;
+
+    for (let i = 1; i <= options.length; i += 1) {
+      const index = (normalizedStartIndex + direction * i + options.length) % options.length;
+      if (!options[index]?.disabled) return index;
+    }
+
+    return -1;
+  };
+
+  const getInitialActiveIndex = () => {
+    if (selectedIndex >= 0 && !options[selectedIndex]?.disabled) {
+      return selectedIndex;
+    }
+
+    const firstEnabledIndex = getNextEnabledIndex(-1, 1);
+    return firstEnabledIndex >= 0 ? firstEnabledIndex : null;
+  };
+
   const handleToggle = () => {
     if (!disabled) {
       const willBeOpen = !isOpen;
       
       // Set open state first
       setIsOpen(willBeOpen);
+      // Don't set activeIndex on click - only keyboard navigation should set it
+      if (!willBeOpen) {
+        setActiveIndex(null);
+      }
       
       // Calculate dropdown direction when opening
       // Use requestAnimationFrame to ensure DOM has updated
@@ -489,13 +557,66 @@ export default function SelectMenu({
     }
 
     onChange?.(optionValue);
-    setIsOpen(false);
+    
+    // Delay closing to allow animation to complete (400ms animation + 100ms buffer)
+    setTimeout(() => {
+      setIsOpen(false);
+      setActiveIndex(null);
+    }, 500);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLDivElement>) => {
     if (!containerRef.current?.contains(e.relatedTarget as Node)) {
       setIsOpen(false);
+      setIsFocused(false);
+      setActiveIndex(null);
       onBlur?.(e);
+    }
+  };
+
+  const moveActiveIndex = (direction: 1 | -1) => {
+    const startIndex = activeIndex ?? selectedIndex;
+    const nextIndex = getNextEnabledIndex(startIndex, direction);
+    if (nextIndex >= 0) {
+      setActiveIndex(nextIndex);
+    }
+  };
+
+  const handleTriggerKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (disabled) return;
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!isOpen) {
+        handleToggle();
+        // Set initial active index only when using keyboard
+        setActiveIndex(getInitialActiveIndex());
+        return;
+      }
+      moveActiveIndex(e.key === 'ArrowDown' ? 1 : -1);
+      return;
+    }
+
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (!isOpen) {
+        handleToggle();
+        return;
+      }
+
+      if (activeIndex !== null && activeIndex >= 0) {
+        const option = options[activeIndex];
+        if (option && !option.disabled) {
+          handleSelect(option.value);
+        }
+      }
+      return;
+    }
+
+    if (e.key === 'Escape' && isOpen) {
+      e.preventDefault();
+      setIsOpen(false);
+      setActiveIndex(null);
     }
   };
 
@@ -518,9 +639,9 @@ export default function SelectMenu({
       <label
         htmlFor={selectId}
         className={labelVariants({
-          floating: isOpen || hasValue,
+          floating: isActive || hasValue,
           error: !!error && !disabled,
-          focused: isOpen,
+          focused: isActive,
           disabled: !!disabled,
         })}
       >
@@ -544,12 +665,8 @@ export default function SelectMenu({
             className,
           )}
           onClick={handleToggle}
-          onKeyDown={e => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              handleToggle();
-            }
-          }}
+          onFocus={() => setIsFocused(true)}
+          onKeyDown={handleTriggerKeyDown}
         >
           {displayValue}
         </div>
@@ -585,7 +702,7 @@ export default function SelectMenu({
           <div
             aria-hidden='true'
             className={animatedUnderline({
-              focused: isOpen,
+              focused: isActive,
               error: !!error,
             })}
           />
@@ -594,19 +711,22 @@ export default function SelectMenu({
         {!disabled && (
           <div
             aria-hidden='true'
-            className={hoverOverlay({ focused: isOpen })}
+            className={hoverOverlay({ focused: isActive })}
           ></div>
         )}
 
         <div
+          ref={menuRef}
           role='listbox'
           className={menuVariants({ open: isOpen, direction: dropdownDirection })}
         >
-          {options.map(option => (
+          {options.map((option, index) => (
             <MenuItem
               key={option.value}
+              id={`${selectId}-option-${index}`}
               option={option}
               isSelected={currentValue === option.value}
+              isActive={activeIndex === index}
               onSelect={handleSelect}
             />
           ))}
