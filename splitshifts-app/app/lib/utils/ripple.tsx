@@ -50,6 +50,8 @@ export interface UseRippleReturn {
   rippleRef: React.RefObject<HTMLElement | null>;
   handleMouseDown: (e: React.MouseEvent<HTMLElement>) => void;
   handleMouseUp: () => void;
+  handleKeyDown: (e: React.KeyboardEvent<HTMLElement>) => void;
+  handleKeyUp: (e: React.KeyboardEvent<HTMLElement>) => void;
   removeRipple: (id: number) => void;
 }
 
@@ -156,6 +158,43 @@ export const useRipple = (config?: RippleConfig): UseRippleReturn => {
     setRipples(prev => prev.map(ripple => ({ ...ripple, isReleased: true })));
   }, []);
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLElement>) => {
+      // Only trigger on Enter or Space
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      
+      // Ignore key repeat events (when key is held down)
+      if (e.repeat) return;
+      
+      // Disable ripple if config says so or if user prefers reduced motion
+      if (config?.disabled || prefersReducedMotion) return;
+
+      const rect = rippleRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      // Center the ripple for keyboard interactions
+      const x = rect.width / 2;
+      const y = rect.height / 2;
+      const size = calculateRippleSize(x, y, rect.width, rect.height);
+      const id = rippleIdRef.current++;
+
+      // Create ripple and keep it expanded until key is released
+      setRipples(prev => [...prev, { x, y, id, size, isReleased: false }]);
+    },
+    [config?.disabled, prefersReducedMotion],
+  );
+
+  const handleKeyUp = useCallback(
+    (e: React.KeyboardEvent<HTMLElement>) => {
+      // Only trigger on Enter or Space
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      
+      // Release all ripples (same as mouse up)
+      setRipples(prev => prev.map(ripple => ({ ...ripple, isReleased: true })));
+    },
+    [],
+  );
+
   const removeRipple = useCallback((id: number) => {
     setRipples(prev => prev.filter(ripple => ripple.id !== id));
   }, []);
@@ -165,6 +204,8 @@ export const useRipple = (config?: RippleConfig): UseRippleReturn => {
     rippleRef,
     handleMouseDown,
     handleMouseUp,
+    handleKeyDown,
+    handleKeyUp,
     removeRipple,
   };
 };
