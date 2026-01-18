@@ -18,6 +18,16 @@ import {
   RIPPLE_DEFAULTS,
   type RippleConfig,
 } from '@/app/lib/utils/ripple';
+import {
+  type Period,
+  initializeTimeState,
+  formatTime as formatTimeUtil,
+  validateHours,
+  validateMinutes,
+  createDateFromTime,
+  to12HourFormat,
+  getPeriodFrom24Hour,
+} from '@/app/lib/utils/time';
 
 interface TimePickerProps {
   label: string;
@@ -33,25 +43,26 @@ interface TimePickerProps {
 }
 
 type TimeMode = 'hours' | 'minutes';
-type Period = 'AM' | 'PM';
 
-// Clock face constants
-const CLOCK_DIAMETER = 256;
-const CLOCK_CENTER = CLOCK_DIAMETER / 2; // 128
-const DIAL_SELECTOR_CENTER_RADIUS = 4; // 8px diameter
-const DIAL_SELECTOR_CONTAINER_RADIUS = 24; // 48px diameter - the circle at end of track
-const NUMBER_BUTTON_SIZE = 48;
-const EDGE_GAP = 2;
-const SELECTOR_TRACK_THICKNESS = 2;
+// Clock geometry constants
+const CLOCK_CONSTANTS = {
+  DIAMETER: 256,
+  CENTER: 128, // DIAMETER / 2
+  DIAL_SELECTOR_CENTER_RADIUS: 4, // 8px diameter
+  DIAL_SELECTOR_CONTAINER_RADIUS: 24, // 48px diameter - circle at end of track
+  NUMBER_BUTTON_SIZE: 48,
+  NUMBER_RADIUS: 102, // CENTER - NUMBER_BUTTON_SIZE/2 - EDGE_GAP
+  EDGE_GAP: 2,
+  SELECTOR_TRACK_THICKNESS: 2,
+} as const;
 
-// Calculate number position: dial radius - button half-width - gap
-const NUMBER_RADIUS = CLOCK_CENTER - NUMBER_BUTTON_SIZE / 2 - EDGE_GAP; // 102px
-
-// Animation constants
-const TRANSITION_TO_MINUTES_DURATION = 250;
-const TRANSITION_STEPS = 20;
-const TRANSITION_DELAY = 50; // Delay before starting transition animation
-const DRAG_BLOCK_DURATION = 100;
+// Animation timing constants
+const ANIMATION_CONSTANTS = {
+  TRANSITION_TO_MINUTES_DURATION: 250, // Total animation time (ms)
+  TRANSITION_STEPS: 20, // Number of animation frames
+  TRANSITION_DELAY: 50, // Delay before starting transition (ms)
+  DRAG_BLOCK_DURATION: 100, // Debounce after drag ends (ms)
+} as const;
 
 // Time Selector Component (editable hours/minutes display)
 interface TimeSelectorProps {
@@ -91,7 +102,7 @@ function TimeSelector({
     disabled: isEditing,
   };
 
-  const { ripples, rippleRef, handleMouseDown, handleMouseUp, removeRipple } =
+  const { ripples, rippleRef, handleMouseDown, handleMouseUp, handleKeyDown, handleKeyUp, removeRipple } =
     useRipple(rippleConfig);
 
   useEffect(() => {
@@ -101,12 +112,6 @@ function TimeSelector({
       inputRef.current.select();
     }
   }, [isEditing, inputRef]);
-
-  const handleFocus = () => {
-    if (!isEditing) {
-      onEdit();
-    }
-  };
 
   const handleKeyDownInternal = (
     e: React.KeyboardEvent<HTMLInputElement>,
@@ -138,7 +143,14 @@ function TimeSelector({
       onKeyDown={!isEditing ? (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          onEdit();
+          e.stopPropagation(); // Prevent dialog from submitting
+          handleKeyDown(e as unknown as React.KeyboardEvent<HTMLElement>); // Trigger ripple
+        }
+      } : undefined}
+      onKeyUp={!isEditing ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          handleKeyUp(e as unknown as React.KeyboardEvent<HTMLElement>); // Release ripple
+          onEdit(); // Trigger action on key release
         }
       } : undefined}
       tabIndex={!isEditing ? 0 : -1}
@@ -217,6 +229,8 @@ function PeriodSelector({ period, onToggle }: PeriodSelectorProps) {
     rippleRef: rippleRefAM,
     handleMouseDown: handleMouseDownAM,
     handleMouseUp: handleMouseUpAM,
+    handleKeyDown: handleKeyDownAM,
+    handleKeyUp: handleKeyUpAM,
     removeRipple: removeRippleAM,
   } = useRipple(rippleConfigAM);
 
@@ -225,6 +239,8 @@ function PeriodSelector({ period, onToggle }: PeriodSelectorProps) {
     rippleRef: rippleRefPM,
     handleMouseDown: handleMouseDownPM,
     handleMouseUp: handleMouseUpPM,
+    handleKeyDown: handleKeyDownPM,
+    handleKeyUp: handleKeyUpPM,
     removeRipple: removeRipplePM,
   } = useRipple(rippleConfigPM);
 
@@ -237,6 +253,8 @@ function PeriodSelector({ period, onToggle }: PeriodSelectorProps) {
         onMouseDown={handleMouseDownAM}
         onMouseUp={handleMouseUpAM}
         onMouseLeave={handleMouseUpAM}
+        onKeyDown={handleKeyDownAM}
+        onKeyUp={handleKeyUpAM}
         className={cn(
           'flex-1 px-3 text-sm font-medium transition-colors ease-emphasized-decelerate rounded-t-lg outline-none relative overflow-hidden before:absolute before:inset-0 before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-secondary focus-visible:outline-offset-2 focus-visible:z-10',
           period === 'AM'
@@ -267,6 +285,8 @@ function PeriodSelector({ period, onToggle }: PeriodSelectorProps) {
         onMouseDown={handleMouseDownPM}
         onMouseUp={handleMouseUpPM}
         onMouseLeave={handleMouseUpPM}
+        onKeyDown={handleKeyDownPM}
+        onKeyUp={handleKeyUpPM}
         className={cn(
           'flex-1 px-3 text-sm font-medium transition-colors ease-emphasized-decelerate rounded-b-lg outline-none relative overflow-hidden before:absolute before:inset-0 before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-secondary focus-visible:outline-offset-2 focus-visible:z-10',
           period === 'PM'
@@ -306,24 +326,10 @@ export default function TimePicker({
 }: TimePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<TimeMode>('hours');
-  const [hours, setHours] = useState(() => {
-    if (value) {
-      const hrs = value.getHours();
-      return hrs === 0 ? 12 : hrs > 12 ? hrs - 12 : hrs;
-    }
-    return 12;
-  });
-  const [minutes, setMinutes] = useState(() => {
-    if (value) return value.getMinutes();
-    return 0;
-  });
-  const [period, setPeriod] = useState<Period>(() => {
-    if (value) {
-      const hrs = value.getHours();
-      return hrs >= 12 ? 'PM' : 'AM';
-    }
-    return 'AM';
-  });
+  const initialState = initializeTimeState(value ?? null);
+  const [hours, setHours] = useState(initialState.hours);
+  const [minutes, setMinutes] = useState(initialState.minutes);
+  const [period, setPeriod] = useState<Period>(initialState.period);
   const [isDragging, setIsDragging] = useState(false);
   const [justFinishedDrag, setJustFinishedDrag] = useState(false);
   const [editingHours, setEditingHours] = useState(false);
@@ -351,9 +357,7 @@ export default function TimePicker({
   // Format time for display in input field
   const formatTime = () => {
     if (!value) return '';
-    const hrs = String(hours).padStart(2, '0');
-    const mins = String(minutes).padStart(2, '0');
-    return `${hrs}:${mins} ${period}`;
+    return formatTimeUtil(hours, minutes, period);
   };
 
   // Calculate angle for clock hand position (0° = 12 o'clock, 90° = 3 o'clock)
@@ -365,8 +369,8 @@ export default function TimePicker({
   const getPosition = (angle: number, radius: number) => {
     const radian = (angle * Math.PI) / 180;
     return {
-      x: Math.cos(radian) * radius + CLOCK_CENTER,
-      y: Math.sin(radian) * radius + CLOCK_CENTER,
+      x: Math.cos(radian) * radius + CLOCK_CONSTANTS.CENTER,
+      y: Math.sin(radian) * radius + CLOCK_CONSTANTS.CENTER,
     };
   };
 
@@ -420,15 +424,7 @@ export default function TimePicker({
       return;
     }
 
-    let numValue = parseInt(tempHoursValue, 10);
-
-    // Validate hours (1-12)
-    if (isNaN(numValue) || numValue < 1) {
-      numValue = 1;
-    } else if (numValue > 12) {
-      numValue = 12;
-    }
-
+    const numValue = validateHours(tempHoursValue);
     setHours(numValue);
     setEditingHours(false);
     setTempHoursValue('');
@@ -458,16 +454,14 @@ export default function TimePicker({
 
       // Auto-complete after 2 digits
       if (value.length === 2) {
-        // Use the current value directly to avoid state timing issues
-        let numValue = parseInt(value, 10);
-        if (isNaN(numValue) || numValue < 0) {
-          numValue = 0;
-        } else if (numValue > 59) {
-          numValue = 59;
-        }
+        const numValue = validateMinutes(value);
         setMinutes(numValue);
         setEditingMinutes(false);
         setTempMinutesValue('');
+        // Blur input - keyboard users can Tab to AM/PM or OK button
+        if (minutesInputRef.current) {
+          minutesInputRef.current.blur();
+        }
       }
     }
   };
@@ -479,15 +473,7 @@ export default function TimePicker({
       return;
     }
 
-    let numValue = parseInt(tempMinutesValue, 10);
-
-    // Validate minutes (0-59)
-    if (isNaN(numValue) || numValue < 0) {
-      numValue = 0;
-    } else if (numValue > 59) {
-      numValue = 59;
-    }
-
+    const numValue = validateMinutes(tempMinutesValue);
     setMinutes(numValue);
     setEditingMinutes(false);
     setTempMinutesValue('');
@@ -512,12 +498,14 @@ export default function TimePicker({
     // Animate hand from current position to 30-minute mark
     setTimeout(() => {
       const targetMinute = 30;
-      const stepDuration = TRANSITION_TO_MINUTES_DURATION / TRANSITION_STEPS;
+      const stepDuration =
+        ANIMATION_CONSTANTS.TRANSITION_TO_MINUTES_DURATION /
+        ANIMATION_CONSTANTS.TRANSITION_STEPS;
       let currentStep = 0;
 
       const animationInterval = setInterval(() => {
         currentStep++;
-        const progress = currentStep / TRANSITION_STEPS;
+        const progress = currentStep / ANIMATION_CONSTANTS.TRANSITION_STEPS;
 
         // Emphasized decelerate easing for smooth, natural motion
         const easedProgress = emphasizedDecelerate(progress);
@@ -530,12 +518,12 @@ export default function TimePicker({
         const currentMinute = Math.round(startMinute + diff * easedProgress);
         setMinutes(currentMinute >= 0 ? currentMinute : currentMinute + 60);
 
-        if (currentStep >= TRANSITION_STEPS) {
+        if (currentStep >= ANIMATION_CONSTANTS.TRANSITION_STEPS) {
           clearInterval(animationInterval);
           setMinutes(targetMinute);
         }
       }, stepDuration);
-    }, TRANSITION_DELAY);
+    }, ANIMATION_CONSTANTS.TRANSITION_DELAY);
   };
 
   // Handle minute selection
@@ -592,7 +580,10 @@ export default function TimePicker({
       e.preventDefault();
       e.stopPropagation();
       setJustFinishedDrag(true);
-      setTimeout(() => setJustFinishedDrag(false), DRAG_BLOCK_DURATION);
+      setTimeout(
+        () => setJustFinishedDrag(false),
+        ANIMATION_CONSTANTS.DRAG_BLOCK_DURATION,
+      );
 
       // Auto-transition to minutes after dragging in hours mode
       if (mode === 'hours') {
@@ -609,14 +600,7 @@ export default function TimePicker({
 
   // Confirm time selection and close dialog
   const handleConfirm = () => {
-    const date = new Date();
-    let hrs = hours;
-
-    // Convert 12-hour to 24-hour format
-    if (period === 'PM' && hrs !== 12) hrs += 12;
-    if (period === 'AM' && hrs === 12) hrs = 0;
-
-    date.setHours(hrs, minutes, 0, 0);
+    const date = createDateFromTime(hours, minutes, period);
     onChange?.(date);
     setIsOpen(false);
     onBlur?.();
@@ -625,11 +609,10 @@ export default function TimePicker({
   // Cancel and reset to original value
   const handleCancel = () => {
     if (value) {
-      const hrs = value.getHours();
-      const mins = value.getMinutes();
-      setHours(hrs === 0 ? 12 : hrs > 12 ? hrs - 12 : hrs);
+      const { hours: hrs, minutes: mins, period: per } = initializeTimeState(value);
+      setHours(hrs);
       setMinutes(mins);
-      setPeriod(hrs >= 12 ? 'PM' : 'AM');
+      setPeriod(per);
     }
     setMode('hours');
     setIsOpen(false);
@@ -665,11 +648,10 @@ export default function TimePicker({
           if (!disabled) {
             // Sync state when opening
             if (value) {
-              const hrs = value.getHours();
-              const mins = value.getMinutes();
-              setHours(hrs === 0 ? 12 : hrs > 12 ? hrs - 12 : hrs);
+              const { hours: hrs, minutes: mins, period: per } = initializeTimeState(value);
+              setHours(hrs);
               setMinutes(mins);
-              setPeriod(hrs >= 12 ? 'PM' : 'AM');
+              setPeriod(per);
             }
             setMode('hours'); // Always start with hours mode
             setEditingHours(false); // Start with hours focused but not editing
@@ -749,13 +731,13 @@ export default function TimePicker({
             >
               <svg
                 className='pointer-events-none absolute inset-0'
-                viewBox={`0 0 ${CLOCK_DIAMETER} ${CLOCK_DIAMETER}`}
+                viewBox={`0 0 ${CLOCK_CONSTANTS.DIAMETER} ${CLOCK_CONSTANTS.DIAMETER}`}
               >
                 {/* Dial selector center */}
                 <circle
-                  cx={CLOCK_CENTER}
-                  cy={CLOCK_CENTER}
-                  r={DIAL_SELECTOR_CENTER_RADIUS}
+                  cx={CLOCK_CONSTANTS.CENTER}
+                  cy={CLOCK_CONSTANTS.CENTER}
+                  r={CLOCK_CONSTANTS.DIAL_SELECTOR_CENTER_RADIUS}
                   fill='currentColor'
                   className='text-primary'
                 />
@@ -765,27 +747,27 @@ export default function TimePicker({
                   <>
                     {/* Dial selector track */}
                     <line
-                      x1={CLOCK_CENTER}
-                      y1={CLOCK_CENTER}
+                      x1={CLOCK_CONSTANTS.CENTER}
+                      y1={CLOCK_CONSTANTS.CENTER}
                       x2={
-                        getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).x
+                        getPosition(getAngle(hours % 12, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).x
                       }
                       y2={
-                        getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).y
+                        getPosition(getAngle(hours % 12, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).y
                       }
                       stroke='currentColor'
-                      strokeWidth={SELECTOR_TRACK_THICKNESS}
+                      strokeWidth={CLOCK_CONSTANTS.SELECTOR_TRACK_THICKNESS}
                       className='text-primary'
                     />
                     {/* Dial selector container */}
                     <circle
                       cx={
-                        getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).x
+                        getPosition(getAngle(hours % 12, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).x
                       }
                       cy={
-                        getPosition(getAngle(hours % 12, 12), NUMBER_RADIUS).y
+                        getPosition(getAngle(hours % 12, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).y
                       }
-                      r={DIAL_SELECTOR_CONTAINER_RADIUS}
+                      r={CLOCK_CONSTANTS.DIAL_SELECTOR_CONTAINER_RADIUS}
                       fill='currentColor'
                       className='text-primary'
                     />
@@ -797,27 +779,27 @@ export default function TimePicker({
                   <>
                     {/* Dial selector track */}
                     <line
-                      x1={CLOCK_CENTER}
-                      y1={CLOCK_CENTER}
+                      x1={CLOCK_CONSTANTS.CENTER}
+                      y1={CLOCK_CONSTANTS.CENTER}
                       x2={
-                        getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).x
+                        getPosition(getAngle(minutes / 5, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).x
                       }
                       y2={
-                        getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).y
+                        getPosition(getAngle(minutes / 5, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).y
                       }
                       stroke='currentColor'
-                      strokeWidth={SELECTOR_TRACK_THICKNESS}
+                      strokeWidth={CLOCK_CONSTANTS.SELECTOR_TRACK_THICKNESS}
                       className='text-primary'
                     />
                     {/* Dial selector container */}
                     <circle
                       cx={
-                        getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).x
+                        getPosition(getAngle(minutes / 5, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).x
                       }
                       cy={
-                        getPosition(getAngle(minutes / 5, 12), NUMBER_RADIUS).y
+                        getPosition(getAngle(minutes / 5, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).y
                       }
-                      r={DIAL_SELECTOR_CONTAINER_RADIUS}
+                      r={CLOCK_CONSTANTS.DIAL_SELECTOR_CONTAINER_RADIUS}
                       fill='currentColor'
                       className='text-primary'
                     />
@@ -829,12 +811,13 @@ export default function TimePicker({
               {mode === 'hours' &&
                 hoursArray.map(hour => {
                   const angle = getAngle(hour % 12, 12);
-                  const pos = getPosition(angle, NUMBER_RADIUS);
+                  const pos = getPosition(angle, CLOCK_CONSTANTS.NUMBER_RADIUS);
                   const isUnderSelectorContainer =
                     isNumberUnderSelectorContainer(hour, true);
                   return (
                     <button
                       key={hour}
+                      tabIndex={-1}
                       onMouseDown={e => {
                         e.stopPropagation();
                         e.preventDefault();
@@ -885,12 +868,13 @@ export default function TimePicker({
               {mode === 'minutes' &&
                 minutesArray.map(minute => {
                   const angle = getAngle(minute / 5, 12);
-                  const pos = getPosition(angle, NUMBER_RADIUS);
+                  const pos = getPosition(angle, CLOCK_CONSTANTS.NUMBER_RADIUS);
                   const isUnderSelectorContainer =
                     isNumberUnderSelectorContainer(minute, false);
                   return (
                     <button
                       key={minute}
+                      tabIndex={-1}
                       onMouseDown={e => {
                         e.stopPropagation();
                         e.preventDefault();
@@ -942,7 +926,7 @@ export default function TimePicker({
           {/* Keyboard Icon - Bottom Left Corner */}
           <button
             type='button'
-            className='absolute bottom-6 left-6 flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant outline-none overflow-hidden before:absolute before:inset-0 before:rounded-full before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 focus:before:opacity-12 before:bg-current'
+            className='absolute bottom-6 left-6 flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant outline-none overflow-hidden before:absolute before:inset-0 before:rounded-full before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 focus-visible:before:opacity-12 before:bg-current focus-visible:outline-2 focus-visible:outline-primary'
             aria-label='Toggle keyboard input'
           >
             <svg
