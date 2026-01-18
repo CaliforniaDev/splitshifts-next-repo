@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { twMerge } from 'tailwind-merge';
 import type { VariantProps } from 'class-variance-authority';
 import { Loader2 } from 'lucide-react';
-import { buttonVariants } from './variants';
+import { buttonVariants, ACTIVE_BORDER_RADIUS } from './variants';
 import {
   useRipple,
   RippleEffect,
@@ -45,6 +45,9 @@ export default function Button<T extends ElementType = 'button'>({
   disabled = false,
   loading = false,
   loadingText,
+  onClick: userOnClick,
+  onKeyDown: userOnKeyDown,
+  onKeyUp: userOnKeyUp,
   ...rest
 }: ButtonProps<T> &
   Omit<React.ComponentPropsWithoutRef<T>, keyof ButtonProps<T>>) {
@@ -60,8 +63,62 @@ export default function Button<T extends ElementType = 'button'>({
     disabled: disabled || loading,
   };
 
-  const { ripples, rippleRef, handleMouseDown, handleMouseUp, removeRipple } =
+  const { ripples, rippleRef, handleMouseDown, handleMouseUp, handleKeyDown, handleKeyUp, removeRipple } =
     useRipple(rippleConfig);
+
+  // Track keyboard press state for active styling
+  const [isKeyPressed, setIsKeyPressed] = React.useState(false);
+  // Track mouse press state for active styling
+  const [isMousePressed, setIsMousePressed] = React.useState(false);
+
+  // Merge user's onMouseDown with ripple's handleMouseDown
+  const mergedMouseDownHandler = React.useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      setIsMousePressed(true);
+      handleMouseDown(e);
+    },
+    [handleMouseDown],
+  );
+
+  // Merge user's onMouseUp with ripple's handleMouseUp
+  const mergedMouseUpHandler = React.useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      setIsMousePressed(false);
+      handleMouseUp();
+    },
+    [handleMouseUp],
+  );
+
+  // Merge user's onKeyDown with ripple's handleKeyDown
+  // Also prevent default to stop button from triggering on keydown
+  const mergedKeyDownHandler = React.useCallback(
+    (e: React.KeyboardEvent<HTMLElement>) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault(); // Prevent default button click on keydown
+        if (!e.repeat) {
+          setIsKeyPressed(true); // Trigger active state
+        }
+      }
+      handleKeyDown(e);
+      userOnKeyDown?.(e as any);
+    },
+    [handleKeyDown, userOnKeyDown],
+  );
+
+  // Merge user's onKeyUp with ripple's handleKeyUp
+  // Trigger onClick on keyup to match mouse behavior
+  const mergedKeyUpHandler = React.useCallback(
+    (e: React.KeyboardEvent<HTMLElement>) => {
+      handleKeyUp(e);
+      // Trigger click on keyup (after ripple is released)
+      if (e.key === 'Enter' || e.key === ' ') {
+        setIsKeyPressed(false); // Release active state
+        userOnClick?.(e as any);
+      }
+      userOnKeyUp?.(e as any);
+    },
+    [handleKeyUp, userOnClick, userOnKeyUp],
+  );
 
   const isNextLink = as === 'next-link';
   const isExternal = isExternalLink(href);
@@ -93,6 +150,8 @@ export default function Button<T extends ElementType = 'button'>({
       className,
     }),
     'text-center',
+    // Apply active border radius when key or mouse is pressed
+    (isKeyPressed || isMousePressed) ? ACTIVE_BORDER_RADIUS[size || 'small'] : '',
   );
 
   // Development-only validations
@@ -148,9 +207,12 @@ export default function Button<T extends ElementType = 'button'>({
         target={isExternal ? '_blank' : undefined}
         rel={isExternal ? 'noopener noreferrer' : undefined}
         className={mergedClass}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        onClick={userOnClick as any}
+        onMouseDown={mergedMouseDownHandler}
+        onMouseUp={mergedMouseUpHandler}
+        onMouseLeave={mergedMouseUpHandler}
+        onKeyDown={mergedKeyDownHandler}
+        onKeyUp={mergedKeyUpHandler}
         aria-busy={loading}
         {...rest}
       >
@@ -186,9 +248,12 @@ export default function Button<T extends ElementType = 'button'>({
       ref={setRippleRef}
       className={mergedClass}
       disabled={isDisabled}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
+      onClick={userOnClick as any}
+      onMouseDown={mergedMouseDownHandler}
+      onMouseUp={mergedMouseUpHandler}
+      onMouseLeave={mergedMouseUpHandler}
+      onKeyDown={mergedKeyDownHandler}
+      onKeyUp={mergedKeyUpHandler}
       aria-busy={loading}
       aria-disabled={isDisabled}
       aria-live={loading ? 'polite' : undefined}
