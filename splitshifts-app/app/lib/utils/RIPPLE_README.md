@@ -42,7 +42,7 @@ function MyComponent() {
   const mergedConfig = { ...RIPPLE_DEFAULTS, ...rippleConfig, disabled: false };
 
   // 2. Use the hook
-  const { ripples, rippleRef, handleMouseDown, handleMouseUp, removeRipple } =
+  const { ripples, rippleRef, handleMouseDown, handleMouseUp, handleKeyDown, handleKeyUp, removeRipple } =
     useRipple(rippleConfig);
 
   // 3. Attach to element
@@ -52,6 +52,8 @@ function MyComponent() {
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onKeyDown={handleKeyDown}      // Keyboard support
+      onKeyUp={handleKeyUp}           // Keyboard support
       className='relative overflow-hidden'
     >
       Click me
@@ -192,12 +194,33 @@ className='relative overflow-hidden'
 ```
 
 This ensures:
+
 - `relative`: Ripple positions correctly relative to parent
 - `overflow-hidden`: Ripple doesn't spill outside bounds
 
 ### Event Handlers
 
-Always attach all three handlers:
+Always attach all handlers for proper ripple behavior:
+
+```tsx
+<button
+  ref={rippleRef as any}
+  onMouseDown={handleMouseDown}
+  onMouseUp={handleMouseUp}
+  onMouseLeave={handleMouseUp}  // Important: Release ripple when mouse leaves
+  onKeyDown={handleKeyDown}     // Keyboard support: Enter/Space keys
+  onKeyUp={handleKeyUp}          // Keyboard support: Release ripple
+  className='relative overflow-hidden'
+>
+```
+
+### Keyboard Support
+
+- `handleKeyDown`: Triggers ripple on Enter or Space key press
+- `handleKeyUp`: Releases ripple when key is released
+- **Centered Ripples**: Keyboard-triggered ripples originate from element center (width/2, height/2)
+- **Repeat Protection**: Ignores key repeat events (e.repeat check) to prevent ripple spam
+- **Key Filtering**: Only responds to Enter and Space keys, ignores all others
 
 ```tsx
 onMouseDown={handleMouseDown}
@@ -295,6 +318,7 @@ Multiple overlapping ripples are supported and each animates independently.
 ### Disabled State Handling
 
 When a button becomes disabled or enters a loading state:
+
 - Active ripples continue and complete their animations naturally
 - New ripples are prevented from triggering
 - No abrupt animation interruption for better UX
@@ -334,6 +358,7 @@ color: 'var(--custom-color)'      // CSS variable
 ## Design Specifications
 
 This implementation follows Material Design 3 interaction principles while being customized for SplitShifts:
+
 - **Timing**: 550ms for both expand and fade animations (industry-standard responsive feel)
 - **Easing**: Emphasized easing curve `cubic-bezier(0.0, 0.0, 0.2, 1)` for natural motion
 - **Accessibility**: WCAG 2.1 AA compliant with proper interaction feedback
@@ -342,15 +367,18 @@ This implementation follows Material Design 3 interaction principles while being
 ## Troubleshooting
 
 ### Ripples not visible
+
 - Ensure parent has `relative` positioning
 - Check `overflow-hidden` is applied to parent
 - Verify `z-index` stacking context
 
 ### Performance issues
+
 - Already optimized with GPU acceleration
 - Check for excessive re-renders in parent component
 - Ensure unique `keyframeName` per component type
 
 ### Animations cut short
+
 - Confirm all three event handlers attached (mouseDown, mouseUp, mouseLeave)
 - This is expected on fast navigation - prioritizes responsiveness over animation completion
