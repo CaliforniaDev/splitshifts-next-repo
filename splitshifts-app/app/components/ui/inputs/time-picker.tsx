@@ -339,6 +339,43 @@ export default function TimePicker({
 
   const hoursInputRef = useRef<HTMLInputElement>(null);
   const minutesInputRef = useRef<HTMLInputElement>(null);
+  
+  // Refs for state values to avoid stale closures in event handlers
+  const modeRef = useRef(mode);
+  const hoursRef = useRef(hours);
+  
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
+  
+  useEffect(() => {
+    hoursRef.current = hours;
+  }, [hours]);
+
+  // Add global mouseup listener when dragging starts
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleGlobalMouseUp = () => {
+      setJustFinishedDrag(true);
+      setTimeout(
+        () => setJustFinishedDrag(false),
+        ANIMATION_CONSTANTS.DRAG_BLOCK_DURATION,
+      );
+
+      // Auto-transition to minutes after dragging in hours mode
+      if (modeRef.current === 'hours') {
+        handleHourSelect(hoursRef.current);
+      }
+      
+      setIsDragging(false);
+    };
+
+    // Attach to document to catch mouseup anywhere
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => document.removeEventListener('mouseup', handleGlobalMouseUp);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDragging]);
 
   // Helper function to close any open inputs
   const closeInputs = () => {
@@ -489,11 +526,11 @@ export default function TimePicker({
   // Handle hour selection and transition to minutes mode
   const handleHourSelect = (hour: number) => {
     setHours(hour);
+    setMode('minutes'); // Switch mode immediately to update visual border
 
     // Start at the corresponding minute position for smooth visual transition
     const startMinute = (hour % 12) * 5;
     setMinutes(startMinute);
-    setMode('minutes');
 
     // Animate hand from current position to 30-minute mark
     setTimeout(() => {
@@ -726,7 +763,6 @@ export default function TimePicker({
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
               onClick={handleClockInteraction}
             >
               <svg
