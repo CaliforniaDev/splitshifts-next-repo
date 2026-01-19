@@ -14,6 +14,7 @@ Custom time picker with 12-hour format, clock face dial, and editable inputs.
 ## Pending Features
 
 ### High Priority
+
 - [ ] **Input-only mode with dial toggle**: Default view shows only time inputs, keyboard icon toggles dial visibility
 - [ ] **Horizontal layout for landscape**: Responsive layout that switches based on viewport width/orientation
 
@@ -46,6 +47,7 @@ Custom time picker with 12-hour format, clock face dial, and editable inputs.
 ## Recent Changes
 
 ### Refactoring (Latest)
+
 - ✅ **Extracted time utilities** to `app/lib/utils/time.ts`
   - Pure functions for conversion, validation, and formatting
   - Type-safe Period type exported for reuse
@@ -55,12 +57,14 @@ Custom time picker with 12-hour format, clock face dial, and editable inputs.
   - `ANIMATION_CONSTANTS`: Timing values (duration, steps, delay, etc.)
 
 ### Interaction State Refinements
+
 - Time selectors: 8% hover overlay, 3px secondary focus border (inset shadow)
 - Period selectors: Ripple effects on click, 3px secondary focus outline (outside)
 - No overlay on focus (only hover), no text shifting from borders
 - Keyboard navigation: Tab focus without auto-editing
 
 ### Component Structure
+
 - TimeSelector: Unified input/button component with ripple support
 - PeriodSelector: Separate AM/PM toggle with individual ripple instances
 - Focus management: Container focusable when not editing, input focusable when editing
@@ -68,6 +72,7 @@ Custom time picker with 12-hour format, clock face dial, and editable inputs.
 ## Design Specs
 
 **Vertical Layout:**
+
 - Dialog: 24px padding, fit-content width
 - Time display: 80px height wrapper, 12px gap between sections
 - Time selectors: 80px × 96px each
@@ -77,6 +82,7 @@ Custom time picker with 12-hour format, clock face dial, and editable inputs.
 - Keyboard icon: Bottom-left absolute positioning
 
 **Colors:**
+
 - Focus border: Secondary (#535F70)
 - Active selector: Primary container background
 - Active period: Tertiary container background
