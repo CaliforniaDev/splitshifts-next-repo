@@ -28,6 +28,7 @@ import {
   to12HourFormat,
   getPeriodFrom24Hour,
 } from '@/app/lib/utils/time';
+import { KeyboardIcon } from '../icons/keyboard-icon';
 
 interface TimePickerProps {
   label: string;
@@ -685,7 +686,11 @@ export default function TimePicker({
           if (!disabled) {
             // Sync state when opening
             if (value) {
-              const { hours: hrs, minutes: mins, period: per } = initializeTimeState(value);
+              const {
+                hours: hrs,
+                minutes: mins,
+                period: per,
+              } = initializeTimeState(value);
               setHours(hrs);
               setMinutes(mins);
               setPeriod(per);
@@ -707,14 +712,14 @@ export default function TimePicker({
       />
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className='p-6 w-fit border-none'>
+        <DialogContent className='w-fit border-none p-6'>
           <DialogHeader>
             <DialogTitle className='typescale-label-medium text-on-surface-variant'>
               Select time
             </DialogTitle>
           </DialogHeader>
 
-          <div className='flex flex-col mt-5'>
+          <div className='mt-5 flex flex-col'>
             {/* Time Display Header - 80px wrapper */}
             <div className='flex h-20 items-stretch gap-3'>
               {/* Time Selectors */}
@@ -734,7 +739,7 @@ export default function TimePicker({
                 />
 
                 {/* Time Selector Separator - 24px gap */}
-                <span className='typescale-display-large !font-normal text-on-surface w-6 text-center -translate-y-1'>
+                <span className='typescale-display-large w-6 -translate-y-1 text-center !font-normal text-on-surface'>
                   :
                 </span>
 
@@ -759,7 +764,7 @@ export default function TimePicker({
 
             {/* Clock Face */}
             <div
-              className='relative mx-auto h-[256px] w-[256px] cursor-pointer select-none rounded-full bg-surface-container-highest mt-9'
+              className='relative mx-auto mt-9 h-[256px] w-[256px] cursor-pointer select-none rounded-full bg-surface-container-highest'
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
@@ -786,10 +791,16 @@ export default function TimePicker({
                       x1={CLOCK_CONSTANTS.CENTER}
                       y1={CLOCK_CONSTANTS.CENTER}
                       x2={
-                        getPosition(getAngle(hours % 12, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).x
+                        getPosition(
+                          getAngle(hours % 12, 12),
+                          CLOCK_CONSTANTS.NUMBER_RADIUS,
+                        ).x
                       }
                       y2={
-                        getPosition(getAngle(hours % 12, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).y
+                        getPosition(
+                          getAngle(hours % 12, 12),
+                          CLOCK_CONSTANTS.NUMBER_RADIUS,
+                        ).y
                       }
                       stroke='currentColor'
                       strokeWidth={CLOCK_CONSTANTS.SELECTOR_TRACK_THICKNESS}
@@ -798,10 +809,16 @@ export default function TimePicker({
                     {/* Dial selector container */}
                     <circle
                       cx={
-                        getPosition(getAngle(hours % 12, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).x
+                        getPosition(
+                          getAngle(hours % 12, 12),
+                          CLOCK_CONSTANTS.NUMBER_RADIUS,
+                        ).x
                       }
                       cy={
-                        getPosition(getAngle(hours % 12, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).y
+                        getPosition(
+                          getAngle(hours % 12, 12),
+                          CLOCK_CONSTANTS.NUMBER_RADIUS,
+                        ).y
                       }
                       r={CLOCK_CONSTANTS.DIAL_SELECTOR_CONTAINER_RADIUS}
                       fill='currentColor'
@@ -818,10 +835,16 @@ export default function TimePicker({
                       x1={CLOCK_CONSTANTS.CENTER}
                       y1={CLOCK_CONSTANTS.CENTER}
                       x2={
-                        getPosition(getAngle(minutes / 5, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).x
+                        getPosition(
+                          getAngle(minutes / 5, 12),
+                          CLOCK_CONSTANTS.NUMBER_RADIUS,
+                        ).x
                       }
                       y2={
-                        getPosition(getAngle(minutes / 5, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).y
+                        getPosition(
+                          getAngle(minutes / 5, 12),
+                          CLOCK_CONSTANTS.NUMBER_RADIUS,
+                        ).y
                       }
                       stroke='currentColor'
                       strokeWidth={CLOCK_CONSTANTS.SELECTOR_TRACK_THICKNESS}
@@ -830,10 +853,16 @@ export default function TimePicker({
                     {/* Dial selector container */}
                     <circle
                       cx={
-                        getPosition(getAngle(minutes / 5, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).x
+                        getPosition(
+                          getAngle(minutes / 5, 12),
+                          CLOCK_CONSTANTS.NUMBER_RADIUS,
+                        ).x
                       }
                       cy={
-                        getPosition(getAngle(minutes / 5, 12), CLOCK_CONSTANTS.NUMBER_RADIUS).y
+                        getPosition(
+                          getAngle(minutes / 5, 12),
+                          CLOCK_CONSTANTS.NUMBER_RADIUS,
+                        ).y
                       }
                       r={CLOCK_CONSTANTS.DIAL_SELECTOR_CONTAINER_RADIUS}
                       fill='currentColor'
@@ -962,23 +991,11 @@ export default function TimePicker({
           {/* Keyboard Icon - Bottom Left Corner */}
           <button
             type='button'
-            className='absolute bottom-6 left-6 flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant outline-none overflow-hidden before:absolute before:inset-0 before:rounded-full before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 focus-visible:before:opacity-12 before:bg-current focus-visible:outline-2 focus-visible:outline-primary'
+            className='absolute bottom-6 left-6 flex h-10 w-10 items-center justify-center overflow-hidden rounded-full text-on-surface-variant outline-none before:absolute before:inset-0 before:rounded-full before:bg-current before:opacity-0 before:transition-all before:duration-200 hover:before:opacity-8 focus-visible:outline-2 focus-visible:outline-primary focus-visible:before:opacity-12'
             aria-label='Toggle keyboard input'
           >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              viewBox='0 0 24 24'
-              fill='currentColor'
-              className='h-6 w-6'
-            >
-              <path
-                fillRule='evenodd'
-                d='M2.25 6a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V6Zm3.97.97a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1 0 1.06l-2.25 2.25a.75.75 0 0 1-1.06-1.06l1.72-1.72-1.72-1.72a.75.75 0 0 1 0-1.06Zm4.28 4.28a.75.75 0 0 0 0 1.5h5.25a.75.75 0 0 0 0-1.5H10.5Z'
-                clipRule='evenodd'
-              />
-            </svg>
+            <KeyboardIcon variant='solid' className='h-6' />
           </button>
-
           <DialogFooter className='mt-6'>
             <Button type='button' variant='text' onClick={handleCancel}>
               Cancel
