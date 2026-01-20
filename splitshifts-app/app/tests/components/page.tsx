@@ -12,7 +12,7 @@ import {
   CardDescription,
   CardFooter,
 } from '@/app/components/ui/card';
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 import Input from '@/app/components/ui/inputs/input';
 import { Textarea, SelectMenu } from '@/app/components/ui/inputs';
 import TimePicker from '@/app/components/ui/inputs/time-picker';
@@ -647,7 +647,6 @@ export default function ComponentTestPage() {
                 <li>AM/PM toggle button</li>
                 <li>Keyboard navigation (Tab, Arrow keys)</li>
                 <li>Ripple effects on all interactive elements</li>
-                <li>Material Design 3 styling</li>
               </ul>
             </div>
           </CardContent>
@@ -946,7 +945,6 @@ export default function ComponentTestPage() {
               <li>□ FormErrorDisplay shows with icon</li>
               <li>□ Cards have appropriate elevation shadows</li>
               <li>□ Card footer layout works</li>
-              <li>□ All colors follow Material Design 3 tokens</li>
               <li>□ Typography scales are consistent</li>
               <li>□ Components are responsive (resize browser)</li>
               <li>□ Sidebar navigation works on desktop (lg+)</li>

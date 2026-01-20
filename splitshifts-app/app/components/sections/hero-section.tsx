@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 import dashboardMockup from '@/public/assets/mockups/dashboard-light.webp';
 
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 import { getBlurredPlaceholder } from '@/app/lib/image-processing';
 
 export default async function Hero() {

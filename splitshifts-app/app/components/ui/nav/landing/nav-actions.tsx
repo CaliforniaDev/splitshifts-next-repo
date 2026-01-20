@@ -1,4 +1,4 @@
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 
 export default function NavActions() {
   return (
