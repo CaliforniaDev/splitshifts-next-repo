@@ -2,7 +2,7 @@
 
 import { validateUserSession } from '@/app/lib/auth-utils';
 import { getEmployees } from '../actions/employee';
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 import Input from '@/app/components/ui/inputs/input';
 
 export default async function EmployeesPage() {

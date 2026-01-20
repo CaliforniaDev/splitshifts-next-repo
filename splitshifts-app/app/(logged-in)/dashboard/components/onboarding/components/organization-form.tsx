@@ -40,7 +40,7 @@ import {
 } from '@/app/components/ui/form';
 
 import { Input, Textarea, SelectMenu } from '@/app/components/ui/inputs';
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 import { Skeleton } from '@/app/components/ui/skeleton';
 
 interface OrganizationFormProps {

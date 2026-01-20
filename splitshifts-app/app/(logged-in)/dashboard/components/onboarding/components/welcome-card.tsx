@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from '@/app/components/ui/card';
 
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 import { STEP_DISPLAY_CONFIG, stepIndicatorVariants, stepTextVariants } from '../constants';
 
 export default function WelcomeCard({

@@ -30,7 +30,7 @@ import {
 import { useToast } from '@/app/components/ui/toast';
 import Input from '@/app/components/ui/inputs/input';
 import { SelectMenu } from '@/app/components/ui/inputs';
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 import { addWorksite } from '@/app/(logged-in)/dashboard/actions/worksite/add-worksite';
 
 interface WorksiteFormCardProps {

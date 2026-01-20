@@ -27,7 +27,7 @@ import {
 
 import { useToast } from '@/app/components/ui/toast';
 import { Input } from '@/app/components/ui/inputs';
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 import { addEmployee } from '@/app/(logged-in)/dashboard/actions/employee/add-employee';
 import WarningIcon from '@/app/components/ui/icons/warning-icon';
 

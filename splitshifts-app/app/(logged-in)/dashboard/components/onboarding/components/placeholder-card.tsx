@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from '@/app/components/ui/card';
 
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 
 export default function PlaceholderStepCard({
   title,
