@@ -5,7 +5,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { useSignUpForm } from '../hooks/use-signup-form';
 import { registerUser } from '../actions/register-user';
 
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 import Input from '@/app/components/ui/inputs/input';
 import AnimatedTransition from '@/app/components/ui/animations/animated-transition';
 
@@ -77,7 +77,7 @@ export default function SignUpForm() {
 
   return isSubmitSuccessful ? (
     <AnimatedTransition animationKey="success">
-      <SignUpSuccessCard />
+      <SignUpSuccessCard email={form.getValues('email')} />
     </AnimatedTransition>
   ) : (
     <AnimatedTransition animationKey="form">
@@ -91,7 +91,7 @@ export default function SignUpForm() {
   );
 }
 
-function SignUpSuccessCard() {
+function SignUpSuccessCard({ email }: { email: string }) {
   return (
     <Card className='w-full border-none shadow-elevation-0'>
       <CardHeader aria-live='polite' role='status'>
@@ -107,7 +107,7 @@ function SignUpSuccessCard() {
         </Button>
         <Button
           as='next-link'
-          href='/resend-verification'
+          href={`/resend-verification?email=${encodeURIComponent(email)}`}
           variant='outlined'
           className='w-full'
         >

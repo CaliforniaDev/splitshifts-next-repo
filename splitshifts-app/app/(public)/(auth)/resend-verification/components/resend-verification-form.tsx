@@ -12,7 +12,7 @@ import { sendEmailVerification } from '../../signup/actions/send-email-verificat
 import { logError } from '@/app/lib/utils';
 
 // ---UI Components-----------------------------------------------------
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 import Input from '@/app/components/ui/inputs/input';
 import AnimatedCheckIcon from '@/app/components/ui/icons/animated-check-icon';
 import AnimatedTransition from '@/app/components/ui/animations/animated-transition';
@@ -48,21 +48,12 @@ interface SuccessCardProps {
 export default function ResendVerificationForm() {
   // ---State Management-------------------------------------------------
   const searchParams = useSearchParams();
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => searchParams.get('email') || '');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
   const emailInputRef = useRef<HTMLInputElement>(null);
 
   // ---Effects----------------------------------------------------------
-  /**
-   * Pre-fill email from URL params if available for better UX
-   */
-  useEffect(() => {
-    const emailParam = searchParams.get('email');
-    if (emailParam) {
-      setEmail(emailParam);
-    }
-  }, [searchParams]);
 
   /**
    * Auto-focus the email input when component mounts for better UX

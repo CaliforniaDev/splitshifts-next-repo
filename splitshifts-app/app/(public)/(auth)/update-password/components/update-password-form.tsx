@@ -37,7 +37,7 @@ import {
 
 // Input & Button components
 import Input from '@/app/components/ui/inputs/input';
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 import AnimatedTransition from '@/app/components/ui/animations/animated-transition';
 
 // Props passed from the server after token validation

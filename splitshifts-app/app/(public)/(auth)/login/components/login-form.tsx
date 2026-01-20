@@ -21,7 +21,7 @@ import {
 } from '../action/login-with-credentials';
 
 // ---UI Components-----------------------------------------------------
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 import {
   Card,
   CardContent,

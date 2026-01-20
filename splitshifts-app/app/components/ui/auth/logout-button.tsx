@@ -1,7 +1,6 @@
 'use client';
 
-import Button from '@/app/components/ui/buttons/button';
-import type { ButtonProps } from '@/app/components/ui/buttons/button';
+import { Button, type ButtonProps } from '@/app/components/ui/buttons';
 import { logOut } from '@/app/(public)/(auth)/actions/logout';
 
 interface LogoutButtonProps

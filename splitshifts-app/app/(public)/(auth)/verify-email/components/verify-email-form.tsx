@@ -12,7 +12,7 @@ import { verifyEmail } from '../actions/verify-email';
 import { logError } from '@/app/lib/utils';
 
 // ---UI Components-----------------------------------------------------
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 import AnimatedTransition from '@/app/components/ui/animations/animated-transition';
 import {
   Card,

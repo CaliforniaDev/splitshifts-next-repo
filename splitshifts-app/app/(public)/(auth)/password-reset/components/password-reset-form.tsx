@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from '@/app/components/ui/form';
 import Input from '@/app/components/ui/inputs/input';
-import Button from '@/app/components/ui/buttons/button';
+import { Button } from '@/app/components/ui/buttons';
 import AnimatedCheckIcon from '@/app/components/ui/icons/animated-check-icon';
 import AnimatedTransition from '@/app/components/ui/animations/animated-transition';
 import { maskEmail } from '@/app/lib/utils';
