@@ -34,7 +34,7 @@ const baseClasses = clsx([
 ]);
 
 // State layer overlay system (hover/focus opacity handled per variant)
-const stateLayer = 'before:opacity-0 hover:before:opacity-8 focus:before:opacity-10';
+const stateLayer = 'before:opacity-0 hover:before:opacity-8 focus-visible:before:opacity-10';
 
 // Disabled state styling
 const disabledState = 'text-on-surface/38 bg-on-surface/12 shadow-none pointer-events-none';
