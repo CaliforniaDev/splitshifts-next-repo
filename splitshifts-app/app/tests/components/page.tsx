@@ -15,6 +15,7 @@ import {
 import Button from '@/app/components/ui/buttons/button';
 import Input from '@/app/components/ui/inputs/input';
 import { Textarea, SelectMenu } from '@/app/components/ui/inputs';
+import TimePicker from '@/app/components/ui/inputs/time-picker';
 import { Label } from '@/app/components/ui/label';
 import {
   Form,
@@ -35,6 +36,11 @@ export default function ComponentTestPage() {
   const [inputValue, setInputValue] = useState('');
   const [textareaValue, setTextareaValue] = useState('');
   const [selectValue, setSelectValue] = useState('');
+  const [time, setTime] = useState<Date | null>(() => {
+    const date = new Date();
+    date.setHours(9, 0, 0, 0);
+    return date;
+  });
   const [showError, setShowError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -52,6 +58,24 @@ export default function ComponentTestPage() {
     { value: 'option3', label: 'Option 3' },
     { value: 'option4', label: 'Option 4 - Long Text Example' },
   ];
+
+  // Helper to create time Date objects
+  const createTimeDate = (hours: number, minutes: number) => {
+    const date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+    return date;
+  };
+
+  // Format time for display
+  const formatTimeDisplay = (date: Date | null) => {
+    if (!date) return '';
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    const displayMinutes = minutes.toString().padStart(2, '0');
+    return `${displayHours}:${displayMinutes} ${period}`;
+  };
 
   const handleLoadingTest = () => {
     setIsLoading(true);
@@ -87,28 +111,24 @@ export default function ComponentTestPage() {
               <div className='flex flex-wrap gap-2'>
                 <Button
                   variant='tonal'
-                  size='default'
                   onClick={() => scrollToSection('buttons')}
                 >
                   Buttons
                 </Button>
                 <Button
                   variant='tonal'
-                  size='default'
                   onClick={() => scrollToSection('inputs')}
                 >
                   Inputs
                 </Button>
                 <Button
                   variant='tonal'
-                  size='default'
                   onClick={() => scrollToSection('form-components')}
                 >
                   Forms
                 </Button>
                 <Button
                   variant='tonal'
-                  size='default'
                   onClick={() => scrollToSection('cards')}
                 >
                   Cards
@@ -126,56 +146,54 @@ export default function ComponentTestPage() {
               <div className='flex flex-wrap gap-2'>
                 <Button
                   variant='tonal'
-                  size='default'
                   onClick={() => scrollToSection('buttons')}
                 >
                   Buttons
                 </Button>
                 <Button
                   variant='tonal'
-                  size='default'
                   onClick={() => scrollToSection('inputs')}
                 >
                   Inputs
                 </Button>
                 <Button
                   variant='tonal'
-                  size='default'
                   onClick={() => scrollToSection('textarea')}
                 >
                   Textarea
                 </Button>
                 <Button
                   variant='tonal'
-                  size='default'
                   onClick={() => scrollToSection('select')}
                 >
                   Select
                 </Button>
                 <Button
                   variant='tonal'
-                  size='default'
+                  onClick={() => scrollToSection('time-picker')}
+                >
+                  Time Picker
+                </Button>
+                <Button
+                  variant='tonal'
                   onClick={() => scrollToSection('form-components')}
                 >
                   Form Components
                 </Button>
                 <Button
                   variant='tonal'
-                  size='default'
                   onClick={() => scrollToSection('cards')}
                 >
                   Cards
                 </Button>
                 <Button
                   variant='tonal'
-                  size='default'
                   onClick={() => scrollToSection('labels')}
                 >
                   Labels
                 </Button>
                 <Button
                   variant='tonal'
-                  size='default'
                   onClick={() => scrollToSection('checklist')}
                 >
                   Checklist
@@ -283,9 +301,7 @@ export default function ComponentTestPage() {
                 Button Sizes
               </Label>
               <div className='flex flex-wrap items-center gap-3'>
-                <Button variant='filled' size='default'>
-                  Default Size
-                </Button>
+                <Button variant='filled'>Default Size</Button>
                 <Button variant='filled' size='large'>
                   Large Size
                 </Button>
@@ -543,6 +559,97 @@ export default function ComponentTestPage() {
                 </p>
               </div>
             )}
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* TIME PICKER SECTION */}
+      <section id='time-picker' className='scroll-mt-8'>
+        <div className='mb-6 border-b-2 border-primary pb-4'>
+          <h2 className='typescale-headline-medium mb-2 text-primary'>
+            TimePicker Component
+          </h2>
+          <p className='typescale-body-medium text-on-surface-variant'>
+            Interactive time selection with clock face and editable inputs
+          </p>
+        </div>
+
+        <Card className='border-none shadow-elevation-2'>
+          <CardContent className='space-y-8 pt-6'>
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                Interactive Time Picker
+              </Label>
+              <p className='mb-4 text-sm text-on-surface-variant'>
+                Click or drag on the clock face, or type directly into the inputs.
+                Supports keyboard navigation with Tab and Arrow keys.
+              </p>
+              <TimePicker
+                label='Select Time *'
+                value={time}
+                onChange={setTime}
+              />
+            </div>
+
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                With Custom Label
+              </Label>
+              <TimePicker
+                label='Shift Start Time *'
+                value={createTimeDate(8, 30)}
+                onChange={() => {}}
+              />
+            </div>
+
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                Error State
+              </Label>
+              <TimePicker
+                label='Appointment Time *'
+                value={null}
+                onChange={() => {}}
+                error={true}
+                errorMessage='Please select a valid time'
+              />
+            </div>
+
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                Disabled State
+              </Label>
+              <TimePicker
+                label='Locked Time'
+                value={createTimeDate(14, 15)}
+                onChange={() => {}}
+                disabled
+              />
+            </div>
+
+            {time && (
+              <div className='rounded-lg bg-tertiary-container p-4'>
+                <p className='text-sm text-on-tertiary-container'>
+                  <strong>Selected Time:</strong> {formatTimeDisplay(time)}
+                </p>
+                <p className='mt-2 text-xs text-on-tertiary-container/70'>
+                  Time format: 12-hour with AM/PM
+                </p>
+              </div>
+            )}
+
+            <div className='rounded-lg border border-outline-variant bg-surface-container-low p-4'>
+              <p className='mb-2 text-sm font-medium'>Features:</p>
+              <ul className='list-inside list-disc space-y-1 text-sm text-on-surface-variant'>
+                <li>Visual clock face with animated hand</li>
+                <li>Click or drag to select time</li>
+                <li>Editable hour/minute inputs with validation</li>
+                <li>AM/PM toggle button</li>
+                <li>Keyboard navigation (Tab, Arrow keys)</li>
+                <li>Ripple effects on all interactive elements</li>
+                <li>Material Design 3 styling</li>
+              </ul>
+            </div>
           </CardContent>
         </Card>
       </section>
