@@ -10,7 +10,7 @@
  * - Material Design Standard easing curves and 200ms duration for all animations
  */
 
-import { useId, useRef, useState } from 'react';
+import { useId, useRef, useState, type ReactNode } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/app/lib/utils';
 
@@ -148,6 +148,8 @@ interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'disabled'>,
     VariantProps<typeof inputVariants> {
   label: string;
+  icon?: ReactNode;
+  iconPosition?: 'start' | 'end';
   error?: boolean | null;
   errorMessage?: string;
   supportingText?: string;
@@ -170,6 +172,8 @@ export default function Input({
   label,
   value,
   defaultValue,
+  icon,
+  iconPosition = 'start',
 
   // Error and supporting text
   error = false,
@@ -195,6 +199,7 @@ export default function Input({
 
   const isControlled = value !== undefined;
   const inputValue = isControlled ? value : uncontrolledValue;
+  const hasIcon = Boolean(icon);
 
   // Types that should always float the label (they always have a visual value)
   const alwaysFloatTypes = [
@@ -242,17 +247,35 @@ export default function Input({
       {/* Label outside the container (MUI approach) */}
       <label
         htmlFor={inputId}
-        className={labelVariants({
-          floating: !!isFocused || hasValue,
-          error: !!error && !disabled,
-          focused: !!isFocused,
-          disabled: !!disabled,
-        })}
+        className={cn(
+          labelVariants({
+            floating: !!isFocused || hasValue,
+            error: !!error && !disabled,
+            focused: !!isFocused,
+            disabled: !!disabled,
+          }),
+          hasIcon &&
+            (iconPosition === 'start' ? 'left-12 right-4' : 'left-4 right-12'),
+        )}
       >
         {label}
       </label>
       {/* Container with input */}
       <div className='relative block w-full'>
+        {hasIcon && (
+          <span
+            aria-hidden='true'
+            className={cn(
+              'absolute top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none transition-colors duration-200 ease-emphasized',
+              iconPosition === 'start' ? 'left-4' : 'right-4',
+              disabled
+                ? 'opacity-[0.38]'
+                : 'group-hover:text-on-surface group-focus-within:text-primary',
+            )}
+          >
+            {icon}
+          </span>
+        )}
         <input
           id={inputId}
           disabled={disabled}
@@ -265,6 +288,8 @@ export default function Input({
               disabled: !!disabled,
             }),
             error ? 'caret-error' : 'caret-primary',
+            hasIcon &&
+              (iconPosition === 'start' ? 'pl-12 pr-4' : 'pl-4 pr-12'),
             className,
           )}
           onFocus={handleFocus}
