@@ -1,15 +1,6 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { Input } from '@/app/components/ui/inputs';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/app/components/ui/dialog';
-import { Button } from '@/app/components/ui/buttons';
 import { cn } from '@/app/lib/utils';
 import {
   useRipple,
@@ -28,6 +19,18 @@ import {
   to12HourFormat,
   getPeriodFrom24Hour,
 } from '@/app/lib/utils/time';
+
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/app/components/ui/dialog';
+
+import { Input } from '@/app/components/ui/inputs';
+import { Button, IconButton } from '@/app/components/ui/buttons';
 import { KeyboardIcon } from '../icons/keyboard-icon';
 
 interface TimePickerProps {
@@ -103,8 +106,15 @@ function TimeSelector({
     disabled: isEditing,
   };
 
-  const { ripples, rippleRef, handleMouseDown, handleMouseUp, handleKeyDown, handleKeyUp, removeRipple } =
-    useRipple(rippleConfig);
+  const {
+    ripples,
+    rippleRef,
+    handleMouseDown,
+    handleMouseUp,
+    handleKeyDown,
+    handleKeyUp,
+    removeRipple,
+  } = useRipple(rippleConfig);
 
   useEffect(() => {
     if (!isEditing) return;
@@ -114,9 +124,7 @@ function TimeSelector({
     }
   }, [isEditing, inputRef]);
 
-  const handleKeyDownInternal = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
+  const handleKeyDownInternal = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!isEditing) {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -141,22 +149,30 @@ function TimeSelector({
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       onClick={!isEditing ? onEdit : undefined}
-      onKeyDown={!isEditing ? (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          e.stopPropagation(); // Prevent dialog from submitting
-          handleKeyDown(e as unknown as React.KeyboardEvent<HTMLElement>); // Trigger ripple
-        }
-      } : undefined}
-      onKeyUp={!isEditing ? (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          handleKeyUp(e as unknown as React.KeyboardEvent<HTMLElement>); // Release ripple
-          onEdit(); // Trigger action on key release
-        }
-      } : undefined}
+      onKeyDown={
+        !isEditing
+          ? e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                e.stopPropagation(); // Prevent dialog from submitting
+                handleKeyDown(e as unknown as React.KeyboardEvent<HTMLElement>); // Trigger ripple
+              }
+            }
+          : undefined
+      }
+      onKeyUp={
+        !isEditing
+          ? e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleKeyUp(e as unknown as React.KeyboardEvent<HTMLElement>); // Release ripple
+                onEdit(); // Trigger action on key release
+              }
+            }
+          : undefined
+      }
       tabIndex={!isEditing ? 0 : -1}
       className={cn(
-        'typescale-display-large h-20 w-24 rounded-lg !font-normal transition-colors overflow-hidden relative outline-none before:absolute before:inset-0 before:transition-all before:duration-200 before:opacity-0 before:bg-current before:z-[1]',
+        'typescale-display-large relative h-20 w-24 overflow-hidden rounded-lg !font-normal outline-none transition-colors before:absolute before:inset-0 before:z-[1] before:bg-current before:opacity-0 before:transition-all before:duration-200',
         isActive
           ? 'bg-primary-container text-on-primary-container'
           : 'bg-surface-container-highest text-on-surface-variant hover:text-on-surface',
@@ -176,8 +192,10 @@ function TimeSelector({
         readOnly={!isEditing}
         tabIndex={isEditing ? 0 : -1}
         className={cn(
-          'typescale-display-large h-20 w-24 rounded-lg bg-transparent text-center !font-normal outline-none relative z-[2]',
-          isEditing ? 'caret-primary cursor-text' : 'caret-transparent cursor-pointer',
+          'typescale-display-large relative z-[2] h-20 w-24 rounded-lg bg-transparent text-center !font-normal outline-none',
+          isEditing
+            ? 'cursor-text caret-primary'
+            : 'cursor-pointer caret-transparent',
         )}
       />
 
@@ -246,7 +264,7 @@ function PeriodSelector({ period, onToggle }: PeriodSelectorProps) {
   } = useRipple(rippleConfigPM);
 
   return (
-    <div className='w-[52px] flex flex-col rounded-lg border border-outline'>
+    <div className='flex w-[52px] flex-col rounded-lg border border-outline'>
       {/* Period Selector - AM */}
       <button
         ref={rippleRefAM as React.RefObject<HTMLButtonElement>}
@@ -257,7 +275,7 @@ function PeriodSelector({ period, onToggle }: PeriodSelectorProps) {
         onKeyDown={handleKeyDownAM}
         onKeyUp={handleKeyUpAM}
         className={cn(
-          'flex-1 px-3 text-sm font-medium transition-colors ease-emphasized-decelerate rounded-t-lg outline-none relative overflow-hidden before:absolute before:inset-0 before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-secondary focus-visible:outline-offset-2 focus-visible:z-10',
+          'relative flex-1 overflow-hidden rounded-t-lg px-3 text-sm font-medium outline-none transition-colors ease-emphasized-decelerate before:absolute before:inset-0 before:opacity-0 before:transition-all before:duration-200 hover:before:opacity-8 focus-visible:z-10 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-secondary',
           period === 'AM'
             ? 'bg-tertiary-container text-on-tertiary-container before:bg-on-tertiary-container'
             : 'bg-surface-container-high text-on-surface-variant before:bg-on-surface-variant',
@@ -289,7 +307,7 @@ function PeriodSelector({ period, onToggle }: PeriodSelectorProps) {
         onKeyDown={handleKeyDownPM}
         onKeyUp={handleKeyUpPM}
         className={cn(
-          'flex-1 px-3 text-sm font-medium transition-colors ease-emphasized-decelerate rounded-b-lg outline-none relative overflow-hidden before:absolute before:inset-0 before:transition-all before:duration-200 before:opacity-0 hover:before:opacity-8 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-secondary focus-visible:outline-offset-2 focus-visible:z-10',
+          'relative flex-1 overflow-hidden rounded-b-lg px-3 text-sm font-medium outline-none transition-colors ease-emphasized-decelerate before:absolute before:inset-0 before:opacity-0 before:transition-all before:duration-200 hover:before:opacity-8 focus-visible:z-10 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-secondary',
           period === 'PM'
             ? 'bg-tertiary-container text-on-tertiary-container before:bg-on-tertiary-container'
             : 'bg-surface-container-high text-on-surface-variant before:bg-on-surface-variant',
@@ -340,15 +358,15 @@ export default function TimePicker({
 
   const hoursInputRef = useRef<HTMLInputElement>(null);
   const minutesInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Refs for state values to avoid stale closures in event handlers
   const modeRef = useRef(mode);
   const hoursRef = useRef(hours);
-  
+
   useEffect(() => {
     modeRef.current = mode;
   }, [mode]);
-  
+
   useEffect(() => {
     hoursRef.current = hours;
   }, [hours]);
@@ -368,7 +386,7 @@ export default function TimePicker({
       if (modeRef.current === 'hours') {
         handleHourSelect(hoursRef.current);
       }
-      
+
       setIsDragging(false);
     };
 
@@ -390,6 +408,11 @@ export default function TimePicker({
     setEditingMinutes(false);
     setTempHoursValue('');
     setTempMinutesValue('');
+    
+    // Also blur any focused element to remove focus from TimeSelector containers
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   };
 
   // Format time for display in input field
@@ -647,7 +670,11 @@ export default function TimePicker({
   // Cancel and reset to original value
   const handleCancel = () => {
     if (value) {
-      const { hours: hrs, minutes: mins, period: per } = initializeTimeState(value);
+      const {
+        hours: hrs,
+        minutes: mins,
+        period: per,
+      } = initializeTimeState(value);
       setHours(hrs);
       setMinutes(mins);
       setPeriod(per);
@@ -989,13 +1016,13 @@ export default function TimePicker({
           </div>
 
           {/* Keyboard Icon - Bottom Left Corner */}
-          <button
+          <IconButton
             type='button'
-            className='absolute bottom-6 left-6 flex h-10 w-10 items-center justify-center overflow-hidden rounded-full text-on-surface-variant outline-none before:absolute before:inset-0 before:rounded-full before:bg-current before:opacity-0 before:transition-all before:duration-200 hover:before:opacity-8 focus-visible:outline-2 focus-visible:outline-primary focus-visible:before:opacity-12'
+            variant='standard'
             aria-label='Toggle keyboard input'
-          >
-            <KeyboardIcon variant='solid' className='h-6' />
-          </button>
+            className='absolute bottom-6 left-6'
+            icon={<KeyboardIcon variant='solid' className='h-6' />}
+          />
           <DialogFooter className='mt-6'>
             <Button type='button' variant='text' onClick={handleCancel}>
               Cancel
