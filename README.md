@@ -47,7 +47,7 @@ SplitShifts is a web application designed to streamline the scheduling process f
   - **Multi-Step Login**: Conditional 2FA verification during login process
 - **Conditional Navigation**: Smart navigation component that automatically hides the navbar on authentication pages while preserving it on public pages
 - **Responsive UI Components**: Comprehensive component library with consistent styling
-  - **Reusable Forms**: Modern Input component with validation, error handling, and ref forwarding support
+  - **Reusable Forms**: Modern Input component with validation, error handling, ref forwarding, and optional icons
   - **OTP Input Component**: Specialized 6-digit OTP input with accessibility features
   - **Authentication Cards**: Consistent card-based design for all auth flows
   - **Component Modernization**: Unified form interface using standardized Input component across all authentication forms

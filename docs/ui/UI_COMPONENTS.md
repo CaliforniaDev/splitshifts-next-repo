@@ -297,6 +297,12 @@ The `Input` component is a modern, reusable input field that supports labels, er
 
 - **`label`** (`string`): The label for the input field.
 
+- **`icon`** (`ReactNode`, optional): Optional icon rendered inside the input.
+
+- **`iconPosition`** (`'start' | 'end'`, optional): Placement for the input icon.
+
+  **Default:** `'start'`
+
 - **`value`** (`string`, optional): The current value of the input field (for controlled components).
 
 - **`defaultValue`** (`string`, optional): The default value of the input field (for uncontrolled components).
@@ -386,6 +392,14 @@ function ExampleForm() {
         type="email"
         onChange={(e) => console.log(e.target.value)}
         supportingText="We'll never share your email."
+      />
+
+      {/* Input with Icon */}
+      <Input
+        label="Search"
+        type="text"
+        icon={<SearchIcon className="h-5 w-5" />}
+        iconPosition="start"
       />
     </form>
   );
