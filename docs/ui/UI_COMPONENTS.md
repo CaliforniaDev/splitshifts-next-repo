@@ -303,6 +303,10 @@ The `Input` component is a modern, reusable input field that supports labels, er
 
   **Default:** `'start'`
 
+- **`onIconClick`** (`() => void`, optional): If provided, the icon becomes a clickable button.
+
+- **`iconButtonAriaLabel`** (`string`, optional): Accessible label for the icon button.
+
 - **`value`** (`string`, optional): The current value of the input field (for controlled components).
 
 - **`defaultValue`** (`string`, optional): The default value of the input field (for uncontrolled components).
@@ -400,6 +404,16 @@ function ExampleForm() {
         type="text"
         icon={<SearchIcon className="h-5 w-5" />}
         iconPosition="start"
+      />
+
+      {/* Input with Action Icon */}
+      <Input
+        label="Select time"
+        type="text"
+        icon={<ClockIcon className="h-5 w-5" />}
+        iconPosition="end"
+        iconButtonAriaLabel="Open time picker"
+        onIconClick={() => setIsTimePickerOpen(true)}
       />
     </form>
   );

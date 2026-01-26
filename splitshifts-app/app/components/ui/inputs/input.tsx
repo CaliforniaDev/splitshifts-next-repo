@@ -150,6 +150,8 @@ interface InputProps
   label: string;
   icon?: ReactNode;
   iconPosition?: 'start' | 'end';
+  onIconClick?: () => void;
+  iconButtonAriaLabel?: string;
   error?: boolean | null;
   errorMessage?: string;
   supportingText?: string;
@@ -174,6 +176,8 @@ export default function Input({
   defaultValue,
   icon,
   iconPosition = 'start',
+  onIconClick,
+  iconButtonAriaLabel,
 
   // Error and supporting text
   error = false,
@@ -188,7 +192,8 @@ export default function Input({
 
   // Callbacks
   onChange,
-  onBlur,
+  onBlur: userOnBlur,
+  onFocus: userOnFocus,
 
   // Rest props
   ...props
@@ -200,6 +205,7 @@ export default function Input({
   const isControlled = value !== undefined;
   const inputValue = isControlled ? value : uncontrolledValue;
   const hasIcon = Boolean(icon);
+  const hasIconAction = Boolean(icon && onIconClick);
 
   // Types that should always float the label (they always have a visual value)
   const alwaysFloatTypes = [
@@ -240,8 +246,14 @@ export default function Input({
     onChange?.(e);
   };
 
-  const handleFocus = () => setIsFocused(true);
-  const handleBlur = () => setIsFocused(false);
+  const handleFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(true);
+    userOnFocus?.(event);
+  };
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(false);
+    userOnBlur?.(event);
+  };
   return (
     <div className='group relative' data-testid={dataTestId}>
       {/* Label outside the container (MUI approach) */}
@@ -255,27 +267,43 @@ export default function Input({
             disabled: !!disabled,
           }),
           hasIcon &&
-            (iconPosition === 'start' ? 'left-12 right-4' : 'left-4 right-12'),
+            (iconPosition === 'start' ? 'left-[52px] right-4' : 'left-4 right-[52px]'),
         )}
       >
         {label}
       </label>
       {/* Container with input */}
       <div className='relative block w-full'>
-        {hasIcon && (
-          <span
-            aria-hidden='true'
-            className={cn(
-              'absolute top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none transition-colors duration-200 ease-emphasized',
-              iconPosition === 'start' ? 'left-4' : 'right-4',
-              disabled
-                ? 'opacity-[0.38]'
-                : 'group-hover:text-on-surface group-focus-within:text-primary',
-            )}
-          >
-            {icon}
-          </span>
-        )}
+        {hasIcon &&
+          (hasIconAction ? (
+            <button
+              type='button'
+              aria-label={iconButtonAriaLabel || `${label} action`}
+              disabled={disabled}
+              onClick={onIconClick}
+              onMouseDown={event => event.preventDefault()}
+              className={cn(
+                'absolute top-1/2 -translate-y-1/2 z-10 h-12 w-12 flex items-center justify-center text-on-surface-variant transition-colors duration-200 ease-emphasized',
+                iconPosition === 'start' ? 'left-0' : 'right-0',
+                disabled && 'opacity-[0.38]',
+                !disabled && 'group-hover:text-on-surface group-focus-within:text-primary',
+              )}
+            >
+              {icon}
+            </button>
+          ) : (
+            <span
+              aria-hidden='true'
+              className={cn(
+                'absolute top-1/2 -translate-y-1/2 z-10 h-12 w-12 flex items-center justify-center text-on-surface-variant transition-colors duration-200 ease-emphasized pointer-events-none',
+                iconPosition === 'start' ? 'left-0' : 'right-0',
+                disabled && 'opacity-[0.38]',
+                !disabled && 'group-hover:text-on-surface group-focus-within:text-primary',
+              )}
+            >
+              {icon}
+            </span>
+          ))}
         <input
           id={inputId}
           disabled={disabled}
@@ -289,7 +317,7 @@ export default function Input({
             }),
             error ? 'caret-error' : 'caret-primary',
             hasIcon &&
-              (iconPosition === 'start' ? 'pl-12 pr-4' : 'pl-4 pr-12'),
+              (iconPosition === 'start' ? 'pl-[52px] pr-4' : 'pl-4 pr-[52px]'),
             className,
           )}
           onFocus={handleFocus}
