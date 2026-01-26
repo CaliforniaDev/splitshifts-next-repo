@@ -28,6 +28,7 @@
   - **Clock Face Integration**: Interactive SVG dial with drag support and auto-transition animations
   - **Precise Spacing**: 36px above clock, 24px below, 12px between sections, 24px separator width
   - **Focus Management**: Container focusable when not editing, input focusable during editing
+- **Input Icon Actions**: Optional clickable icon button support for Input fields with accessible labels
 - Implementation plan documentation with 5-phase MVP roadmap (`docs/IMPLEMENTATION_PLAN.md`)
   - Phase 1: Foundation & Core CRUD (Week 1-2, 60% complete)
   - Phase 2: Shift Assignment & Notifications (Week 3)
@@ -252,6 +253,9 @@
 
 ### Changed
 
+- Allow Enter key to confirm Time Picker selections after manual entry.
+- Update Time Picker manual input to auto-advance hours → minutes and support AM/PM shortcuts.
+- Add `iconPosition` prop to control the Time Picker field icon alignment.
 - Extracted shared Tailwind CSS styles for `Button` and `LinkButton` components into a separate file (`buttonStyles.ts`) to ensure consistency and reusability across both components.
 - **Folder Structure**: Organized the app into `(public)` and `(logged-in)` sections for better separation of concerns.
 - **Component Refactoring**: Improved the structure and readability of reusable components like `Button` and `Input` (migrated from TextField for better consistency).
@@ -260,6 +264,7 @@
 
 ### Fixed
 
+- Fix Time Picker minutes input swapping digits after manual entry.
 - Align SelectMenu check icon beside the option label within menu items.
 - Match SelectMenu focus styling to Input with label color and underline animation on keyboard focus.
 - Restore SelectMenu arrow-key navigation and active item highlighting when navigating options.

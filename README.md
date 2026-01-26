@@ -50,6 +50,7 @@ SplitShifts is a web application designed to streamline the scheduling process f
   - **Reusable Forms**: Modern Input component with validation, error handling, ref forwarding, and optional icons
   - **OTP Input Component**: Specialized 6-digit OTP input with accessibility features
   - **Authentication Cards**: Consistent card-based design for all auth flows
+  - **Time Picker Manual Entry**: Type hours → minutes with auto-advance, use A/P for AM/PM, Enter confirms, icon opens the dial
   - **Component Modernization**: Unified form interface using standardized Input component across all authentication forms
   - **AuthLayout System**: Professional responsive layout for authentication pages
     - **Three Layout Variants**: Default (50/50), Wide (60/40), and Compact (66/33) split layouts
@@ -368,6 +369,7 @@ The project uses `tailwindcss` for styling, along with plugins like `tailwindcss
 The application features a centralized animation system built on Tailwind CSS:
 
 #### Custom Keyframes
+
 ```css
 /* Located in tailwind.config.ts */
 keyframes: {
@@ -383,6 +385,7 @@ keyframes: {
 ```
 
 #### Animation Classes
+
 ```css
 animation: {
   'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
@@ -391,6 +394,7 @@ animation: {
 ```
 
 #### Usage Examples
+
 ```tsx
 // Staggered animations with delays
 <div className="animate-fade-in-up [animation-delay:0.3s] opacity-0">
@@ -414,17 +418,20 @@ The project uses `nodemailer` in combination with Resend for sending transaction
 ### Configuration
 
 1. Install `nodemailer` and Resend:
+
    ```bash
    pnpm install nodemailer @resend/client
    ```
 
 2. Set up environment variables in your `.env` file:
+
    ```env
    RESEND_API_KEY=your-resend-api-key
    EMAIL_FROM=your-email@example.com
    ```
 
 3. Example usage:
+
    ```javascript
    import { mailer } from '@/app/lib/email';
    import { buildVerificationLink, generateSecureToken } from '@/app/lib/utils';
@@ -464,18 +471,21 @@ The project uses `nodemailer` in combination with Resend for sending transaction
 The application features a comprehensive authentication system built with NextAuth.js and modern security practices:
 
 #### **User Registration & Login**
+
 - **Sign-Up Flow**: Multi-field registration with first name, last name, email, password, and confirmation
 - **Login System**: Secure email/password authentication with optional 2FA verification
 - **Form Validation**: Real-time client and server-side validation using Zod schemas
 - **Error Handling**: Comprehensive error states with user-friendly feedback
 
 #### **Password Management**
+
 - **Password Reset**: Email-based password reset with secure token validation
 - **Password Updates**: In-app password change functionality for authenticated users
 - **Security Requirements**: Enforced password complexity with special characters and minimum length
 - **Token Security**: Time-limited password reset tokens with automatic expiration
 
 #### **Two-Factor Authentication (2FA)**
+
 - **OTP Implementation**: Time-based One-Time Password using industry-standard algorithms
 - **QR Code Setup**: Generate QR codes for popular authenticator apps (Google Authenticator, Authy, Microsoft Authenticator)
 - **Multi-Step Login**: Conditional 2FA verification during login process
@@ -483,6 +493,7 @@ The application features a comprehensive authentication system built with NextAu
 - **6-Digit Verification**: Secure OTP input component with accessibility features
 
 #### **Session & Security**
+
 - **Session Management**: Automatic session handling with NextAuth.js
 - **Route Protection**: Authentication middleware for protected routes
 - **Logout Functionality**: Clean logout with session termination
@@ -494,6 +505,7 @@ The application features a comprehensive authentication system built with NextAu
 The app implements an intelligent navigation system with conditional rendering:
 
 #### **Route-Based Navigation**
+
 - **Conditional Rendering**: Navigation automatically hides on authentication pages (`/login`, `/signup`, `/password-reset`, `/update-password`)
 - **Secure Matching**: Uses `pathname.startsWith()` for precise route detection and security
 - **Consistent UX**: Maintains navigation on all public pages while providing clean auth experiences
@@ -516,6 +528,7 @@ export default function AppNavigation() {
 ### Authentication Components
 
 #### **Form Components**
+
 - **SignUpForm**: Complete registration form with validation
 - **LoginForm**: Multi-step login with 2FA support
 - **PasswordResetForm**: Email-based password reset request
@@ -523,6 +536,7 @@ export default function AppNavigation() {
 - **TwoFactorAuthForm**: 2FA setup and management interface
 
 #### **UI Components**
+
 - **OTPInput**: Specialized 6-digit OTP input with keyboard navigation
 - **LogoutButton**: Reusable logout component with error handling
 - **AuthenticationCards**: Consistent card-based design for all auth flows
