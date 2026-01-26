@@ -9,13 +9,13 @@ Custom time picker with 12-hour format, clock face dial, and editable inputs.
 ✅ Vertical layout implementation complete
 ✅ Interaction states refined (focus borders, hover overlays, ripples)
 ✅ TimeSelector and PeriodSelector sub-components
+✅ Manual input field with icon-triggered dial
 ✅ Keyboard navigation support
 
 ## Pending Features
 
 ### High Priority
 
-- [ ] **Input-only mode with dial toggle**: Default view shows only time inputs, keyboard icon toggles dial visibility
 - [ ] **Horizontal layout for landscape**: Responsive layout that switches based on viewport width/orientation
 
 ### Refactoring Backlog (After Features Complete)
@@ -68,6 +68,12 @@ Custom time picker with 12-hour format, clock face dial, and editable inputs.
 - TimeSelector: Unified input/button component with ripple support
 - PeriodSelector: Separate AM/PM toggle with individual ripple instances
 - Focus management: Container focusable when not editing, input focusable when editing
+
+### Manual Input Updates
+
+- Input highlights hours on focus, auto-advances to minutes, and accepts A/P for AM/PM
+- Clock icon opens the picker dialog without entering edit mode
+- Icon position is configurable via `iconPosition` prop
 
 ## Design Specs
 

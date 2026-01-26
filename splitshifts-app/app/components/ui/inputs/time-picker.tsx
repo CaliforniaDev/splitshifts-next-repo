@@ -16,8 +16,6 @@ import {
   validateHours,
   validateMinutes,
   createDateFromTime,
-  to12HourFormat,
-  getPeriodFrom24Hour,
 } from '@/app/lib/utils/time';
 
 
@@ -31,7 +29,7 @@ import {
 
 import { Input } from '@/app/components/ui/inputs';
 import { Button, IconButton } from '@/app/components/ui/buttons';
-import { KeyboardIcon } from '../icons/keyboard-icon';
+import { KeyboardIcon, ClockIcon } from '../icons';
 
 interface TimePickerProps {
   label: string;
@@ -44,9 +42,11 @@ interface TimePickerProps {
   disabled?: boolean;
   required?: boolean;
   className?: string;
+  iconPosition?: 'start' | 'end';
 }
 
 type TimeMode = 'hours' | 'minutes';
+type ManualSegment = 'hours' | 'minutes' | 'period';
 
 // Clock geometry constants
 const CLOCK_CONSTANTS = {
@@ -59,6 +59,12 @@ const CLOCK_CONSTANTS = {
   EDGE_GAP: 2,
   SELECTOR_TRACK_THICKNESS: 2,
 } as const;
+
+const MANUAL_SEGMENT_RANGES: Record<ManualSegment, [number, number]> = {
+  hours: [0, 2],
+  minutes: [3, 5],
+  period: [6, 8],
+};
 
 // Animation timing constants
 const ANIMATION_CONSTANTS = {
@@ -76,7 +82,7 @@ interface TimeSelectorProps {
   tempValue: string;
   onEdit: () => void;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onBlur: () => void;
+  onBlur: (e?: React.FocusEvent<HTMLInputElement>) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   inputRef: React.RefObject<HTMLInputElement | null>;
   rippleKeyframeName: string;
@@ -342,6 +348,7 @@ export default function TimePicker({
   disabled = false,
   required = false,
   className = '',
+  iconPosition = 'start',
 }: TimePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<TimeMode>('hours');
@@ -355,9 +362,13 @@ export default function TimePicker({
   const [editingMinutes, setEditingMinutes] = useState(false);
   const [tempHoursValue, setTempHoursValue] = useState('');
   const [tempMinutesValue, setTempMinutesValue] = useState('');
+  const [isManualEditing, setIsManualEditing] = useState(false);
+  const [activeSegment, setActiveSegment] = useState<ManualSegment>('hours');
+  const [segmentBuffer, setSegmentBuffer] = useState('');
 
   const hoursInputRef = useRef<HTMLInputElement>(null);
   const minutesInputRef = useRef<HTMLInputElement>(null);
+  const manualInputRef = useRef<HTMLInputElement | null>(null);
 
   // Refs for state values to avoid stale closures in event handlers
   const modeRef = useRef(mode);
@@ -370,6 +381,7 @@ export default function TimePicker({
   useEffect(() => {
     hoursRef.current = hours;
   }, [hours]);
+
 
   // Add global mouseup listener when dragging starts
   useEffect(() => {
@@ -420,6 +432,48 @@ export default function TimePicker({
     if (!value) return '';
     return formatTimeUtil(hours, minutes, period);
   };
+
+  const getManualDisplayValue = () => {
+    return formatTimeUtil(hours, minutes, period);
+  };
+
+  const selectSegment = (segment: ManualSegment) => {
+    const input = manualInputRef.current;
+    if (!input) return;
+    const [start, end] = MANUAL_SEGMENT_RANGES[segment];
+    requestAnimationFrame(() => input.setSelectionRange(start, end));
+  };
+
+  const setSegment = (segment: ManualSegment) => {
+    setActiveSegment(segment);
+    setSegmentBuffer('');
+    selectSegment(segment);
+  };
+
+  const advanceSegment = () => {
+    if (activeSegment === 'hours') {
+      setSegment('minutes');
+      return;
+    }
+    if (activeSegment === 'minutes') {
+      setSegment('period');
+    }
+  };
+
+  const retreatSegment = () => {
+    if (activeSegment === 'period') {
+      setSegment('minutes');
+      return;
+    }
+    if (activeSegment === 'minutes') {
+      setSegment('hours');
+    }
+  };
+
+  useEffect(() => {
+    if (!isManualEditing) return;
+    selectSegment(activeSegment);
+  }, [activeSegment, hours, isManualEditing, minutes, period]);
 
   // Calculate angle for clock hand position (0° = 12 o'clock, 90° = 3 o'clock)
   const getAngle = (value: number, total: number) => {
@@ -515,10 +569,7 @@ export default function TimePicker({
 
       // Auto-complete after 2 digits
       if (value.length === 2) {
-        const numValue = validateMinutes(value);
-        setMinutes(numValue);
-        setEditingMinutes(false);
-        setTempMinutesValue('');
+        commitMinutesValue(value);
         // Blur input - keyboard users can Tab to AM/PM or OK button
         if (minutesInputRef.current) {
           minutesInputRef.current.blur();
@@ -527,23 +578,177 @@ export default function TimePicker({
     }
   };
 
-  const handleMinutesBlur = () => {
-    if (tempMinutesValue === '') {
+  const commitMinutesValue = (rawValue?: string) => {
+    const nextValue =
+      rawValue ?? minutesInputRef.current?.value ?? tempMinutesValue;
+
+    if (nextValue === '') {
       // User didn't type anything, keep current value
       setEditingMinutes(false);
+      setTempMinutesValue('');
       return;
     }
 
-    const numValue = validateMinutes(tempMinutesValue);
+    const numValue = validateMinutes(nextValue);
     setMinutes(numValue);
     setEditingMinutes(false);
     setTempMinutesValue('');
   };
 
+  const handleMinutesBlur = (e?: React.FocusEvent<HTMLInputElement>) => {
+    commitMinutesValue(e?.currentTarget.value);
+  };
+
   const handleMinutesKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === 'Tab') {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      handleMinutesBlur();
+      const resolvedValue =
+        minutesInputRef.current?.value ?? tempMinutesValue;
+      const confirmedMinutes =
+        resolvedValue === '' ? minutes : validateMinutes(resolvedValue);
+      commitMinutesValue(resolvedValue);
+      handleConfirm({ minutes: confirmedMinutes });
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      commitMinutesValue();
+    }
+  };
+
+  const finalizeManualEditing = () => {
+    if (!isManualEditing) return;
+    const currentState = value ? initializeTimeState(value) : null;
+    const hasChanged =
+      !currentState ||
+      currentState.hours !== hours ||
+      currentState.minutes !== minutes ||
+      currentState.period !== period;
+    if (hasChanged) {
+      const date = createDateFromTime(hours, minutes, period);
+      onChange?.(date);
+    }
+    setIsManualEditing(false);
+    setSegmentBuffer('');
+  };
+
+  const handleManualFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+    manualInputRef.current = event.currentTarget;
+    if (value) {
+      const { hours: hrs, minutes: mins, period: per } =
+        initializeTimeState(value);
+      setHours(hrs);
+      setMinutes(mins);
+      setPeriod(per);
+    }
+    setIsManualEditing(true);
+    setSegment('hours');
+  };
+
+  const handleManualClick = (event: React.MouseEvent<HTMLInputElement>) => {
+    manualInputRef.current = event.currentTarget;
+    if (!isManualEditing) {
+      setIsManualEditing(true);
+    }
+    const cursorPosition = event.currentTarget.selectionStart ?? 0;
+    if (cursorPosition <= 2) {
+      setSegment('hours');
+      return;
+    }
+    if (cursorPosition <= 5) {
+      setSegment('minutes');
+      return;
+    }
+    setSegment('period');
+  };
+
+  const handleManualChange = (_event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isManualEditing) return;
+  };
+
+  const handleManualBlur = () => {
+    finalizeManualEditing();
+    onBlur?.();
+  };
+
+  const handleManualKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!isManualEditing) return;
+
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+
+    if (event.key === 'Tab') return;
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      manualInputRef.current?.blur();
+      return;
+    }
+
+    if (event.key === 'ArrowRight' || event.key === ':' || event.key === ' ') {
+      event.preventDefault();
+      advanceSegment();
+      return;
+    }
+
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      retreatSegment();
+      return;
+    }
+
+    if (event.key === 'Backspace') {
+      event.preventDefault();
+      if (segmentBuffer.length > 0) {
+        const nextBuffer = segmentBuffer.slice(0, -1);
+        setSegmentBuffer(nextBuffer);
+        if (activeSegment === 'hours' && nextBuffer) {
+          setHours(validateHours(nextBuffer));
+        }
+        if (activeSegment === 'minutes' && nextBuffer) {
+          setMinutes(validateMinutes(nextBuffer));
+        }
+        return;
+      }
+      retreatSegment();
+      return;
+    }
+
+    const lowerKey = event.key.toLowerCase();
+    if (lowerKey === 'a' || lowerKey === 'p') {
+      event.preventDefault();
+      setPeriod(lowerKey === 'a' ? 'AM' : 'PM');
+      setSegment('period');
+      return;
+    }
+
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+      return;
+    }
+
+    event.preventDefault();
+
+    if (activeSegment === 'hours') {
+      const nextBuffer = `${segmentBuffer}${event.key}`.slice(-2);
+      const nextHours = validateHours(nextBuffer);
+      setSegmentBuffer(nextBuffer);
+      setHours(nextHours);
+      const shouldAdvance =
+        nextBuffer.length === 2 || (nextBuffer.length === 1 && nextHours > 1);
+      if (shouldAdvance) {
+        advanceSegment();
+      }
+      return;
+    }
+
+    if (activeSegment === 'minutes') {
+      const nextBuffer = `${segmentBuffer}${event.key}`.slice(-2);
+      setSegmentBuffer(nextBuffer);
+      setMinutes(validateMinutes(nextBuffer));
+      if (nextBuffer.length === 2) {
+        advanceSegment();
+      }
     }
   };
 
@@ -660,8 +865,12 @@ export default function TimePicker({
   };
 
   // Confirm time selection and close dialog
-  const handleConfirm = () => {
-    const date = createDateFromTime(hours, minutes, period);
+  const handleConfirm = (override?: { hours?: number; minutes?: number; period?: Period }) => {
+    const date = createDateFromTime(
+      override?.hours ?? hours,
+      override?.minutes ?? minutes,
+      override?.period ?? period,
+    );
     onChange?.(date);
     setIsOpen(false);
     onBlur?.();
@@ -681,6 +890,30 @@ export default function TimePicker({
     }
     setMode('hours');
     setIsOpen(false);
+  };
+
+  const handleOpenPicker = () => {
+    if (disabled) return;
+
+    if (isManualEditing) {
+      finalizeManualEditing();
+    }
+
+    if (value) {
+      const {
+        hours: hrs,
+        minutes: mins,
+        period: per,
+      } = initializeTimeState(value);
+      setHours(hrs);
+      setMinutes(mins);
+      setPeriod(per);
+    }
+
+    setMode('hours'); // Always start with hours mode
+    setEditingHours(false);
+    setEditingMinutes(false);
+    setIsOpen(true);
   };
 
   // Generate hour/minute arrays
@@ -708,34 +941,23 @@ export default function TimePicker({
       <Input
         label={label}
         type='text'
-        value={formatTime()}
-        onClick={() => {
-          if (!disabled) {
-            // Sync state when opening
-            if (value) {
-              const {
-                hours: hrs,
-                minutes: mins,
-                period: per,
-              } = initializeTimeState(value);
-              setHours(hrs);
-              setMinutes(mins);
-              setPeriod(per);
-            }
-            setMode('hours'); // Always start with hours mode
-            setEditingHours(false); // Start with hours focused but not editing
-            setEditingMinutes(false);
-            setIsOpen(true);
-          }
-        }}
-        onBlur={onBlur}
+        icon={<ClockIcon variant='outline' className='h-6' />}
+        iconPosition={iconPosition}
+        onIconClick={handleOpenPicker}
+        iconButtonAriaLabel='Open time picker'
+        value={isManualEditing ? getManualDisplayValue() : formatTime()}
+        onFocus={handleManualFocus}
+        onClick={handleManualClick}
+        onChange={handleManualChange}
+        onKeyDown={handleManualKeyDown}
+        onBlur={handleManualBlur}
         error={error}
         errorMessage={errorMessage}
         supportingText={supportingText}
         disabled={disabled}
         required={required}
-        readOnly
-        className={cn('cursor-pointer', className)}
+        placeholder='HH:MM AM'
+        className={className}
       />
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -1027,7 +1249,11 @@ export default function TimePicker({
             <Button type='button' variant='text' onClick={handleCancel}>
               Cancel
             </Button>
-            <Button type='button' variant='text' onClick={handleConfirm}>
+            <Button
+              type='button'
+              variant='text'
+              onClick={() => handleConfirm()}
+            >
               OK
             </Button>
           </DialogFooter>
