@@ -400,6 +400,7 @@ export default function ComponentTestPage() {
                   placeholder='(555) 123-4567'
                 />
                 <Input label='Hire Date' type='date' />
+                <Input label='Hire Date' type='time' />
                 <Input label='Salary' type='number' placeholder='50000' />
                 <Input
                   label='Website URL'
