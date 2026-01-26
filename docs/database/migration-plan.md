@@ -1,16 +1,19 @@
 # SplitShifts Database Migration Plan
 
 ## Overview
+
 This document outlines the step-by-step migration plan to transform the current authentication-only database into a full-featured multi-tenant scheduling system.
 
 ## Current State Analysis
 
 ### Existing Tables
+
 - ✅ `users` - Authentication users (keeping as-is for backward compatibility)
 - ✅ `email_verification_tokens` - Email verification (keeping structure)
 - ✅ `password_reset_tokens` - Password reset flow (adding missing `created_at`)
 
 ### Migration Strategy
+
 - **Additive approach**: Add new tables without breaking existing auth functionality
 - **Backward compatibility**: Keep existing serial PKs for auth tables
 - **Multi-tenancy**: Add `org_id` to all new business tables
@@ -20,6 +23,7 @@ This document outlines the step-by-step migration plan to transform the current 
 ### Phase 1: Core Infrastructure (Week 1)
 
 #### Step 1.1: Database Extensions and Functions
+
 ```sql
 -- Enable required PostgreSQL extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -37,6 +41,7 @@ $$ LANGUAGE plpgsql STABLE;
 ```
 
 #### Step 1.2: Enums and Types
+
 ```sql
 -- Create all enum types first
 CREATE TYPE shift_status AS ENUM ('draft', 'published', 'cancelled');
@@ -49,6 +54,7 @@ CREATE TYPE audit_operation AS ENUM ('INSERT', 'UPDATE', 'DELETE');
 ```
 
 #### Step 1.3: Fix Existing Auth Tables
+
 ```sql
 -- Add missing created_at to password_reset_tokens
 ALTER TABLE password_reset_tokens 
@@ -58,6 +64,7 @@ ADD COLUMN created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 ### Phase 2: Core Business Tables (Week 1-2)
 
 #### Step 2.1: Organizations (Root Multi-tenant Entity)
+
 ```sql
 CREATE TABLE organizations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -82,6 +89,7 @@ CREATE POLICY org_isolation ON organizations
 ```
 
 #### Step 2.2: Employees and Work Sites
+
 ```sql
 -- Create employees table
 CREATE TABLE employees (
@@ -137,6 +145,7 @@ CREATE TABLE roles (
 ### Phase 3: Scheduling Core (Week 2-3)
 
 #### Step 3.1: Shifts and Groups
+
 ```sql
 -- Create shift groups for split-shift support
 CREATE TABLE shift_groups (
@@ -180,6 +189,7 @@ CREATE TABLE shifts (
 ```
 
 #### Step 3.2: Shift Assignments with Overlap Prevention
+
 ```sql
 -- Create shift assignments with exclusion constraint
 CREATE TABLE shift_assignments (
@@ -211,6 +221,7 @@ CREATE TABLE shift_assignments (
 ### Phase 4: Employee Support Tables (Week 3-4)
 
 #### Step 4.1: Certifications and Skills
+
 ```sql
 -- Certifications management
 CREATE TABLE certifications (
@@ -263,6 +274,7 @@ CREATE TABLE employee_skills (
 ```
 
 #### Step 4.2: Availability and Time-Off
+
 ```sql
 -- Employee availability windows
 CREATE TABLE employee_availability (
@@ -306,6 +318,7 @@ CREATE TABLE time_off_requests (
 ### Phase 5: System Tables (Week 4)
 
 #### Step 5.1: System Support Tables
+
 ```sql
 -- Holiday calendars
 CREATE TABLE holiday_calendars (
@@ -355,6 +368,7 @@ CREATE TABLE audit_log (
 ### Phase 6: Performance and Security (Week 5)
 
 #### Step 6.1: Indexes for Performance
+
 ```sql
 -- Multi-tenant indexes (org_id first for RLS performance)
 CREATE INDEX idx_employees_org_id ON employees(org_id) WHERE deleted_at IS NULL;
@@ -387,6 +401,7 @@ CREATE INDEX idx_notifications_status_scheduled ON notifications_outbox(status, 
 ```
 
 #### Step 6.2: Row Level Security Policies
+
 ```sql
 -- Enable RLS on all business tables
 ALTER TABLE employees ENABLE ROW LEVEL SECURITY;
@@ -406,6 +421,7 @@ CREATE POLICY org_isolation ON shift_assignments FOR ALL TO authenticated USING 
 ```
 
 #### Step 6.3: Triggers for Maintenance
+
 ```sql
 -- Updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -430,6 +446,7 @@ CREATE TRIGGER update_employees_updated_at
 ### Phase 7: Materialized Views and Analytics (Week 6)
 
 #### Step 7.1: Performance Views
+
 ```sql
 -- Weekly hours materialized view
 CREATE MATERIALIZED VIEW employee_weekly_hours AS
@@ -462,6 +479,7 @@ CREATE MATERIALIZED VIEW site_coverage_analysis AS
 ### Initial Seed Data
 
 #### Create Demo Organization Function
+
 ```sql
 -- Function to bootstrap a demo organization
 CREATE OR REPLACE FUNCTION create_demo_organization(
@@ -516,6 +534,7 @@ $$ LANGUAGE plpgsql;
 ### Sample Data for Testing
 
 #### Organizations
+
 ```sql
 -- Create test organizations
 SELECT create_demo_organization('Acme Security', 'admin@acme-security.com', 'hashed_password');
@@ -523,6 +542,7 @@ SELECT create_demo_organization('Elite Guard Services', 'admin@elite-guard.com',
 ```
 
 #### Sample Employees per Organization
+
 ```sql
 -- For each organization, create sample employees
 INSERT INTO employees (org_id, first_name, last_name, email, phone, hire_date) VALUES
@@ -533,6 +553,7 @@ INSERT INTO employees (org_id, first_name, last_name, email, phone, hire_date) V
 ```
 
 #### Sample Certifications
+
 ```sql
 INSERT INTO certifications (org_id, name, description, validity_months, is_required) VALUES
     ('{org_id}', 'Security Guard License', 'State-required security guard license', 24, true),
@@ -544,11 +565,13 @@ INSERT INTO certifications (org_id, name, description, validity_months, is_requi
 ## Rollback Plan
 
 ### Rollback Strategy
+
 1. **Phase-by-phase rollback**: Each phase can be rolled back independently
 2. **Data preservation**: Auth tables remain untouched during rollback
 3. **Dependency awareness**: Drop tables in reverse dependency order
 
 ### Rollback Scripts
+
 ```sql
 -- Emergency rollback - remove all new tables
 -- WARNING: This will destroy all business data!
@@ -601,6 +624,7 @@ ALTER TABLE password_reset_tokens DROP COLUMN IF EXISTS created_at;
 ## Testing and Validation
 
 ### Testing Checklist
+
 - [ ] All tables created successfully
 - [ ] RLS policies working correctly
 - [ ] Exclusion constraints prevent overlaps
@@ -613,6 +637,7 @@ ALTER TABLE password_reset_tokens DROP COLUMN IF EXISTS created_at;
 - [ ] Multi-tenant isolation verified
 
 ### Performance Validation
+
 - [ ] Query plans use indexes efficiently
 - [ ] RLS overhead is acceptable
 - [ ] Materialized view refresh times reasonable
@@ -622,6 +647,7 @@ ALTER TABLE password_reset_tokens DROP COLUMN IF EXISTS created_at;
 ## Post-Migration Tasks
 
 ### Application Updates Required
+
 1. **Authentication middleware**: Set `app.current_org_id` session variable
 2. **API endpoints**: Update to use new schema structure
 3. **Business logic**: Implement shift assignment workflows
@@ -629,6 +655,7 @@ ALTER TABLE password_reset_tokens DROP COLUMN IF EXISTS created_at;
 5. **Background jobs**: Set up materialized view refresh schedule
 
 ### Monitoring Setup
+
 1. **Performance monitoring**: Track query performance
 2. **RLS policy effectiveness**: Monitor access patterns
 3. **Constraint violations**: Alert on overlap attempts
@@ -636,6 +663,7 @@ ALTER TABLE password_reset_tokens DROP COLUMN IF EXISTS created_at;
 5. **Data integrity**: Regular consistency checks
 
 ### Documentation Updates
+
 1. **API documentation**: Update with new endpoints
 2. **Database schema docs**: Maintain ERD and table documentation
 3. **Business process docs**: Document scheduling workflows

@@ -8,7 +8,7 @@ Your Neon database (`splitshifts`) has pg_cron available. Everything happens in 
 
 ### Step 1: Enable pg_cron
 
-1. Go to Neon Console: https://console.neon.tech
+1. Go to Neon Console: <https://console.neon.tech>
 2. Select your SplitShifts project
 3. Click "SQL Editor"
 4. Make sure `splitshifts` database is selected
@@ -29,6 +29,7 @@ CREATE EXTENSION IF NOT EXISTS pg_cron;
 5. Click "Run"
 
 This creates:
+
 - `purge_old_soft_deleted_organizations()` function
 - `cleanup_audit_log` table
 - `purge_old_soft_deleted_with_audit()` wrapper function
@@ -75,6 +76,7 @@ SELECT * FROM cleanup_audit_log LIMIT 1;
 ```
 
 You should see:
+
 - pg_cron extension exists
 - One job with `active = true` and schedule `0 2 * * *`
 - Two functions: `purge_old_soft_deleted_organizations` and `purge_old_soft_deleted_with_audit`
@@ -90,6 +92,7 @@ SELECT * FROM purge_old_soft_deleted_with_audit();
 ```
 
 Expected result:
+
 - Returns `purged_count: 0` and empty array (if no old deleted records exist)
 - Adds entry to `cleanup_audit_log` table
 
@@ -121,17 +124,20 @@ LIMIT 10;
 ## Common Issues
 
 ### "relation cron.job does not exist"
+
 - **Problem:** pg_cron not enabled
 - **Solution:** Run `CREATE EXTENSION IF NOT EXISTS pg_cron;` in `splitshifts` database
 
 ### "function purge_old_soft_deleted_with_audit() does not exist"
+
 - **Problem:** Functions not created yet
 - **Solution:** Run Steps 1-3 from `cleanup-soft-deletes.sql`
 
 ### Job scheduled but not running
+
 - **Problem:** Check for errors in execution log
 - **Solution:** Run the monitoring query above to see error messages
 
-## Done! 
+## Done
 
 The cron job will now run automatically every day at 2 AM UTC and permanently delete any organizations that were soft-deleted more than 90 days ago.

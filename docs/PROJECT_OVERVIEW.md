@@ -1,17 +1,20 @@
 # SplitShifts Project Overview
 
 ## Project Description
+
 SplitShifts is a modern web application built with Next.js 15 and React 19, featuring a comprehensive dashboard navigation system with Material Design 3 styling and full accessibility support.
 
 ## Tech Stack
 
 ### Core Framework & Runtime
+
 - **Next.js** `15.1.7` - React framework with App Router
 - **React** `19.0.0` - UI library  
 - **React DOM** `19.0.3` - React DOM rendering
 - **TypeScript** `5.8.3` - Type safety and development experience
 
 ### Authentication & Security
+
 - **NextAuth.js** `5.0.0-beta.25` - Authentication solution
 - **@auth/core** `0.40.0` - Authentication core library
 - **bcryptjs** `3.0.2` - Password hashing
@@ -19,6 +22,7 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - **qrcode.react** `4.2.0` - QR code generation for 2FA
 
 ### Database & ORM
+
 - **Drizzle ORM** `0.40.1` - TypeScript-first ORM with UUID support
 - **Drizzle Kit** `0.31.4` - Database migrations and tooling
 - **Neon Database** `0.10.4` - Serverless PostgreSQL with UUID primary keys
@@ -26,6 +30,7 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - **@types/uuid** `10.0.0` - TypeScript types for UUID
 
 ### Styling & UI Framework
+
 - **Tailwind CSS** `3.4.17` - Utility-first CSS framework
 - **Class Variance Authority (CVA)** `0.7.1` - Component variant management
 - **Tailwind Merge** `3.3.1` - Intelligent Tailwind class merging
@@ -34,10 +39,12 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - **clsx** `2.1.1` - Conditional className utility
 
 ### Image Processing & Optimization
+
 - **Sharp** `0.33.6` - High-performance image processing for blur placeholders
 - **Next.js Image Optimization** - Built-in WebP conversion and responsive images
 
 ### UI Component Libraries
+
 - **Radix UI** - Headless, accessible components:
   - `@radix-ui/react-label` `2.1.7` - Form labels
   - `@radix-ui/react-slot` `1.2.3` - Component composition
@@ -46,16 +53,19 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - **HeroIcons** - Icon styles and design patterns (manually implemented)
 
 ### Forms & Input Handling
+
 - **React Hook Form** `7.60.0` - Form state management
 - **@hookform/resolvers** `4.1.3` - Form validation resolvers
 - **Zod** `3.25.76` - Schema validation
 - **input-otp** `1.4.2` - OTP input component
 
 ### Email & Communication
+
 - **Nodemailer** `7.0.5` - Email sending
 - **@types/nodemailer** `6.4.17` - TypeScript types
 
 ### Development Tools
+
 - **ESLint** `9.31.0` - Code linting
 - **Prettier** `3.6.2` - Code formatting with Tailwind plugin
 - **PostCSS** `8.5.6` - CSS processing
@@ -65,6 +75,7 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 ## Custom Architecture
 
 ### Dashboard Navigation System
+
 - **Location**: `/app/components/ui/nav/dashboard/`
 - **Key Components**:
   - `nav-drawer.tsx` - Main navigation container
@@ -73,6 +84,7 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
   - `nav-config.tsx` - Navigation configuration and routing
 
 ### Authentication Layout System
+
 - **Location**: `/app/components/ui/auth/`
 - **Key Components**:
   - `auth-layout.tsx` - Responsive auth layouts with image optimization
@@ -84,6 +96,7 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
   - Server-side image optimization
 
 ### Icon System
+
 - **Location**: `/app/components/ui/icons/dashboard/`
 - **Architecture**: Custom React components based on HeroIcons design patterns
 - **Features**:
@@ -94,6 +107,7 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - **Icons Available**: home, calendar, employees, locations, settings
 
 ### Material Design 3 Implementation
+
 - **Custom Color System**: Full MD3 palette in Tailwind config
 - **Typography Scale**: Display, Headline, Body, Label, and Title variants
 - **Elevation System**: 6-level shadow system
@@ -102,6 +116,7 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 ## Key Features
 
 ### ✅ Database Architecture
+
 - **20-Table Schema**: Complete shift scheduling system with UUID primary keys
 - **Multi-Tenant Design**: Organization-based data isolation
 - **UUID Primary Keys**: Scalable UUIDv7 for all entities
@@ -111,6 +126,7 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - **Advanced Types**: JSONB, custom enums, numeric precision for monetary fields
 
 ### ✅ Authentication System
+
 - NextAuth.js integration
 - Two-factor authentication with QR codes
 - Password reset functionality
@@ -120,6 +136,7 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - Smooth form animations and transitions
 
 ### ✅ Onboarding System
+
 - Multi-step organization setup wizard
 - Progress persistence with database state tracking
 - Resume onboarding after page refresh
@@ -130,6 +147,7 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - Flexible user flow without forced completion
 
 ### ✅ Navigation System
+
 - Material Design 3 compliant styling
 - Active state detection via pathname comparison
 - Keyboard navigation support (`Tab` key)
@@ -137,6 +155,7 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - Accessibility with ARIA labels and semantic HTML
 
 ### ✅ Form Management
+
 - React Hook Form with Zod validation
 - Type-safe form handling
 - Accessible form components
@@ -144,6 +163,7 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - **Form Context Safety**: Early return guards prevent context errors in modals
 
 ### ✅ Organization Management
+
 - **CRUD Operations**: Full create, read, update, delete functionality
 - **Transaction-Based Cascade Deletes**: Atomic multi-table soft-deletes
 - **Modal System**: Radix Dialog with React Hook Form integration
@@ -152,12 +172,14 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - **Database Driver**: neon-serverless (WebSocket) for transaction support
 
 ### ✅ Calendar & Shift Management
+
 - **Shift Creation Modal**: Form-based shift scheduling interface
 - **Form Context Handling**: Proper React Hook Form integration with Radix Dialog
 - **Validation**: Zod schemas for type-safe shift data
 - **Multi-Tenant**: Organization-scoped shift management
 
 ### ✅ Database Integration
+
 - **UUID-Based Schema**: 20-table system with UUIDv7 primary keys
 - **Drizzle ORM**: TypeScript-first ORM with complete type safety
 - **Transaction Support**: Full ACID compliance with neon-serverless driver
@@ -166,6 +188,7 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 - **Serverless PostgreSQL**: Neon database with WebSocket connectivity
 
 ### ✅ Accessibility Features
+
 - Proper ARIA roles and labels
 - Keyboard navigation support
 - Focus-visible indicators
@@ -175,25 +198,29 @@ SplitShifts is a modern web application built with Next.js 15 and React 19, feat
 ## Development Guidelines
 
 ### Component Architecture
+
 - Use CVA for variant-based styling
 - Implement proper TypeScript interfaces
 - Follow Material Design 3 principles
 - Maintain accessibility standards
 
 ### Icon Guidelines
+
 - Use HeroIcons design patterns for consistency
 - Implement solid/outline variants
 - Maintain `currentColor` for theme integration
 - Use descriptive TypeScript union types
 
 ### Styling Standards
+
 - Tailwind CSS with Material Design 3 color system
 - CVA for component variants
 - Consistent spacing and typography scales
 - Proper hover/focus state implementations
 
 ## File Structure
-```
+
+```text
 splitshifts-app/
 ├── app/
 │   ├── components/ui/
@@ -209,11 +236,13 @@ splitshifts-app/
 ```
 
 ## Package Manager
+
 - **pnpm** - Fast, efficient package management
 - Run `pnpm dev` for development
 - Run `pnpm build` for production build
 
 ## Environment
+
 - **Node.js** - Modern JavaScript runtime
 - **TypeScript** - Full type safety throughout
 - **Next.js App Router** - Modern routing system

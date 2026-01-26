@@ -8,12 +8,12 @@ The Time Picker is a custom component for selecting times in 12-hour format. It 
 
 ## Key Features
 
-- **Dual Input Methods**: Click/drag on clock face OR type directly into hour/minute fields
-- **Auto-navigation**: Automatically advances from hours → minutes after entering 2 digits
+- **Dual Input Methods**: Click the clock icon to use the dial, or type directly in the field
+- **Segmented Manual Input**: Hours highlight on focus, auto-advance to minutes, A/P sets AM/PM
 - **Visual Feedback**: Animated hand transitions, color-coded active states, number highlighting
 - **Interaction States**: Hover overlays on time selectors, ripple effects on AM/PM toggles
 - **Keyboard Support**: Enter/Tab navigation between fields
-- **Validation**: Hours (1-12), Minutes (0-59) with automatic clamping
+- **Validation**: Hours (1-12), Minutes (0-59) with automatic clamping; optional AM/PM
 - **Smooth Animations**: Emphasized decelerate easing for natural motion, proper color tokens
 
 ## Component Architecture
@@ -32,6 +32,7 @@ interface TimePickerProps {
   disabled?: boolean;               // Disable interaction
   required?: boolean;               // Show required indicator
   className?: string;               // Additional CSS classes
+  iconPosition?: 'start' | 'end';   // Position of the clock icon
 }
 ```
 
@@ -55,6 +56,7 @@ interface TimePickerProps {
 ### 0. Sub-Components
 
 **TimeSelector Component**: Displays and edits hours or minutes (80px × 96px)
+
 - Unified component: Container div wraps input, manages focus states
 - Input always present but readonly when not editing
 - Hover state: 8% opacity overlay (only when inactive)
@@ -65,6 +67,7 @@ interface TimePickerProps {
 - Focus management: Container focusable when not editing (tabIndex=0), input focusable when editing
 
 **PeriodSelector Component**: AM/PM toggle buttons (52px wide)
+
 - Two vertically stacked buttons with 1px outline border
 - Ripple effects on click (0.2 opacity, currentColor, separate instances per button)
 - Active state: Tertiary container background
@@ -80,10 +83,12 @@ type TimeMode = 'hours' | 'minutes';
 ```
 
 The picker has two modes that determine what the clock face displays:
+
 - **hours**: Shows numbers 1-12, dial points to selected hour
 - **minutes**: Shows 00, 05, 10, ... 55, dial points to selected minute
 
 Switching modes:
+
 - Clicking hour/minute selector label → switches mode
 - Selecting an hour → auto-transitions to minutes with animation
 - Opening picker → always starts in hours mode
@@ -99,6 +104,7 @@ const DIAL_SELECTOR_CENTER_RADIUS = 4;      // Center dot (8px diameter)
 ```
 
 **Coordinate System:**
+
 - Origin (0,0) is top-left of SVG
 - Center of clock is at (128, 128)
 - Angles: 0° = 12 o'clock, 90° = 3 o'clock, 180° = 6 o'clock, 270° = 9 o'clock
@@ -106,6 +112,7 @@ const DIAL_SELECTOR_CENTER_RADIUS = 4;      // Center dot (8px diameter)
 ### 3. Angle Calculations
 
 **Converting time value to angle:**
+
 ```typescript
 const getAngle = (value: number, total: number) => {
   return (value * 360) / total - 90;  // -90 adjusts for 12 o'clock being at top
@@ -113,12 +120,14 @@ const getAngle = (value: number, total: number) => {
 ```
 
 **Converting mouse position to angle:**
+
 ```typescript
 let angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
 if (angle < 0) angle += 360;
 ```
 
 **Converting angle to time:**
+
 ```typescript
 // Hours: 0-360° maps to 1-12
 const hour = Math.round((angle / 360) * 12) || 12;
@@ -146,6 +155,7 @@ Extracted sub-component that handles the editable hour/minute display boxes at t
 ```
 
 **Visual States:**
+
 - **Inactive**: Gray background, no border
 - **Active**: Primary container background, 2px primary border
 - **Editing**: Same styling + visible cursor with primary color
@@ -154,7 +164,7 @@ Extracted sub-component that handles the editable hour/minute display boxes at t
 
 ### Flow 1: Clicking Hour Number
 
-```
+```text
 User clicks "3" on clock face
   ↓
 handleHourSelect(3) called
@@ -169,7 +179,7 @@ Clock face updates to show minute numbers
 
 ### Flow 2: Typing Hours
 
-```
+```text
 User clicks hour selector label
   ↓
 handleHoursClick()
@@ -188,7 +198,7 @@ User types "2" (2nd digit)
 
 ### Flow 3: Dragging on Clock Face
 
-```
+```text
 User presses mouse down on clock face
   ↓
 handleMouseDown()
@@ -299,6 +309,7 @@ const closeInputs = () => {
 ```
 
 Called whenever:
+
 - User interacts with clock face (drag/click)
 - User clicks on clock numbers
 - Prevents showing input cursor during dial interaction
@@ -414,6 +425,7 @@ typescale-label-medium           /* Dialog title "Select time" */
 ### Interaction States
 
 **TimeSelector (Hour/Minute Inputs):**
+
 - Default: Surface container highest background
 - Hover: 8% opacity overlay (`hover:before:opacity-8`) - only when inactive
 - Focus: 3px secondary border via inset shadow (`focus-within:shadow-[inset_0_0_0_3px_#535F70]`)
@@ -425,6 +437,7 @@ typescale-label-medium           /* Dialog title "Select time" */
 - Ripple effects: System integrated but disabled (`disabled: isEditing`)
 
 **PeriodSelector (AM/PM Toggles):**
+
 - Default: Surface container high background (inactive)
 - Hover: 8% opacity overlay (`hover:before:opacity-8`)
 - Focus: 3px secondary outline border (`focus-visible:outline-[3px] focus-visible:outline-secondary`)
@@ -446,32 +459,39 @@ transition-all duration-200      /* Multi-property transitions */
 ### Layout Specifications (Vertical Orientation)
 
 **Dialog Container:**
+
 - Padding: 24px (`p-6`)
 - Width: Fit content (`w-fit`)
 - Border: None (`border-none`)
 
 **Header:**
+
 - Typography: `typescale-label-medium`
 - Color: `text-on-surface-variant`
 - Gap below: 20px (`mt-5`)
 
 **Time Display Wrapper:**
+
 - Height: 80px (`h-20`)
 - Gap: 12px between sections (`gap-3`)
 
 **Time Selectors:**
+
 - Size: 80px × 96px (`h-20 w-24`)
 - Separator: 24px width (`w-6`), vertically centered (`-translate-y-1`)
 
 **Period Selector:**
+
 - Width: 52px (`w-[52px]`)
 - Border: 1px outline (`border border-outline`)
 
 **Clock Face:**
+
 - Gap above: 36px (`mt-9`)
 - Gap below: 24px (Footer `mt-6`)
 
 **Keyboard Toggle:**
+
 - Position: Absolute bottom-left (`bottom-6 left-6`)
 - Size: 24px icon
 
@@ -490,6 +510,7 @@ transition-all duration-200      /* Multi-property transitions */
 **Cause**: `onMouseDown` on number buttons stops propagation, preventing clock face drag handler
 
 **Solution**: Add full drag initialization logic inside number button `onMouseDown`:
+
 ```typescript
 onMouseDown={e => {
   e.stopPropagation();
@@ -505,6 +526,7 @@ onMouseDown={e => {
 **Cause**: State changes don't trigger DOM blur
 
 **Solution**: Manually blur input elements using refs:
+
 ```typescript
 if (editingHours && hoursInputRef.current) {
   hoursInputRef.current.blur();
@@ -516,6 +538,7 @@ if (editingHours && hoursInputRef.current) {
 **Cause**: Auto-complete reads stale state instead of current input value
 
 **Solution**: Validate directly from input value, not state:
+
 ```typescript
 if (value.length === 2) {
   let numValue = parseInt(value, 10);  // Use 'value' not tempMinutesValue
@@ -528,6 +551,7 @@ if (value.length === 2) {
 **Cause**: Tailwind can't interpolate JavaScript variables in template literals
 
 **Solution**: Use literal values in className:
+
 ```typescript
 // ❌ WRONG
 className={`h-[${CLOCK_DIAMETER}px]`}

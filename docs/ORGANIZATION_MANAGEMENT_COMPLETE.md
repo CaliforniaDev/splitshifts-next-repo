@@ -25,6 +25,7 @@
 ### 1.1 What We're Building
 
 The Organization Management System is a **modal-based interface** that allows administrators to:
+
 - **Edit** organization details (name, description, week start day)
 - **Delete** organizations using soft-delete pattern
 - **View** real-time feedback with loading states and error messages
@@ -32,28 +33,32 @@ The Organization Management System is a **modal-based interface** that allows ad
 ### 1.2 Technology Stack Explained
 
 #### **Next.js 15 App Router**
+
 - **What it is**: React framework with file-based routing and server/client component separation
 - **Why we use it**: Built-in server actions, type safety, performance optimization
 - **How it works**: Files in `app/` directory become routes automatically
 
 #### **Drizzle ORM**
+
 - **What it is**: TypeScript-first SQL query builder and ORM (Object-Relational Mapping)
 - **Why we use it**: Type safety, SQL-like syntax, excellent PostgreSQL support
 - **How it works**: Converts TypeScript code to SQL queries
 
 #### **NextAuth.js v5**
+
 - **What it is**: Authentication library for Next.js
 - **Why we use it**: Secure session management, provider support, TypeScript integration
 - **How it works**: Manages user sessions, tokens, and authentication state
 
 #### **React Hook Form + Zod**
+
 - **What it is**: Form state management + validation library
 - **Why we use it**: Type-safe validation, performance optimization, excellent UX
 - **How it works**: Validates data before sending to server
 
 ### 1.3 Architecture Pattern: Server + Client Components
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │                    DASHBOARD PAGE                        │
 │                  (Server Component)                     │
@@ -87,6 +92,7 @@ The Organization Management System is a **modal-based interface** that allows ad
 ### 2.1 Understanding Drizzle ORM
 
 **Drizzle ORM** is our data access layer that provides:
+
 - **Type Safety**: TypeScript types are generated from database schema
 - **SQL-like Syntax**: Familiar SQL operations in TypeScript
 - **Performance**: Direct SQL queries, no heavy abstraction
@@ -95,6 +101,7 @@ The Organization Management System is a **modal-based interface** that allows ad
 ### 2.2 Database Connection Setup
 
 **File**: `db/drizzle.ts`
+
 ```typescript
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
@@ -106,6 +113,7 @@ export default db;
 ```
 
 **What's happening here**:
+
 1. **`neon()`**: Creates connection to Neon PostgreSQL database
 2. **`drizzle()`**: Wraps the connection with Drizzle ORM capabilities
 3. **`process.env.DATABASE_URL`**: Environment variable containing database connection string
@@ -116,6 +124,7 @@ export default db;
 #### Organizations Table Schema
 
 **File**: `db/schema/organizationsSchema.ts`
+
 ```typescript
 export const organizations = pgTable('organizations', {
   id: uuid('id')
@@ -174,6 +183,7 @@ export const organizations = pgTable('organizations', {
 #### Organization Users Junction Table
 
 **File**: `db/schema/organizationUsersSchema.ts`
+
 ```typescript
 export const organizationUsers = pgTable('organization_users', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
@@ -194,7 +204,7 @@ export const organizationUsers = pgTable('organization_users', {
 **Key concepts**:
 
 - **Junction Table**: Links users to organizations (many-to-many relationship)
-- **Foreign Keys**: 
+- **Foreign Keys**:
   - `orgId` references `organizations.id`
   - `userId` references `users.id`
 - **Cascade Delete**: If organization/user is deleted, this record is also deleted
@@ -204,6 +214,7 @@ export const organizationUsers = pgTable('organization_users', {
 ### 2.4 Drizzle Query Patterns
 
 #### Basic Select Query
+
 ```typescript
 const [organization] = await db
   .select()
@@ -212,6 +223,7 @@ const [organization] = await db
 ```
 
 **Explanation**:
+
 - **`db.select()`**: Start a SELECT query
 - **`.from(organizations)`**: Specify the table
 - **`.where(eq(organizations.id, organizationId))`**: Add WHERE clause
@@ -219,6 +231,7 @@ const [organization] = await db
 - **Destructuring `[organization]`**: Get first result from array
 
 #### Complex Join Query
+
 ```typescript
 const [userOrg] = await db
   .select({
@@ -237,12 +250,14 @@ const [userOrg] = await db
 ```
 
 **Explanation**:
+
 - **`.select({ ... })`**: Specify which columns to return with aliases
 - **`.innerJoin()`**: Join tables where relationship exists
 - **`and()`**: Combine multiple conditions with AND logic
 - **`isNull()`**: Check if column is NULL (for active organizations)
 
 #### Update Query
+
 ```typescript
 await db
   .update(organizations)
@@ -255,6 +270,7 @@ await db
 ```
 
 **Explanation**:
+
 - **`.update(organizations)`**: Update the organizations table
 - **`.set({ ... })`**: Specify new values for columns
 - **`.where()`**: Specify which records to update
@@ -266,6 +282,7 @@ await db
 ### 3.1 NextAuth.js Configuration
 
 **File**: `auth.ts`
+
 ```typescript
 export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
@@ -312,6 +329,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 ### 3.3 TypeScript Session Types
 
 **File**: `types/next-auth.d.ts`
+
 ```typescript
 declare module 'next-auth' {
   interface User {
@@ -337,6 +355,7 @@ declare module 'next-auth' {
 ### 4.1 Understanding Zod
 
 **Zod** is a schema validation library that provides:
+
 - **Runtime validation**: Checks data at runtime, not just compile time
 - **TypeScript integration**: Generates types from schemas
 - **Error messages**: Detailed validation error information
@@ -347,6 +366,7 @@ declare module 'next-auth' {
 **File**: `app/lib/validation/organization.ts`
 
 #### Create Organization Schema
+
 ```typescript
 export const createOrganizationSchema = z.object({
   name: z
@@ -362,6 +382,7 @@ export const createOrganizationSchema = z.object({
 ```
 
 **Breaking down the validation**:
+
 - **`z.string()`**: Must be a string
 - **`.min(2)`**: Minimum 2 characters
 - **`.max(100)`**: Maximum 100 characters
@@ -370,6 +391,7 @@ export const createOrganizationSchema = z.object({
 - **`.enum(['monday', 'sunday'])`**: Must be one of these values
 
 #### Update Organization Schema
+
 ```typescript
 export const updateOrganizationSchema = createOrganizationSchema.extend({
   id: z.string().uuid('Invalid organization ID format'),
@@ -377,10 +399,12 @@ export const updateOrganizationSchema = createOrganizationSchema.extend({
 ```
 
 **Schema composition**:
+
 - **`.extend()`**: Adds new fields to existing schema
 - **`.uuid()`**: Validates string is valid UUID format
 
 #### TypeScript Type Generation
+
 ```typescript
 export type CreateOrganizationFormData = z.infer<typeof createOrganizationSchema>;
 export type UpdateOrganizationFormData = z.infer<typeof updateOrganizationSchema>;
@@ -407,6 +431,7 @@ try {
 ### 5.1 Understanding Server Actions
 
 **Server Actions** are Next.js 15 functions that run on the server and can be called directly from client components. They provide:
+
 - **Type safety**: Full TypeScript support
 - **Security**: Run server-side, protected from client manipulation
 - **Simplicity**: No need for separate API routes
@@ -417,6 +442,7 @@ try {
 **File**: `app/(logged-in)/dashboard/actions/edit-organization.ts`
 
 #### Security Layer Architecture
+
 ```typescript
 /**
  * 5-Layer Security Architecture:
@@ -429,6 +455,7 @@ try {
 ```
 
 #### Layer 1: Authentication Check
+
 ```typescript
 const session = await auth();
 if (!session?.user?.id) {
@@ -437,21 +464,25 @@ if (!session?.user?.id) {
 ```
 
 **What happens**:
+
 - **`await auth()`**: Gets current user session
 - **Null check**: Ensures user is logged in
 - **`redirect()`**: Sends unauthenticated users to logout
 
 #### Layer 2: Data Validation
+
 ```typescript
 const validatedData = updateOrganizationSchema.parse(data);
 ```
 
 **What happens**:
+
 - **`parse()`**: Validates incoming data against Zod schema
 - **Throws error**: If validation fails, execution stops
 - **Type safety**: `validatedData` has correct TypeScript types
 
 #### Layer 3: Authorization Check
+
 ```typescript
 const [userOrgRelation] = await db
   .select({
@@ -477,11 +508,13 @@ if (!userOrgRelation) {
 ```
 
 **What happens**:
+
 - **Database query**: Checks if user is admin of this specific organization
 - **Multiple conditions**: User ID, Organization ID, Role, Active status
 - **Authorization failure**: Returns error if not authorized
 
 #### Layer 4: Deletion Guard
+
 ```typescript
 const [existingOrg] = await db
   .select({ deletedAt: organizations.deletedAt })
@@ -499,11 +532,13 @@ if (existingOrg.deletedAt) {
 ```
 
 **What happens**:
+
 - **Existence check**: Verifies organization exists
 - **Deletion check**: Prevents editing soft-deleted organizations
 - **Error handling**: Returns specific error messages
 
 #### Layer 5: Database Update
+
 ```typescript
 await db
   .update(organizations)
@@ -519,6 +554,7 @@ return { success: true };
 ```
 
 **What happens**:
+
 - **Update query**: Modifies organization record
 - **Audit trail**: Sets `updatedAt` timestamp
 - **Success response**: Returns confirmation
@@ -606,6 +642,7 @@ export async function deleteOrganization(organizationId: DeleteOrganizationData)
 ```
 
 **Why Transaction-Based Cascade Soft Delete**:
+
 - **Atomicity**: All updates succeed or all fail (ACID compliance)
 - **Data Integrity**: Related data is deleted in proper order
 - **Multi-tenant Safety**: All org-scoped data is marked as deleted
@@ -614,6 +651,7 @@ export async function deleteOrganization(organizationId: DeleteOrganizationData)
 - **Relationship Safety**: Maintains foreign key constraints
 
 **Database Driver Requirements**:
+
 ```typescript
 // ❌ WRONG - neon-http driver (no transaction support)
 import { neon } from '@neondatabase/serverless';
@@ -629,6 +667,7 @@ const db = drizzle(pool);
 ```
 
 **Tables Affected by Cascade Delete**:
+
 1. **shifts** - All shifts for the organization
 2. **employees** - All employees in the organization
 3. **roles** - All roles defined by the organization
@@ -636,6 +675,7 @@ const db = drizzle(pool);
 5. **organizations** - The organization itself (last)
 
 **Security Layers**:
+
 1. **Authentication** - User must be logged in
 2. **Input Validation** - UUID format check via Zod
 3. **Authorization** - User must be admin of THIS organization
@@ -650,7 +690,7 @@ const db = drizzle(pool);
 
 The organization management system uses a **hierarchical component structure**:
 
-```
+```text
 Dashboard Page (Server Component)
     ↓
 OrganizationManagementClient (Client Component)
@@ -708,6 +748,7 @@ export default async function Dashboard() {
 ```
 
 **Key concepts**:
+
 - **Server Component**: Runs on server, can access database directly
 - **Authentication**: Checks session before rendering
 - **Data Fetching**: Queries database for organization info
@@ -741,6 +782,7 @@ export default function OrganizationManagementClient({ organization }) {
 ```
 
 **Why this component exists**:
+
 - **State Management**: Modal open/close state needs client-side React
 - **Bridge Pattern**: Connects server data to client interactions
 - **Event Handling**: Button clicks require client-side JavaScript
@@ -750,6 +792,7 @@ export default function OrganizationManagementClient({ organization }) {
 **File**: `app/(logged-in)/dashboard/components/organization/management-modal.tsx`
 
 #### Form Setup with React Hook Form
+
 ```typescript
 const form = useForm<UpdateOrganizationFormData>({
   resolver: zodResolver(updateOrganizationSchema),
@@ -763,11 +806,13 @@ const form = useForm<UpdateOrganizationFormData>({
 ```
 
 **What's happening**:
+
 - **`useForm<T>()`**: Creates form with TypeScript typing
 - **`resolver: zodResolver()`**: Connects Zod validation to form
 - **`defaultValues`**: Pre-populates form with current organization data
 
 #### Form Field Pattern
+
 ```typescript
 <FormField
   name='name'
@@ -790,6 +835,7 @@ const form = useForm<UpdateOrganizationFormData>({
 ```
 
 **Breaking down the pattern**:
+
 - **`FormField`**: Wrapper that connects field to form state
 - **`control={form.control}`**: Links to React Hook Form controller
 - **`render={({ field, fieldState })}`**: Render prop pattern
@@ -798,6 +844,7 @@ const form = useForm<UpdateOrganizationFormData>({
 - **`onBlur={field.onBlur}`**: Validation triggers on blur
 
 #### Update Handler
+
 ```typescript
 const handleUpdate = async (data: UpdateOrganizationFormData) => {
   try {
@@ -823,12 +870,14 @@ const handleUpdate = async (data: UpdateOrganizationFormData) => {
 ```
 
 **What's happening**:
+
 - **`await editOrganization(data)`**: Calls server action
 - **`router.refresh()`**: Refreshes server components to show updated data
 - **`form.setError('root', ...)`**: Shows server errors in form
 - **Error handling**: Catches unexpected errors
 
 #### Delete Handler
+
 ```typescript
 const handleDelete = async () => {
   const confirm = window.confirm(
@@ -853,6 +902,7 @@ const handleDelete = async () => {
 ```
 
 **What's happening**:
+
 - **`window.confirm()`**: Native browser confirmation dialog
 - **`setIsDeleting(true)`**: Shows loading state on delete button
 - **`router.refresh()`**: After deletion, user has no org, so shows onboarding
@@ -863,7 +913,7 @@ const handleDelete = async () => {
 
 ### 7.1 Complete Data Flow Diagram
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                      USER INTERACTION                       │
 └─────────────────────┬───────────────────────────────────────┘
@@ -934,6 +984,7 @@ const handleDelete = async () => {
 ### 7.2 Props Flow
 
 #### Dashboard → ManagementClient
+
 ```typescript
 // Dashboard passes organization data
 <OrganizationManagementClient 
@@ -947,6 +998,7 @@ const handleDelete = async () => {
 ```
 
 #### ManagementClient → Modal
+
 ```typescript
 // Client passes organization data + modal control
 <OrganizationManagementModal
@@ -959,11 +1011,13 @@ const handleDelete = async () => {
 ### 7.3 State Management
 
 #### Client-Side State (React)
+
 - **Modal visibility**: `isModalOpen` state in ManagementClient
 - **Form state**: Managed by React Hook Form in Modal
 - **Loading states**: `isSubmitting`, `isDeleting` in Modal
 
 #### Server-Side State (Database)
+
 - **Organization data**: Stored in PostgreSQL
 - **User sessions**: Managed by NextAuth
 - **Authentication**: Verified on each server action call
@@ -971,12 +1025,13 @@ const handleDelete = async () => {
 ### 7.4 Event Flow
 
 #### Update Organization Flow
+
 1. **User clicks "Edit Organization"** → Sets `isModalOpen = true`
 2. **Modal opens** → Form pre-populated with current data
 3. **User modifies fields** → React Hook Form manages state
 4. **User clicks "Update"** → `handleUpdate()` called
 5. **Form validation** → Zod validates data client-side
-6. **Server action called** → `editOrganization(data)` 
+6. **Server action called** → `editOrganization(data)`
 7. **Server validation** → Zod validates data server-side
 8. **Database update** → Drizzle executes UPDATE query
 9. **Success response** → Server returns `{ success: true }`
@@ -984,6 +1039,7 @@ const handleDelete = async () => {
 11. **Modal closes** → `onClose()` called
 
 #### Delete Organization Flow
+
 1. **User clicks "Delete"** → `handleDelete()` called
 2. **Confirmation dialog** → `window.confirm()` shown
 3. **User confirms** → Sets `isDeleting = true`
@@ -999,6 +1055,7 @@ const handleDelete = async () => {
 ### 8.1 Multi-Layer Security Architecture
 
 #### Layer 1: Route Protection (Middleware)
+
 ```typescript
 // middleware.ts
 export default async function middleware(request: NextRequest) {
@@ -1011,6 +1068,7 @@ export default async function middleware(request: NextRequest) {
 ```
 
 #### Layer 2: Component Authentication
+
 ```typescript
 // Every protected server component
 const session = await auth();
@@ -1020,6 +1078,7 @@ if (!session?.user?.id) {
 ```
 
 #### Layer 3: Server Action Authentication
+
 ```typescript
 // Every server action
 const session = await auth();
@@ -1029,6 +1088,7 @@ if (!session?.user?.id) {
 ```
 
 #### Layer 4: Data Validation
+
 ```typescript
 // Client-side validation (UX)
 const form = useForm({
@@ -1040,6 +1100,7 @@ const validatedData = updateOrganizationSchema.parse(data);
 ```
 
 #### Layer 5: Authorization Checks
+
 ```typescript
 // Verify user can perform action on specific resource
 const [userOrgRelation] = await db
@@ -1058,6 +1119,7 @@ const [userOrgRelation] = await db
 ### 8.2 Error Handling Patterns
 
 #### Server Action Error Response
+
 ```typescript
 try {
   // ... operation
@@ -1072,6 +1134,7 @@ try {
 ```
 
 #### Client-Side Error Handling
+
 ```typescript
 try {
   const response = await serverAction(data);
@@ -1096,6 +1159,7 @@ try {
 ```
 
 #### Form Validation Errors
+
 ```typescript
 // Zod validation errors are automatically handled by React Hook Form
 <FormField
@@ -1113,16 +1177,19 @@ try {
 ### 8.3 Security Best Practices Implemented
 
 #### Input Sanitization
+
 - **Client validation**: Immediate feedback, better UX
 - **Server validation**: Security boundary, never trust client
 - **SQL injection prevention**: Drizzle ORM parameterized queries
 
 #### Authorization
+
 - **Resource-based**: Check user's access to specific organization
 - **Role-based**: Verify user has admin role
 - **Active status**: Ensure user account is active
 
 #### Audit Trail
+
 - **Created timestamps**: Track when records created
 - **Updated timestamps**: Track when records modified
 - **Deleted timestamps**: Track when records soft-deleted
@@ -1135,18 +1202,21 @@ try {
 ### 9.1 Soft Delete Pattern Deep Dive
 
 #### Why Soft Delete?
+
 ```typescript
 // Instead of: DELETE FROM organizations WHERE id = ?
 // We do: UPDATE organizations SET deleted_at = NOW() WHERE id = ?
 ```
 
 **Benefits**:
+
 - **Data preservation**: Historical records maintained
 - **Audit compliance**: Regulatory requirements met
 - **Relationship integrity**: Foreign keys remain valid
 - **Recovery possible**: "Undelete" functionality available
 
 #### Implementation Details
+
 ```typescript
 // Mark as deleted
 const now = new Date();
@@ -1168,6 +1238,7 @@ const activeOrgs = await db
 ### 9.2 Multi-Tenant Architecture
 
 #### Organization Scoping
+
 Every data query must be scoped to the user's organization:
 
 ```typescript
@@ -1190,6 +1261,7 @@ const employees = await db
 ```
 
 #### Session-Based Organization Context
+
 ```typescript
 // Store orgId in JWT token
 jwt({ token, user }) {
@@ -1209,6 +1281,7 @@ if (!orgId) {
 ### 9.3 Type Safety Throughout the Stack
 
 #### Database Schema → TypeScript Types
+
 ```typescript
 // Drizzle generates types from schema
 type Organization = typeof organizations.$inferSelect;
@@ -1216,19 +1289,22 @@ type NewOrganization = typeof organizations.$inferInsert;
 ```
 
 #### Zod Schema → TypeScript Types
+
 ```typescript
 // Zod generates types from validation schema
 type UpdateFormData = z.infer<typeof updateOrganizationSchema>;
 ```
 
 #### End-to-End Type Safety
-```
+
+```text
 Database Schema → Drizzle Types → Zod Validation → React Hook Form → UI Components
 ```
 
 ### 9.4 Performance Optimizations
 
 #### Database Query Optimization
+
 ```typescript
 // Only select needed columns
 const [userOrg] = await db
@@ -1243,6 +1319,7 @@ const [userOrg] = await db
 ```
 
 #### React Performance
+
 ```typescript
 // Memoize expensive computations
 const memoizedValidation = useMemo(
@@ -1261,6 +1338,7 @@ const debouncedValue = useDebounce(inputValue, 300);
 ### 10.1 Common Database Issues
 
 #### Issue: "Organization not found" during delete
+
 ```typescript
 // Problem: Query returns no results
 const [existingOrg] = await db
@@ -1274,11 +1352,13 @@ console.log('Org ID type:', typeof organizationId);
 ```
 
 **Debugging steps**:
+
 1. Verify UUID format: `12345678-1234-1234-1234-123456789abc`
 2. Check database with Drizzle Studio: `pnpm db:studio`
 3. Verify organization exists and `deleted_at` is NULL
 
 #### Issue: Session orgId is null
+
 ```typescript
 // Problem: User has organization but session.user.orgId is null
 const orgId = session.user.orgId;
@@ -1293,6 +1373,7 @@ if (!orgId) {
 ### 10.2 Common Validation Issues
 
 #### Issue: Zod validation fails silently
+
 ```typescript
 // Problem: Using wrong validation method
 const result = updateOrganizationSchema.safeParse(data);
@@ -1304,6 +1385,7 @@ if (!result.success) {
 ```
 
 #### Issue: Form doesn't show validation errors
+
 ```typescript
 // Problem: Missing error display
 <Input
@@ -1316,6 +1398,7 @@ if (!result.success) {
 ### 10.3 Common Component Issues
 
 #### Issue: Modal doesn't close after success
+
 ```typescript
 // Problem: Missing onClose() call
 if (response.success) {
@@ -1325,6 +1408,7 @@ if (response.success) {
 ```
 
 #### Issue: Server component data not refreshing
+
 ```typescript
 // Problem: Using router.push() instead of router.refresh()
 router.refresh(); // Refreshes server components
@@ -1335,24 +1419,29 @@ router.push('/dashboard'); // Navigates to different page
 ### 10.4 Development Tools
 
 #### Drizzle Studio
+
 ```bash
 # Open database GUI
 pnpm db:studio
 ```
+
 - View tables and data
 - Run manual queries
 - Check relationships
 
 #### Next.js Development
+
 ```bash
 # Start with detailed error logging
 pnpm dev --turbopack
 ```
+
 - Hot reload for rapid development
 - Detailed error messages
 - TypeScript checking
 
 #### Browser DevTools
+
 - **Network tab**: Monitor server action calls
 - **Console**: Check client-side errors  
 - **React DevTools**: Inspect component state
@@ -1364,16 +1453,19 @@ pnpm dev --turbopack
 This comprehensive guide covers the complete organization management system, from database schemas to UI components. Key takeaways:
 
 ### **Architecture Patterns**
+
 - **Server/Client separation**: Server components for data, client for interactivity
 - **Security layers**: Multiple validation and authorization checkpoints
 - **Type safety**: End-to-end TypeScript integration
 
 ### **Data Flow**
+
 - **Server → Client**: Props pass data down component tree
 - **Client → Server**: Server actions handle mutations
 - **Database**: Drizzle ORM provides type-safe database access
 
 ### **Best Practices**
+
 - **Validation**: Client and server-side with Zod
 - **Security**: Authentication, authorization, input sanitization
 - **Performance**: Selective queries, optimized React patterns

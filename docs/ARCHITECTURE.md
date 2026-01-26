@@ -7,17 +7,20 @@ SplitShifts follows a modern, component-based architecture using Next.js 15 with
 ## Architecture Patterns
 
 ### Component Architecture
+
 - **Atomic Design** - Components organized in a hierarchy (atoms → molecules → organisms)
 - **CVA (Class Variance Authority)** - Variant-based styling system
 - **Composition Pattern** - Using Radix UI's slot pattern for flexible components
 
 ### State Management
+
 - **Server State** - Next.js App Router with RSC (React Server Components)
 - **Client State** - React Hook Form for form state
 - **Authentication State** - NextAuth.js session management
 - **Onboarding State** - Database-persisted user progress with server actions
 
 ### Styling Architecture
+
 - **Tailwind CSS** - Utility-first styling
 - **Material Design 3** - Design system implementation
 - **CVA Variants** - Component styling variants
@@ -25,7 +28,7 @@ SplitShifts follows a modern, component-based architecture using Next.js 15 with
 
 ## Directory Structure
 
-```
+```text
 splitshifts-app/
 ├── app/                              # Next.js App Router
 │   ├── components/ui/                # UI component library
@@ -58,6 +61,7 @@ splitshifts-app/
 ## Design Patterns
 
 ### 1. Navigation System
+
 **Pattern**: Configuration-driven navigation with dynamic active states
 
 ```tsx
@@ -71,6 +75,7 @@ const isActive = pathname === href;
 ```
 
 ### 2. Icon System
+
 **Pattern**: Unified icon picker with variant support
 
 ```tsx
@@ -84,6 +89,7 @@ export function HomeIcon({ variant = 'outline' }) {
 ```
 
 ### 3. Styling System
+
 **Pattern**: CVA-based variant system with Material Design compliance
 
 ```tsx
@@ -99,6 +105,7 @@ const listItemVariants = cva(baseStyles, {
 ```
 
 ### 4. Onboarding System
+
 **Pattern**: Multi-step wizard with progress persistence and flexible navigation
 
 ```tsx
@@ -127,13 +134,16 @@ const handleStepChange = async (newStep: number) => {
 ## Data Flow
 
 ### Authentication Flow
+
 1. User authentication via NextAuth.js
 2. Session management with JWT/database sessions
 3. Route protection using middleware
 4. 2FA integration with QR codes
 
 ### Database Architecture
+
 **Driver**: Neon Serverless (WebSocket-based for transaction support)
+
 ```typescript
 import { Pool } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
@@ -143,6 +153,7 @@ const db = drizzle(pool);
 ```
 
 **Key Features**:
+
 - **Transaction Support**: ACID-compliant transactions for data integrity
 - **Cascade Soft-Deletes**: Organization deletion cascades to all related records
 - **Multi-Tenant**: Organization-scoped data isolation via `orgId` foreign keys
@@ -150,6 +161,7 @@ const db = drizzle(pool);
 - **UUIDv7 Primary Keys**: All tables use time-sortable UUIDs
 
 **Cascade Delete Pattern**:
+
 ```typescript
 await db.transaction(async (tx) => {
   // Delete in dependency order
@@ -162,12 +174,14 @@ await db.transaction(async (tx) => {
 ```
 
 ### Navigation Flow
+
 1. Route changes trigger pathname updates
 2. Components automatically detect active states
 3. CVA variants apply appropriate styles
 4. Accessibility attributes updated
 
 ### Form Flow
+
 1. React Hook Form manages form state
 2. Zod validation schemas
 3. Server actions for form submission
@@ -177,11 +191,13 @@ await db.transaction(async (tx) => {
 ## Performance Considerations
 
 ### Bundle Optimization
+
 - **Tree Shaking** - Only used icons included
 - **Code Splitting** - Route-based splitting with App Router
 - **Static Generation** - Where possible with Next.js
 
 ### Runtime Optimization
+
 - **CVA Caching** - Compiled class variants
 - **React Server Components** - Server-side rendering
 - **Image Optimization** - Next.js Image component
@@ -189,12 +205,14 @@ await db.transaction(async (tx) => {
 ## Accessibility Architecture
 
 ### ARIA Implementation
+
 - **Semantic HTML** - Proper element usage
 - **ARIA Labels** - Descriptive labels for screen readers
 - **Focus Management** - Keyboard navigation support
 - **Live Regions** - Dynamic content announcements
 
 ### Keyboard Navigation
+
 - **Tab Order** - Logical navigation flow
 - **Focus Indicators** - Clear visual focus states
 - **Escape Handling** - Modal and menu dismissal
@@ -202,11 +220,13 @@ await db.transaction(async (tx) => {
 ## Testing Strategy
 
 ### Component Testing
+
 - **Unit Tests** - Individual component logic
 - **Integration Tests** - Component interactions
 - **Accessibility Tests** - a11y compliance validation
 
 ### E2E Testing
+
 - **User Flows** - Critical path testing
 - **Cross-browser** - Compatibility testing
 - **Mobile Testing** - Responsive behavior
@@ -214,11 +234,13 @@ await db.transaction(async (tx) => {
 ## Security Architecture
 
 ### Authentication Security
+
 - **Session Management** - Secure session handling
 - **CSRF Protection** - Built-in Next.js protection
 - **2FA Integration** - Time-based OTP
 
 ### Data Security
+
 - **Input Validation** - Zod schema validation
 - **SQL Injection Prevention** - Drizzle ORM protection
 - **Environment Variables** - Secure config management

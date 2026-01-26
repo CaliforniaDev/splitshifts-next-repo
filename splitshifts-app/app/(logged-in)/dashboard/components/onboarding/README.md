@@ -5,7 +5,8 @@ A complete, modular onboarding wizard system with clean architecture and reusabl
 ## Architecture
 
 ### 📁 Folder Structure
-```
+
+```text
 onboarding/
 ├── components/           # UI Components
 │   ├── index.ts         # Component exports
@@ -36,7 +37,7 @@ onboarding/
 
 ### 🔄 Data Flow
 
-```
+```text
 OnboardingWizard (Step Management)
     ↓ onSuccess/onBack callbacks
 Individual Forms (Self-Contained)
@@ -47,22 +48,26 @@ Backend Services
 ## Components
 
 ### Core Components
+
 - **OnboardingWizard**: Main coordinator component
 - **StepProgress**: Visual progress indicator
 - **WelcomeCard**: Initial welcome screen with step preview
 
 ### Form Components
+
 - **OrganizationForm**: Self-contained organization creation
 - **WorksiteForm**: Self-contained worksite creation with timezone support
 - **PlaceholderCard**: Placeholder for future form steps
 
 ### Utility Components
+
 - **FormLayout**: Shared form wrapper component
 - **CompletionCard**: Success completion screen
 
 ## Usage
 
 ### Basic Import
+
 ```tsx
 import {
   WelcomeCard,
@@ -73,6 +78,7 @@ import {
 ```
 
 ### Form Pattern
+
 ```tsx
 <OrganizationForm
   onSuccess={() => setStep(OnboardingStep.WORKSITE)}
@@ -86,6 +92,7 @@ import {
 ```
 
 ### Progress Persistence
+
 ```tsx
 // Server action saves progress
 export async function saveOnboardingProgress(step: string | null) {
@@ -125,12 +132,14 @@ if (!userOrg || user?.onboardingStep) {
 ## Extending
 
 ### Adding New Steps
+
 1. Create form component in `components/`
 2. Add step to `OnboardingStep` enum
 3. Add step configuration to `STEP_DISPLAY_CONFIG`
 4. Implement in main wizard with same callback pattern
 
 ### Custom Hooks
+
 - Use `useFormSubmission` for consistent API handling
 - Add new hooks in `hooks/` directory
 - Export through main index file

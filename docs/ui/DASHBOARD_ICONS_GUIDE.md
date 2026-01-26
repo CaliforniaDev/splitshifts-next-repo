@@ -4,7 +4,7 @@ This guide shows you how to use the dashboard SVG icons that have been converted
 
 ## 📁 File Structure
 
-```
+```text
 app/components/ui/icons/dashboard/
 ├── index.tsx                    # Main exports and types
 ├── dashboard-icon.tsx           # Unified icon component

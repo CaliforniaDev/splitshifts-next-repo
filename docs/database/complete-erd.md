@@ -1,6 +1,7 @@
 # SplitShifts Complete Database Schema
 
 ## Overview
+
 This document shows the complete database schema for SplitShifts, a multi-tenant scheduling application designed for any company that needs shift-based workforce management. While particularly well-suited for security companies due to their multi-site operations and split-shift requirements, the platform is flexible enough to serve healthcare facilities, manufacturing, retail, hospitality, and any business with location-based scheduling needs.
 
 ## Entity Relationship Diagram
@@ -301,27 +302,32 @@ erDiagram
 ## Key Features
 
 ### Universal Applicability
+
 - **Flexible Industry Support**: Works for security companies, healthcare facilities, manufacturing, retail, hospitality, and any business requiring shift-based scheduling
 - **Customizable Roles**: Organizations define their own job types (Security Guard, Nurse, Technician, Sales Associate, etc.)
 - **Multi-Site Operations**: Perfect for businesses operating across multiple locations
 - **Split Shift Optimization**: Designed for complex scheduling patterns common in 24/7 operations
 
 ### Multi-Tenancy
+
 - Every business table includes `org_id` for organization isolation
 - Row Level Security (RLS) policies enforce data separation
 - Auth tables remain global for potential SSO integration
 
 ### Shift Management
+
 - **Split Shifts**: Supported via `shift_groups` table
 - **Overlap Prevention**: PostgreSQL exclusion constraints with `tstzrange`
 - **Time Zones**: Each work site has its own timezone setting
 
 ### Employee Management
+
 - **Flexible User Link**: Employees can exist without user accounts
 - **Skills & Certifications**: Track qualifications and expiry dates
 - **Availability**: Define when employees can work
 
 ### Advanced PostgreSQL Features
+
 - **Generated Columns**: Automatic shift duration calculation
 - **Range Types**: `tstzrange` for time periods and overlap detection
 - **JSONB**: Flexible storage for settings, contact info, etc.
@@ -329,12 +335,14 @@ erDiagram
 - **Materialized Views**: Performance optimization for analytics
 
 ### Performance Optimizations
+
 - Strategic indexing for multi-tenant queries
 - GiST indexes for time range operations
 - Materialized views for common aggregations
 - Efficient RLS policies with `current_org_id()` function
 
 ## Security
+
 - Row Level Security on all business tables
 - Audit logging for compliance
 - Soft deletes preserve data history

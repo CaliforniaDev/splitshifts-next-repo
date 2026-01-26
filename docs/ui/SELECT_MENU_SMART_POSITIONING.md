@@ -358,7 +358,7 @@ if (scrollParent) {
 
 **Visual representation:**
 
-```
+```text
 ┌─────────────────────────────────┐ ← Viewport top (0)
 │                                 │
 │  ┌───────────────────────────┐  │ ← Scroll container top
@@ -398,6 +398,7 @@ if (scrollParent) {
    ```
 
 4. **Space above in viewport:**
+
    ```typescript
    rect.top;
    // Distance from viewport top (which is 0)
@@ -929,7 +930,7 @@ bottom: 100%;
 
 **Visual:**
 
-```
+```text
 direction: 'down'              direction: 'up'
 ┌────────────────┐             ┌────────────────┐
 │ SelectMenu     │             │   Dropdown     │
@@ -1017,7 +1018,7 @@ animation: {
 
 **Easing curves:**
 
-```
+```text
 cubic-bezier(0.4, 0, 0.2, 1) = "ease-out"
 - Starts fast
 - Ends slowly
@@ -1106,7 +1107,7 @@ if (spaceBelow < menuHeight && spaceAbove > spaceBelow) {
 
 **Symptom:**
 
-```
+```text
 handleToggle called
 containerRef.current: null
 ```

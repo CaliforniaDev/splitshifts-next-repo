@@ -42,11 +42,13 @@
 ## Key Design Decisions
 
 ### Multi-Tenancy Strategy
+
 - **org_id** on every business table for hard isolation
 - Row Level Security (RLS) policies on all business tables
 - Auth tables (users, tokens) remain global for SSO potential
 
 ### User-Organization Relationship
+
 - **organization_users** table links users to organizations with roles
 - **Many-to-many relationship**: Users can belong to multiple organizations, organizations can have multiple users
 - **Role-based access**: admin (full control), manager (scheduling/employees), member (basic access)
@@ -54,37 +56,44 @@
 - **Future extensibility**: Ready for user invitations and multi-org access
 
 ### Primary Key Strategy
+
 - **UUIDv7** for all tables (time-ordered, index-friendly, globally unique)
 - **Migrated from serial keys** to UUID for better scalability and distribution
 - UUIDv7 provides natural ordering while avoiding sequence bottlenecks
 - Eliminates potential key conflicts in multi-region deployments
 
 ### Timestamp Strategy
+
 - **timestamptz** (timestamp with timezone) everywhere for consistency
 - Each work_site stores timezone for proper local time handling
 - created_at/updated_at/deleted_at pattern for audit trail
 
 ### Split Shifts Modeling
+
 **Decision: Multiple shifts with shift_group_id**
 
 **Pros:**
+
 - Natural representation of each work period
 - Easy to handle different rates, breaks, locations per segment
 - Flexible for complex split scenarios
 - Simpler queries for time calculations
 
 **Cons:**
+
 - More rows in shifts table
 - Need to group related shifts for some operations
 
 **Alternative:** Single shift with time ranges array - rejected due to complexity in querying and PostgreSQL's limited array query capabilities
 
 ### Overlap Prevention
+
 - **tstzrange + EXCLUDE constraint** on shift_assignments per employee
 - Prevents scheduling conflicts at database level
 - Handles cross-midnight shifts naturally
 
 ### Soft Deletes
+
 - **deleted_at** column pattern for business records
 - Maintains referential integrity while hiding deleted records
 - Important for audit trails and compliance
@@ -92,6 +101,7 @@
 ## PostgreSQL-Specific Features
 
 ### Range Types & Constraints
+
 ```sql
 -- Prevent overlapping assignments per employee
 EXCLUDE USING gist (employee_id WITH =, 
@@ -100,6 +110,7 @@ EXCLUDE USING gist (employee_id WITH =,
 ```
 
 ### Row Level Security Example
+
 ```sql
 -- Restrict access to organization's data only
 CREATE POLICY org_isolation ON shifts 
@@ -108,6 +119,7 @@ CREATE POLICY org_isolation ON shifts
 ```
 
 ### Generated Columns
+
 ```sql
 -- Computed shift duration
 shift_duration_hours NUMERIC 
@@ -117,6 +129,7 @@ shift_duration_hours NUMERIC
 ```
 
 ### Materialized Views
+
 - Weekly hours rollups per employee
 - Coverage gap analysis
 - Dashboard metrics
@@ -124,11 +137,13 @@ shift_duration_hours NUMERIC
 ## Performance Considerations
 
 ### Indexing Strategy
+
 - Composite indexes on (org_id, frequently_queried_column)
 - GiST indexes on tstzrange columns for overlap queries
 - Partial indexes on non-deleted records (WHERE deleted_at IS NULL)
 
 ### Query Patterns
+
 - Always filter by org_id first
 - Use range operators for shift overlap queries
 - Leverage PostgreSQL's date/time functions for week calculations
@@ -136,11 +151,13 @@ shift_duration_hours NUMERIC
 ## Compliance & Audit
 
 ### Change Tracking
+
 - Audit log table captures all significant changes
 - Triggers on key tables for automatic logging
 - JSON change payloads for detailed history
 
 ### Data Retention
+
 - Soft deletes preserve historical data
 - Automatic archival policies for old records
 - GDPR compliance considerations for employee data

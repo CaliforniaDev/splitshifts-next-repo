@@ -12,18 +12,21 @@ SplitShifts uses a **two-tier deletion strategy** to balance data safety with st
 ### Hard Delete (Immediate Removal)
 
 **When to use:**
+
 - User canceling during onboarding
 - Organization has no business data
 - User hasn't completed setup
 - Session/temporary data
 
 **Implementation:**
+
 ```typescript
 // app/(logged-in)/dashboard/actions/hard-delete-organization.ts
 await hardDeleteOrganization({ id: organizationId });
 ```
 
 **Why hard delete for onboarding:**
+
 - User expects "cancel" to fully undo setup
 - No business value in keeping incomplete data
 - No employees, shifts, or schedules exist yet
@@ -32,12 +35,14 @@ await hardDeleteOrganization({ id: organizationId });
 ### Soft Delete (90-Day Retention)
 
 **When to use:**
+
 - Production organizations with data
 - Organizations with employees
 - Organizations with shift history
 - Any deletion requiring audit trail
 
 **Implementation:**
+
 ```typescript
 // app/(logged-in)/dashboard/actions/delete-organization.ts
 await deleteOrganization({ id: organizationId });
@@ -45,6 +50,7 @@ await deleteOrganization({ id: organizationId });
 ```
 
 **Why soft delete for production:**
+
 - Audit compliance requirements
 - Data recovery if accidental deletion
 - Historical reporting and analytics
@@ -65,11 +71,13 @@ CREATE EXTENSION IF NOT EXISTS pg_cron;
 ```
 
 **Schedule:**
+
 - Runs daily at 2:00 AM UTC
 - Purges records soft-deleted >90 days ago
 - Logs all operations to `cleanup_audit_log` table
 
 **What it does:**
+
 ```sql
 -- Finds organizations deleted more than 90 days ago
 DELETE FROM organizations
@@ -80,6 +88,7 @@ WHERE deleted_at IS NOT NULL
 ### Manual Operations
 
 **View what would be deleted:**
+
 ```sql
 SELECT id, name, deleted_at, 
        NOW() - deleted_at AS days_deleted
@@ -89,11 +98,13 @@ WHERE deleted_at IS NOT NULL
 ```
 
 **Execute cleanup manually:**
+
 ```sql
 SELECT * FROM purge_old_soft_deleted_with_audit();
 ```
 
 **View cleanup history:**
+
 ```sql
 SELECT * FROM cleanup_audit_log 
 ORDER BY executed_at DESC 
@@ -101,6 +112,7 @@ LIMIT 10;
 ```
 
 **Check cron job status:**
+
 ```sql
 -- View scheduled jobs
 SELECT * FROM cron.job 
@@ -205,6 +217,7 @@ SELECT cron.schedule(
 ### Regular Checks
 
 1. **Weekly:** Review audit logs
+
 ```sql
 SELECT 
   executed_at,
@@ -216,6 +229,7 @@ ORDER BY executed_at DESC;
 ```
 
 2. **Monthly:** Verify cron job is running
+
 ```sql
 SELECT 
   start_time,
@@ -231,6 +245,7 @@ ORDER BY start_time DESC;
 ```
 
 3. **Quarterly:** Review retention policy effectiveness
+
 ```sql
 -- How many soft-deleted records exist?
 SELECT 
@@ -245,6 +260,7 @@ WHERE deleted_at IS NOT NULL;
 ### Pause/Resume Cleanup
 
 **Pause (e.g., during investigation):**
+
 ```sql
 UPDATE cron.job 
 SET active = FALSE 
@@ -252,6 +268,7 @@ WHERE jobname = 'purge-soft-deleted-organizations';
 ```
 
 **Resume:**
+
 ```sql
 UPDATE cron.job 
 SET active = TRUE 
@@ -267,6 +284,7 @@ WHERE jobname = 'purge-soft-deleted-organizations';
 3. Document backup retention policy (Neon default: 7 days for Pro plan)
 
 **For compliance-heavy industries:**
+
 - Archive soft-deleted records to cold storage before purge
 - Export to S3/backup system
 - Consider longer retention (180+ days)
@@ -279,6 +297,7 @@ WHERE jobname = 'purge-soft-deleted-organizations';
 2. Select your project
 3. Go to SQL Editor
 4. Run:
+
 ```sql
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 ```

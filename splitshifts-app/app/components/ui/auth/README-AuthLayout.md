@@ -98,16 +98,19 @@ export default function PasswordResetPage() {
 ## Layout Variants
 
 ### AuthLayout (Default)
+
 - **Desktop**: 50% image, 50% form
 - **Mobile**: 100% form, no image
 - **Best for**: Standard login, signup forms
 
 ### AuthLayoutWide
+
 - **Desktop**: 60% image, 40% form
 - **Mobile**: 100% form, no image  
 - **Best for**: Complex forms with multiple fields
 
 ### AuthLayoutCompact
+
 - **Desktop**: 66% image, 33% form
 - **Mobile**: 100% form, no image
 - **Best for**: Simple forms like password reset
@@ -227,14 +230,17 @@ export default async function AuthLayout({ imageSrc, ...props }) {
 ## Troubleshooting
 
 ### Form Too Wide
+
 If your form appears too wide, ensure you're using `w-full` on the Card component and let the layout control the container width.
 
 ### Image Not Showing
+
 1. Check the image path is correct relative to the `public` folder
 2. Verify the image file exists
 3. Check browser network tab for 404 errors
 
 ### Layout Not Responsive
+
 Ensure you're using the `lg:` prefix for desktop-specific styles and that Tailwind's responsive breakpoints are working correctly.
 
 ## Migration Guide

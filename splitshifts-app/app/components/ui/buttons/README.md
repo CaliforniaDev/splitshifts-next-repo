@@ -4,7 +4,7 @@ This folder contains all button component types following Material Design 3 spec
 
 ## Structure
 
-```
+```text
 buttons/
 ├── button/           # Standard button component
 │   ├── button.tsx    # Button component implementation
@@ -49,6 +49,7 @@ export { IconButton } from './icon-button';
 ## Shared Utilities
 
 The `shared.ts` file contains:
+
 - `baseButtonClasses` - Common layout, hover overlays, focus states
 - `stateLayer` - Material Design 3 state layer opacity values
 - `disabledState` - Consistent disabled styling
