@@ -351,6 +351,7 @@ export default function TimePicker({
   iconPosition = 'start',
 }: TimePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showDial, setShowDial] = useState(true); // Toggle between dial and keyboard-only mode
   const [mode, setMode] = useState<TimeMode>('hours');
   const initialState = initializeTimeState(value ?? null);
   const [hours, setHours] = useState(initialState.hours);
@@ -532,17 +533,25 @@ export default function TimePicker({
     }
   };
 
-  const handleHoursBlur = () => {
-    if (tempHoursValue === '') {
+  const commitHoursValue = (rawValue?: string) => {
+    const nextValue =
+      rawValue ?? hoursInputRef.current?.value ?? tempHoursValue;
+
+    if (nextValue === '') {
       // User didn't type anything, keep current value
       setEditingHours(false);
+      setTempHoursValue('');
       return;
     }
 
-    const numValue = validateHours(tempHoursValue);
+    const numValue = validateHours(nextValue);
     setHours(numValue);
     setEditingHours(false);
     setTempHoursValue('');
+  };
+
+  const handleHoursBlur = (e?: React.FocusEvent<HTMLInputElement>) => {
+    commitHoursValue(e?.currentTarget.value);
   };
 
   const handleHoursKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -913,7 +922,21 @@ export default function TimePicker({
     setMode('hours'); // Always start with hours mode
     setEditingHours(false);
     setEditingMinutes(false);
+    setShowDial(true); // Reset to dial mode when opening
     setIsOpen(true);
+  };
+
+  const toggleDialMode = () => {
+    setShowDial(prev => !prev);
+    // Close any active editing when switching modes
+    if (editingHours) {
+      commitHoursValue();
+      setEditingHours(false);
+    }
+    if (editingMinutes) {
+      commitMinutesValue();
+      setEditingMinutes(false);
+    }
   };
 
   // Generate hour/minute arrays
@@ -961,14 +984,20 @@ export default function TimePicker({
       />
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className='w-fit border-none p-6'>
+        <DialogContent
+          className={cn(
+            'w-[328px] gap-5 border-none p-6 shadow-elevation-3',
+            'duration-500 ease-expressive-default-spatial transition-[height]',
+            showDial ? 'h-[524px]' : 'h-[268px]',
+          )}
+        >
           <DialogHeader>
             <DialogTitle className='typescale-label-medium text-on-surface-variant'>
               Select time
             </DialogTitle>
           </DialogHeader>
 
-          <div className='mt-5 flex flex-col'>
+          <div className='flex flex-col'>
             {/* Time Display Header - 80px wrapper */}
             <div className='flex h-20 items-stretch gap-3'>
               {/* Time Selectors */}
@@ -1011,9 +1040,15 @@ export default function TimePicker({
               <PeriodSelector period={period} onToggle={handlePeriodToggle} />
             </div>
 
-            {/* Clock Face */}
+            {/* Clock Face - Animated transition */}
             <div
-              className='relative mx-auto mt-9 h-[256px] w-[256px] cursor-pointer select-none rounded-full bg-surface-container-highest'
+              className={cn(
+                'relative mx-auto mt-9 h-[256px] w-[256px] cursor-pointer select-none rounded-full bg-surface-container-highest',
+                'ease-expressive-default-spatial origin-center transition-all duration-500',
+                showDial
+                  ? 'pointer-events-auto scale-100 opacity-100'
+                  : 'pointer-events-none scale-75 opacity-0',
+              )}
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
@@ -1237,26 +1272,53 @@ export default function TimePicker({
             </div>
           </div>
 
-          {/* Keyboard Icon - Bottom Left Corner */}
-          <IconButton
-            type='button'
-            variant='standard'
-            aria-label='Toggle keyboard input'
-            className='absolute bottom-6 left-6'
-            icon={<KeyboardIcon variant='solid' className='h-6' />}
-          />
-          <DialogFooter className='mt-6'>
-            <Button type='button' variant='text' onClick={handleCancel}>
-              Cancel
-            </Button>
-            <Button
-              type='button'
-              variant='text'
-              onClick={() => handleConfirm()}
-            >
-              OK
-            </Button>
-          </DialogFooter>
+          {/* Action Buttons Row */}
+          <div className='flex h-12 items-center justify-between'>
+            {/* Keyboard/Dial toggle button */}
+            <IconButton
+              size='small'
+              variant='standard'
+              aria-label={
+                showDial ? 'Switch to keyboard input' : 'Switch to dial'
+              }
+              onClick={toggleDialMode}
+              icon={
+                <div className='relative h-6 w-6'>
+                  <div
+                    className={cn(
+                      'ease-expressive-default-spatial absolute inset-0 transition-opacity duration-500',
+                      showDial ? 'opacity-100' : 'opacity-0',
+                    )}
+                  >
+                    <KeyboardIcon className='h-6 w-6' />
+                  </div>
+                  <div
+                    className={cn(
+                      'ease-expressive-default-spatial absolute inset-0 transition-opacity duration-500',
+                      showDial ? 'opacity-0' : 'opacity-100',
+                    )}
+                  >
+                    <ClockIcon variant='outline' className='h-6 w-6' />
+                  </div>
+                </div>
+              }
+              className='focus-visible:rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary'
+            />
+
+            {/* CTA Buttons */}
+            <div className='flex gap-2'>
+              <Button type='button' variant='text' onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button
+                type='button'
+                variant='text'
+                onClick={() => handleConfirm()}
+              >
+                OK
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </>

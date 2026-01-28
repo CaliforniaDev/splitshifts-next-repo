@@ -116,7 +116,8 @@ const config: Config = {
       transitionTimingFunction: {
         emphasized: 'cubic-bezier(0.2, 0, 0, 1)',
         'emphasized-decelerate': 'cubic-bezier(0.05, 0.7, 0.1, 1)',
-        'expressive-fast-spatial': 'cubic-bezier(0.42, 1.67, 0.21, 0.9)',
+        'expressive-fast-spatial': 'cubic-bezier(0.42, 1.67, 0.21, 0.9)', // Use 350ms
+        'expressive-default-spatial': 'cubic-bezier(0.38, 1.21, 0.22, 1.00)', // Use 500ms
       },
       keyframes: {
         'caret-blink': {
