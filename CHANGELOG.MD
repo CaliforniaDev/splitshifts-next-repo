@@ -158,6 +158,14 @@
     - **Signup Form**: Auto-focus on first name field for immediate user engagement
     - **Password Reset Form**: Auto-focus on email field using `useRef` for optimal performance
     - **Resend Verification Form**: Auto-focus on email field with proper ref management
+
+### Fixed
+
+- Fix time picker dialog height animation and CTA positioning when toggling dial/keyboard modes
+
+### Changed
+
+- Animate dialog max-height on mode toggle and keep dial fade/scale synced inside the collapse
     - **Consistent Implementation**: All forms use `requestAnimationFrame` for proper DOM timing and TypeScript-safe ref handling
   - **Form Error Handling**: Improved error state management with proper boolean/string typing for Input components
   - **Visual Design Consistency**: Centered success states and animations across all verification flows
