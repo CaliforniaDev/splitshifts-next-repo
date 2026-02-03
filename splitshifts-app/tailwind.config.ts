@@ -118,6 +118,12 @@ const config: Config = {
         'emphasized-decelerate': 'cubic-bezier(0.05, 0.7, 0.1, 1)',
         'expressive-fast-spatial': 'cubic-bezier(0.42, 1.67, 0.21, 0.9)', // Use 350ms
         'expressive-default-spatial': 'cubic-bezier(0.38, 1.21, 0.22, 1.00)', // Use 500ms
+        'expressive-slow-effects': 'cubic-bezier(0.34, 0.88, 0.34, 1.00)', // Use 300ms
+      },
+      transitionDuration: {
+        350: '350ms',
+        400: '400ms',
+        500: '500ms',
       },
       keyframes: {
         'caret-blink': {

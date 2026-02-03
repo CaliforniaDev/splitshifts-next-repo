@@ -34,4 +34,16 @@ body:not(.hydrated) {
   .text-balance {
     text-wrap: balance;
   }
+
+  .motion-expressive-default {
+    @apply ease-expressive-default-spatial duration-500;
+  }
+
+  .motion-expressive-fast {
+    @apply ease-expressive-fast-spatial duration-350;
+  }
+
+  .motion-expressive-slow-effects {
+    @apply ease-expressive-slow-effects duration-500;
+  }
 }
