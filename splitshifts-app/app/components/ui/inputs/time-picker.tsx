@@ -353,6 +353,20 @@ export default function TimePicker({
   const [isOpen, setIsOpen] = useState(false);
   const [showDial, setShowDial] = useState(true); // Toggle between dial and keyboard-only mode
   const [mode, setMode] = useState<TimeMode>('hours');
+
+  // Responsive: Use keyboard mode on desktop (>=768px), dial on mobile
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 768px)');
+    setShowDial(!mediaQuery.matches); // Desktop = false (keyboard), Mobile = true (dial)
+
+    const handler = (e: MediaQueryListEvent) => {
+      setShowDial(!e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
   const initialState = initializeTimeState(value ?? null);
   const [hours, setHours] = useState(initialState.hours);
   const [minutes, setMinutes] = useState(initialState.minutes);
@@ -922,7 +936,9 @@ export default function TimePicker({
     setMode('hours'); // Always start with hours mode
     setEditingHours(false);
     setEditingMinutes(false);
-    setShowDial(true); // Reset to dial mode when opening
+    // Reset to appropriate mode based on screen size
+    const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+    setShowDial(!isDesktop); // Desktop = keyboard, Mobile = dial
     setIsOpen(true);
   };
 
@@ -987,8 +1003,8 @@ export default function TimePicker({
         <DialogContent
           className={cn(
             'w-[328px] gap-5 border-none p-6 shadow-elevation-3',
-            'duration-500 ease-expressive-default-spatial transition-[height]',
-            showDial ? 'h-[524px]' : 'h-[268px]',
+            'motion-expressive-slow-effects overflow-hidden transition-[max-height]',
+            showDial ? 'max-h-[524px]' : 'max-h-[268px]',
           )}
         >
           <DialogHeader>
@@ -1043,232 +1059,250 @@ export default function TimePicker({
             {/* Clock Face - Animated transition */}
             <div
               className={cn(
-                'relative mx-auto mt-9 h-[256px] w-[256px] cursor-pointer select-none rounded-full bg-surface-container-highest',
-                'ease-expressive-default-spatial origin-center transition-all duration-500',
-                showDial
-                  ? 'pointer-events-auto scale-100 opacity-100'
-                  : 'pointer-events-none scale-75 opacity-0',
+                'overflow-hidden transition-[max-height] motion-expressive-slow-effects',
+                showDial ? 'max-h-[292px]' : 'max-h-0',
               )}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onClick={handleClockInteraction}
             >
-              <svg
-                className='pointer-events-none absolute inset-0'
-                viewBox={`0 0 ${CLOCK_CONSTANTS.DIAMETER} ${CLOCK_CONSTANTS.DIAMETER}`}
-              >
-                {/* Dial selector center */}
-                <circle
-                  cx={CLOCK_CONSTANTS.CENTER}
-                  cy={CLOCK_CONSTANTS.CENTER}
-                  r={CLOCK_CONSTANTS.DIAL_SELECTOR_CENTER_RADIUS}
-                  fill='currentColor'
-                  className='text-primary'
-                />
-
-                {/* Hours mode: Dial selector track and container */}
-                {mode === 'hours' && (
-                  <>
-                    {/* Dial selector track */}
-                    <line
-                      x1={CLOCK_CONSTANTS.CENTER}
-                      y1={CLOCK_CONSTANTS.CENTER}
-                      x2={
-                        getPosition(
-                          getAngle(hours % 12, 12),
-                          CLOCK_CONSTANTS.NUMBER_RADIUS,
-                        ).x
-                      }
-                      y2={
-                        getPosition(
-                          getAngle(hours % 12, 12),
-                          CLOCK_CONSTANTS.NUMBER_RADIUS,
-                        ).y
-                      }
-                      stroke='currentColor'
-                      strokeWidth={CLOCK_CONSTANTS.SELECTOR_TRACK_THICKNESS}
-                      className='text-primary'
-                    />
-                    {/* Dial selector container */}
+              <div className='flex h-[292px] items-center justify-center'>
+                <div
+                  className={cn(
+                    'relative h-[256px] w-[256px] cursor-pointer select-none rounded-full bg-surface-container-highest',
+                    'origin-center transition-[opacity,transform] motion-expressive-slow-effects',
+                    showDial
+                      ? 'pointer-events-auto scale-100 opacity-100'
+                      : 'pointer-events-none scale-75 opacity-0',
+                  )}
+                  aria-hidden={!showDial}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onClick={handleClockInteraction}
+                >
+                  <svg
+                    className='pointer-events-none absolute inset-0'
+                    viewBox={`0 0 ${CLOCK_CONSTANTS.DIAMETER} ${CLOCK_CONSTANTS.DIAMETER}`}
+                  >
+                    {/* Dial selector center */}
                     <circle
-                      cx={
-                        getPosition(
-                          getAngle(hours % 12, 12),
-                          CLOCK_CONSTANTS.NUMBER_RADIUS,
-                        ).x
-                      }
-                      cy={
-                        getPosition(
-                          getAngle(hours % 12, 12),
-                          CLOCK_CONSTANTS.NUMBER_RADIUS,
-                        ).y
-                      }
-                      r={CLOCK_CONSTANTS.DIAL_SELECTOR_CONTAINER_RADIUS}
+                      cx={CLOCK_CONSTANTS.CENTER}
+                      cy={CLOCK_CONSTANTS.CENTER}
+                      r={CLOCK_CONSTANTS.DIAL_SELECTOR_CENTER_RADIUS}
                       fill='currentColor'
                       className='text-primary'
                     />
-                  </>
-                )}
 
-                {/* Minutes mode: Dial selector track and container */}
-                {mode === 'minutes' && (
-                  <>
-                    {/* Dial selector track */}
-                    <line
-                      x1={CLOCK_CONSTANTS.CENTER}
-                      y1={CLOCK_CONSTANTS.CENTER}
-                      x2={
-                        getPosition(
-                          getAngle(minutes / 5, 12),
-                          CLOCK_CONSTANTS.NUMBER_RADIUS,
-                        ).x
-                      }
-                      y2={
-                        getPosition(
-                          getAngle(minutes / 5, 12),
-                          CLOCK_CONSTANTS.NUMBER_RADIUS,
-                        ).y
-                      }
-                      stroke='currentColor'
-                      strokeWidth={CLOCK_CONSTANTS.SELECTOR_TRACK_THICKNESS}
-                      className='text-primary'
-                    />
-                    {/* Dial selector container */}
-                    <circle
-                      cx={
-                        getPosition(
-                          getAngle(minutes / 5, 12),
-                          CLOCK_CONSTANTS.NUMBER_RADIUS,
-                        ).x
-                      }
-                      cy={
-                        getPosition(
-                          getAngle(minutes / 5, 12),
-                          CLOCK_CONSTANTS.NUMBER_RADIUS,
-                        ).y
-                      }
-                      r={CLOCK_CONSTANTS.DIAL_SELECTOR_CONTAINER_RADIUS}
-                      fill='currentColor'
-                      className='text-primary'
-                    />
-                  </>
-                )}
-              </svg>
+                    {/* Hours mode: Dial selector track and container */}
+                    {mode === 'hours' && (
+                      <>
+                        {/* Dial selector track */}
+                        <line
+                          x1={CLOCK_CONSTANTS.CENTER}
+                          y1={CLOCK_CONSTANTS.CENTER}
+                          x2={
+                            getPosition(
+                              getAngle(hours % 12, 12),
+                              CLOCK_CONSTANTS.NUMBER_RADIUS,
+                            ).x
+                          }
+                          y2={
+                            getPosition(
+                              getAngle(hours % 12, 12),
+                              CLOCK_CONSTANTS.NUMBER_RADIUS,
+                            ).y
+                          }
+                          stroke='currentColor'
+                          strokeWidth={CLOCK_CONSTANTS.SELECTOR_TRACK_THICKNESS}
+                          className='text-primary'
+                        />
+                        {/* Dial selector container */}
+                        <circle
+                          cx={
+                            getPosition(
+                              getAngle(hours % 12, 12),
+                              CLOCK_CONSTANTS.NUMBER_RADIUS,
+                            ).x
+                          }
+                          cy={
+                            getPosition(
+                              getAngle(hours % 12, 12),
+                              CLOCK_CONSTANTS.NUMBER_RADIUS,
+                            ).y
+                          }
+                          r={CLOCK_CONSTANTS.DIAL_SELECTOR_CONTAINER_RADIUS}
+                          fill='currentColor'
+                          className='text-primary'
+                        />
+                      </>
+                    )}
 
-              {/* Hour numbers */}
-              {mode === 'hours' &&
-                hoursArray.map(hour => {
-                  const angle = getAngle(hour % 12, 12);
-                  const pos = getPosition(angle, CLOCK_CONSTANTS.NUMBER_RADIUS);
-                  const isUnderSelectorContainer =
-                    isNumberUnderSelectorContainer(hour, true);
-                  return (
-                    <button
-                      key={hour}
-                      tabIndex={-1}
-                      onMouseDown={e => {
-                        e.stopPropagation();
-                        e.preventDefault();
+                    {/* Minutes mode: Dial selector track and container */}
+                    {mode === 'minutes' && (
+                      <>
+                        {/* Dial selector track */}
+                        <line
+                          x1={CLOCK_CONSTANTS.CENTER}
+                          y1={CLOCK_CONSTANTS.CENTER}
+                          x2={
+                            getPosition(
+                              getAngle(minutes / 5, 12),
+                              CLOCK_CONSTANTS.NUMBER_RADIUS,
+                            ).x
+                          }
+                          y2={
+                            getPosition(
+                              getAngle(minutes / 5, 12),
+                              CLOCK_CONSTANTS.NUMBER_RADIUS,
+                            ).y
+                          }
+                          stroke='currentColor'
+                          strokeWidth={CLOCK_CONSTANTS.SELECTOR_TRACK_THICKNESS}
+                          className='text-primary'
+                        />
+                        {/* Dial selector container */}
+                        <circle
+                          cx={
+                            getPosition(
+                              getAngle(minutes / 5, 12),
+                              CLOCK_CONSTANTS.NUMBER_RADIUS,
+                            ).x
+                          }
+                          cy={
+                            getPosition(
+                              getAngle(minutes / 5, 12),
+                              CLOCK_CONSTANTS.NUMBER_RADIUS,
+                            ).y
+                          }
+                          r={CLOCK_CONSTANTS.DIAL_SELECTOR_CONTAINER_RADIUS}
+                          fill='currentColor'
+                          className='text-primary'
+                        />
+                      </>
+                    )}
+                  </svg>
 
-                        // Exit input editing mode
-                        closeInputs();
+                  {/* Hour numbers */}
+                  {mode === 'hours' &&
+                    hoursArray.map(hour => {
+                      const angle = getAngle(hour % 12, 12);
+                      const pos = getPosition(
+                        angle,
+                        CLOCK_CONSTANTS.NUMBER_RADIUS,
+                      );
+                      const isUnderSelectorContainer =
+                        isNumberUnderSelectorContainer(hour, true);
+                      return (
+                        <button
+                          key={hour}
+                          tabIndex={-1}
+                          onMouseDown={e => {
+                            e.stopPropagation();
+                            e.preventDefault();
 
-                        setJustFinishedDrag(false);
-                        setIsDragging(true);
-                        const target = e.currentTarget.parentElement;
-                        if (target) {
-                          const rect = target.getBoundingClientRect();
-                          const centerX = rect.width / 2;
-                          const centerY = rect.height / 2;
-                          const x = e.clientX - rect.left - centerX;
-                          const y = e.clientY - rect.top - centerY;
-                          let angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
-                          if (angle < 0) angle += 360;
-                          const calculatedHour =
-                            Math.round((angle / 360) * 12) || 12;
-                          setHours(calculatedHour);
-                        }
-                      }}
-                      onClick={e => {
-                        e.stopPropagation();
+                            // Exit input editing mode
+                            closeInputs();
 
-                        // Exit input editing mode
-                        closeInputs();
+                            setJustFinishedDrag(false);
+                            setIsDragging(true);
+                            const target = e.currentTarget.parentElement;
+                            if (target) {
+                              const rect = target.getBoundingClientRect();
+                              const centerX = rect.width / 2;
+                              const centerY = rect.height / 2;
+                              const x = e.clientX - rect.left - centerX;
+                              const y = e.clientY - rect.top - centerY;
+                              let angle =
+                                Math.atan2(y, x) * (180 / Math.PI) + 90;
+                              if (angle < 0) angle += 360;
+                              const calculatedHour =
+                                Math.round((angle / 360) * 12) || 12;
+                              setHours(calculatedHour);
+                            }
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
 
-                        if (!justFinishedDrag) {
-                          handleHourSelect(hour);
-                        }
-                      }}
-                      className={cn(
-                        'typescale-body-large absolute flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-all duration-200',
-                        isUnderSelectorContainer
-                          ? 'text-on-primary'
-                          : 'text-on-surface',
-                      )}
-                      style={{ left: pos.x, top: pos.y }}
-                    >
-                      {hour}
-                    </button>
-                  );
-                })}
+                            // Exit input editing mode
+                            closeInputs();
 
-              {/* Minute numbers */}
-              {mode === 'minutes' &&
-                minutesArray.map(minute => {
-                  const angle = getAngle(minute / 5, 12);
-                  const pos = getPosition(angle, CLOCK_CONSTANTS.NUMBER_RADIUS);
-                  const isUnderSelectorContainer =
-                    isNumberUnderSelectorContainer(minute, false);
-                  return (
-                    <button
-                      key={minute}
-                      tabIndex={-1}
-                      onMouseDown={e => {
-                        e.stopPropagation();
-                        e.preventDefault();
+                            if (!justFinishedDrag) {
+                              handleHourSelect(hour);
+                            }
+                          }}
+                          className={cn(
+                            'typescale-body-large absolute flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-all duration-200',
+                            isUnderSelectorContainer
+                              ? 'text-on-primary'
+                              : 'text-on-surface',
+                          )}
+                          style={{ left: pos.x, top: pos.y }}
+                        >
+                          {hour}
+                        </button>
+                      );
+                    })}
 
-                        // Exit input editing mode
-                        closeInputs();
+                  {/* Minute numbers */}
+                  {mode === 'minutes' &&
+                    minutesArray.map(minute => {
+                      const angle = getAngle(minute / 5, 12);
+                      const pos = getPosition(
+                        angle,
+                        CLOCK_CONSTANTS.NUMBER_RADIUS,
+                      );
+                      const isUnderSelectorContainer =
+                        isNumberUnderSelectorContainer(minute, false);
+                      return (
+                        <button
+                          key={minute}
+                          tabIndex={-1}
+                          onMouseDown={e => {
+                            e.stopPropagation();
+                            e.preventDefault();
 
-                        setJustFinishedDrag(false);
-                        setIsDragging(true);
-                        const target = e.currentTarget.parentElement;
-                        if (target) {
-                          const rect = target.getBoundingClientRect();
-                          const centerX = rect.width / 2;
-                          const centerY = rect.height / 2;
-                          const x = e.clientX - rect.left - centerX;
-                          const y = e.clientY - rect.top - centerY;
-                          let angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
-                          if (angle < 0) angle += 360;
-                          const calculatedMinute =
-                            Math.floor((angle / 360) * 60) % 60;
-                          setMinutes(calculatedMinute);
-                        }
-                      }}
-                      onClick={e => {
-                        e.stopPropagation();
+                            // Exit input editing mode
+                            closeInputs();
 
-                        // Exit input editing mode
-                        closeInputs();
+                            setJustFinishedDrag(false);
+                            setIsDragging(true);
+                            const target = e.currentTarget.parentElement;
+                            if (target) {
+                              const rect = target.getBoundingClientRect();
+                              const centerX = rect.width / 2;
+                              const centerY = rect.height / 2;
+                              const x = e.clientX - rect.left - centerX;
+                              const y = e.clientY - rect.top - centerY;
+                              let angle =
+                                Math.atan2(y, x) * (180 / Math.PI) + 90;
+                              if (angle < 0) angle += 360;
+                              const calculatedMinute =
+                                Math.floor((angle / 360) * 60) % 60;
+                              setMinutes(calculatedMinute);
+                            }
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
 
-                        if (!justFinishedDrag) {
-                          handleMinuteSelect(minute);
-                        }
-                      }}
-                      className={cn(
-                        'typescale-body-large absolute flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-all duration-200',
-                        isUnderSelectorContainer
-                          ? 'text-on-primary'
-                          : 'text-on-surface',
-                      )}
-                      style={{ left: pos.x, top: pos.y }}
-                    >
-                      {String(minute).padStart(2, '0')}
-                    </button>
-                  );
-                })}
+                            // Exit input editing mode
+                            closeInputs();
+
+                            if (!justFinishedDrag) {
+                              handleMinuteSelect(minute);
+                            }
+                          }}
+                          className={cn(
+                            'typescale-body-large absolute flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-all duration-200',
+                            isUnderSelectorContainer
+                              ? 'text-on-primary'
+                              : 'text-on-surface',
+                          )}
+                          style={{ left: pos.x, top: pos.y }}
+                        >
+                          {String(minute).padStart(2, '0')}
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1286,7 +1320,7 @@ export default function TimePicker({
                 <div className='relative h-6 w-6'>
                   <div
                     className={cn(
-                      'ease-expressive-default-spatial absolute inset-0 transition-opacity duration-500',
+                      'motion-expressive-default absolute inset-0 transition-opacity',
                       showDial ? 'opacity-100' : 'opacity-0',
                     )}
                   >
@@ -1294,7 +1328,7 @@ export default function TimePicker({
                   </div>
                   <div
                     className={cn(
-                      'ease-expressive-default-spatial absolute inset-0 transition-opacity duration-500',
+                      'motion-expressive-default absolute inset-0 transition-opacity',
                       showDial ? 'opacity-0' : 'opacity-100',
                     )}
                   >
