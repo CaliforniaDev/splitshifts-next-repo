@@ -17,19 +17,21 @@ Custom time picker with 12-hour format, clock face dial, and editable inputs.
 
 ### Dual Input Modes
 
-**Dial Mode (Default)**
+#### Dial Mode (Default)
+
 - Visual clock face with clickable/draggable interface
 - Click hour numbers (1-12) or minute markers (00-55)
 - Drag around clock face for continuous selection
 - Smooth animations with emphasized decelerate easing
 
-**Keyboard Mode**
+#### Keyboard Mode
+
 - Click keyboard icon in dialog header to hide dial
 - Use TimeSelector inputs directly (hours, minutes, period)
 - Compact layout (328px width) for quick edits
 - Perfect for power users and accessibility
 
-### Input Methods
+#### Input Methods
 
 1. **Manual Input Field** (External)
    - Type directly in the input field with clock icon
