@@ -16,6 +16,7 @@ import { Button } from '@/app/components/ui/buttons';
 import Input from '@/app/components/ui/inputs/input';
 import { Textarea, SelectMenu } from '@/app/components/ui/inputs';
 import TimePicker from '@/app/components/ui/inputs/time-picker';
+import TimePickerOld from '@/app/components/ui/inputs/time-picker-old';
 import { Label } from '@/app/components/ui/label';
 import {
   Form,
@@ -37,6 +38,11 @@ export default function ComponentTestPage() {
   const [textareaValue, setTextareaValue] = useState('');
   const [selectValue, setSelectValue] = useState('');
   const [time, setTime] = useState<Date | null>(() => {
+    const date = new Date();
+    date.setHours(9, 0, 0, 0);
+    return date;
+  });
+  const [timeOld, setTimeOld] = useState<Date | null>(() => {
     const date = new Date();
     date.setHours(9, 0, 0, 0);
     return date;
@@ -568,10 +574,10 @@ export default function ComponentTestPage() {
       <section id='time-picker' className='scroll-mt-8'>
         <div className='mb-6 border-b-2 border-primary pb-4'>
           <h2 className='typescale-headline-medium mb-2 text-primary'>
-            TimePicker Component
+            TimePicker Component (Refactored)
           </h2>
           <p className='typescale-body-medium text-on-surface-variant'>
-            Interactive time selection with clock face and editable inputs
+            New modular architecture - 70% smaller, better organized
           </p>
         </div>
 
@@ -579,7 +585,7 @@ export default function ComponentTestPage() {
           <CardContent className='space-y-8 pt-6'>
             <div>
               <Label className='typescale-title-medium mb-3 block'>
-                Interactive Time Picker
+                Interactive Time Picker (New)
               </Label>
               <p className='mb-4 text-sm text-on-surface-variant'>
                 Click or drag on the clock face, or type directly into the inputs.
@@ -648,6 +654,108 @@ export default function ComponentTestPage() {
                 <li>AM/PM toggle button</li>
                 <li>Keyboard navigation (Tab, Arrow keys)</li>
                 <li>Ripple effects on all interactive elements</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* TIME PICKER COMPARISON SECTION */}
+      <section id='time-picker-comparison' className='scroll-mt-8'>
+        <div className='mb-6 border-b-2 border-tertiary pb-4'>
+          <h2 className='typescale-headline-medium mb-2 text-tertiary'>
+            TimePicker Component (Original - For Comparison)
+          </h2>
+          <p className='typescale-body-medium text-on-surface-variant'>
+            Legacy 1361-line monolithic implementation - preserved for behavior
+            verification
+          </p>
+        </div>
+
+        <Card className='border-none shadow-elevation-2'>
+          <CardContent className='space-y-8 pt-6'>
+            {/* Basic Interactive Time Picker (Old) */}
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                Interactive Time Picker (Original)
+              </Label>
+              <TimePickerOld value={timeOld} onChange={setTimeOld} />
+            </div>
+
+            {/* Custom Label */}
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                With Custom Label (Original)
+              </Label>
+              <TimePickerOld
+                label='Appointment Time'
+                value={timeOld}
+                onChange={setTimeOld}
+              />
+            </div>
+
+            {/* Error State */}
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                Error State (Original)
+              </Label>
+              <TimePickerOld
+                label='Invalid Time'
+                value={timeOld}
+                onChange={setTimeOld}
+                error={true}
+                errorMessage='Please select a valid time'
+              />
+            </div>
+
+            {/* Disabled State */}
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                Disabled State (Original)
+              </Label>
+              <TimePickerOld
+                label='Scheduled Time'
+                value={timeOld}
+                onChange={setTimeOld}
+                disabled={true}
+              />
+            </div>
+
+            {timeOld && (
+              <div className='rounded-lg border border-tertiary-container bg-tertiary-container/20 p-4'>
+                <p className='typescale-body-large text-on-tertiary-container'>
+                  <strong>Selected Time (Original):</strong>{' '}
+                  {formatTimeDisplay(timeOld)}
+                </p>
+                <p className='mt-2 text-xs text-on-tertiary-container/70'>
+                  Compare with refactored version above - behavior should be
+                  identical
+                </p>
+              </div>
+            )}
+
+            <div className='rounded-lg border border-outline-variant bg-surface-container-low p-4'>
+              <p className='mb-2 text-sm font-medium'>
+                Comparison Testing Notes:
+              </p>
+              <ul className='list-inside list-disc space-y-1 text-sm text-on-surface-variant'>
+                <li>
+                  Both versions should have identical visual appearance and
+                  animations
+                </li>
+                <li>
+                  Test clock interaction (click, drag), keyboard input, and
+                  manual editing
+                </li>
+                <li>Verify responsive behavior (desktop vs mobile modes)</li>
+                <li>
+                  Check that error states, disabled states, and validation work
+                  the same
+                </li>
+                <li>
+                  Refactored version is 70% smaller (400 vs 1361 lines) with
+                  modular architecture
+                </li>
               </ul>
             </div>
           </CardContent>
