@@ -38,12 +38,23 @@ body:not(.hydrated) {
   .motion-expressive-default {
     @apply ease-expressive-default-spatial duration-500;
   }
+  .motion-expressive-default-effects {
+    @apply ease-expressive-default-effects duration-200;
+  }
 
   .motion-expressive-fast {
     @apply ease-expressive-fast-spatial duration-350;
   }
 
+
   .motion-expressive-slow-effects {
     @apply ease-expressive-slow-effects duration-500;
+  }
+
+  .long-ease-emphasized-decelerate {
+    @apply ease-emphasized-decelerate duration-500;
+  }
+    .short-ease-emphasized-decelerate {
+    @apply ease-emphasized-decelerate duration-200;
   }
 }

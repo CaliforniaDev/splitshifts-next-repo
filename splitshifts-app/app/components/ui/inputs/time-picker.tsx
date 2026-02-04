@@ -281,7 +281,7 @@ function PeriodSelector({ period, onToggle }: PeriodSelectorProps) {
         onKeyDown={handleKeyDownAM}
         onKeyUp={handleKeyUpAM}
         className={cn(
-          'relative flex-1 overflow-hidden rounded-t-lg px-3 text-sm font-medium outline-none transition-colors ease-emphasized-decelerate before:absolute before:inset-0 before:opacity-0 before:transition-all before:duration-200 hover:before:opacity-8 focus-visible:z-10 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-secondary',
+          'motion-expressive-default-effects relative flex-1 overflow-hidden rounded-t-lg px-3 text-sm font-medium outline-none transition-colors before:absolute before:inset-0 before:opacity-0 before:transition-all before:duration-200 hover:before:opacity-8 focus-visible:z-10 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-secondary',
           period === 'AM'
             ? 'bg-tertiary-container text-on-tertiary-container before:bg-on-tertiary-container'
             : 'bg-surface-container-high text-on-surface-variant before:bg-on-surface-variant',
@@ -313,7 +313,7 @@ function PeriodSelector({ period, onToggle }: PeriodSelectorProps) {
         onKeyDown={handleKeyDownPM}
         onKeyUp={handleKeyUpPM}
         className={cn(
-          'relative flex-1 overflow-hidden rounded-b-lg px-3 text-sm font-medium outline-none transition-colors ease-emphasized-decelerate before:absolute before:inset-0 before:opacity-0 before:transition-all before:duration-200 hover:before:opacity-8 focus-visible:z-10 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-secondary',
+          'motion-expressive-default-effects relative flex-1 overflow-hidden rounded-b-lg px-3 text-sm font-medium outline-none transition-colors before:absolute before:inset-0 before:opacity-0 before:transition-all before:duration-200 hover:before:opacity-8 focus-visible:z-10 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-secondary',
           period === 'PM'
             ? 'bg-tertiary-container text-on-tertiary-container before:bg-on-tertiary-container'
             : 'bg-surface-container-high text-on-surface-variant before:bg-on-surface-variant',
@@ -1003,7 +1003,7 @@ export default function TimePicker({
         <DialogContent
           className={cn(
             'w-[328px] gap-5 border-none p-6 shadow-elevation-3',
-            'motion-expressive-slow-effects overflow-hidden transition-[max-height]',
+            'long-ease-emphasized-decelerate overflow-hidden transition-[max-height]',
             showDial ? 'max-h-[524px]' : 'max-h-[268px]',
           )}
         >
@@ -1059,15 +1059,15 @@ export default function TimePicker({
             {/* Clock Face - Animated transition */}
             <div
               className={cn(
-                'overflow-hidden transition-[max-height] motion-expressive-slow-effects',
+                'overflow-hidden transition-[max-height] long-ease-emphasized-decelerate',
                 showDial ? 'max-h-[292px]' : 'max-h-0',
               )}
             >
               <div className='flex h-[292px] items-center justify-center'>
                 <div
                   className={cn(
-                    'relative h-[256px] w-[256px] cursor-pointer select-none rounded-full bg-surface-container-highest',
-                    'origin-center transition-[opacity,transform] motion-expressive-slow-effects',
+                    'relative h-[256px] w-[256px] cursor-pointer select-none rounded-full bg-surface-container-highest opacity-100',
+                    'origin-center transition-[opacity,transform] long-ease-emphasized-decelerate',
                     showDial
                       ? 'pointer-events-auto scale-100 opacity-100'
                       : 'pointer-events-none scale-75 opacity-0',
@@ -1320,7 +1320,7 @@ export default function TimePicker({
                 <div className='relative h-6 w-6'>
                   <div
                     className={cn(
-                      'motion-expressive-default absolute inset-0 transition-opacity',
+                      'motion-expressive-default-effects absolute inset-0 transition-opacity',
                       showDial ? 'opacity-100' : 'opacity-0',
                     )}
                   >
@@ -1328,7 +1328,7 @@ export default function TimePicker({
                   </div>
                   <div
                     className={cn(
-                      'motion-expressive-default absolute inset-0 transition-opacity',
+                      'motion-expressive-default-effects absolute inset-0 transition-opacity',
                       showDial ? 'opacity-0' : 'opacity-100',
                     )}
                   >

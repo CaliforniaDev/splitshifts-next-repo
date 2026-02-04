@@ -116,14 +116,17 @@ const config: Config = {
       transitionTimingFunction: {
         emphasized: 'cubic-bezier(0.2, 0, 0, 1)',
         'emphasized-decelerate': 'cubic-bezier(0.05, 0.7, 0.1, 1)',
-        'expressive-fast-spatial': 'cubic-bezier(0.42, 1.67, 0.21, 0.9)', // Use 350ms
-        'expressive-default-spatial': 'cubic-bezier(0.38, 1.21, 0.22, 1.00)', // Use 500ms
-        'expressive-slow-effects': 'cubic-bezier(0.34, 0.88, 0.34, 1.00)', // Use 300ms
+        'expressive-fast-spatial': 'cubic-bezier(0.42, 1.67, 0.21, 0.9)', // duration = 350ms
+        'expressive-default-spatial': 'cubic-bezier(0.38, 1.21, 0.22, 1.00)', // duration = 500ms
+        'expressive-default-effects': 'cubic-bezier(0.34, 0.80, 0.34, 1.00)', // duration = 200ms
+        'expressive-slow-effects': 'cubic-bezier(0.34, 0.88, 0.34, 1.00)', // duration = 300ms
       },
       transitionDuration: {
+        200: '200ms',
         350: '350ms',
         400: '400ms',
         500: '500ms',
+        3: '5000ms',
       },
       keyframes: {
         'caret-blink': {
