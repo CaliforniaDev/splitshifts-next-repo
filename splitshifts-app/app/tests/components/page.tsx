@@ -13,11 +13,13 @@ import {
   CardFooter,
 } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/buttons';
+import IconButton from '@/app/components/ui/buttons/icon-button/icon-button';
 import Input from '@/app/components/ui/inputs/input';
 import { Textarea, SelectMenu } from '@/app/components/ui/inputs';
 import TimePicker from '@/app/components/ui/inputs/time-picker';
 import TimePickerOld from '@/app/components/ui/inputs/time-picker-old';
 import { Label } from '@/app/components/ui/label';
+import { Settings, Trash2, Plus, X, Heart, Share2 } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -155,6 +157,12 @@ export default function ComponentTestPage() {
                   onClick={() => scrollToSection('buttons')}
                 >
                   Buttons
+                </Button>
+                <Button
+                  variant='tonal'
+                  onClick={() => scrollToSection('icon-buttons')}
+                >
+                  Icon Buttons
                 </Button>
                 <Button
                   variant='tonal'
@@ -321,6 +329,104 @@ export default function ComponentTestPage() {
               <Button variant='filled' className='w-full'>
                 Full Width Button
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* ICON BUTTONS SECTION */}
+      <section id='icon-buttons' className='scroll-mt-8'>
+        <div className='mb-6 border-b-2 border-primary pb-4'>
+          <h2 className='typescale-headline-medium mb-2 text-primary'>
+            Icon Button Component
+          </h2>
+          <p className='typescale-body-medium text-on-surface-variant'>
+            Icon-only buttons with focus outline transition - Tab to test keyboard navigation
+          </p>
+        </div>
+
+        <Card className='border-none shadow-elevation-2'>
+          <CardContent className='space-y-8 pt-6'>
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                Filled Variant
+              </Label>
+              <div className='flex flex-wrap items-center gap-3'>
+                <IconButton variant='filled' icon={<Settings />} />
+                <IconButton variant='filled' icon={<Plus />} />
+                <IconButton variant='filled' icon={<Heart />} />
+                <IconButton variant='filled' icon={<Share2 />} disabled />
+                <IconButton variant='filled' icon={<Trash2 />} loading />
+              </div>
+            </div>
+
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                Tonal Variant
+              </Label>
+              <div className='flex flex-wrap items-center gap-3'>
+                <IconButton variant='tonal' icon={<Settings />} />
+                <IconButton variant='tonal' icon={<Plus />} />
+                <IconButton variant='tonal' icon={<Heart />} />
+                <IconButton variant='tonal' icon={<Share2 />} disabled />
+              </div>
+            </div>
+
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                Outlined Variant
+              </Label>
+              <div className='flex flex-wrap items-center gap-3'>
+                <IconButton variant='outlined' icon={<Settings />} />
+                <IconButton variant='outlined' icon={<Plus />} />
+                <IconButton variant='outlined' icon={<X />} />
+                <IconButton variant='outlined' icon={<Trash2 />} disabled />
+              </div>
+            </div>
+
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                Standard Variant (Text-like)
+              </Label>
+              <div className='flex flex-wrap items-center gap-3'>
+                <IconButton variant='standard' icon={<Settings />} />
+                <IconButton variant='standard' icon={<Plus />} />
+                <IconButton variant='standard' icon={<X />} />
+                <IconButton variant='standard' icon={<Trash2 />} disabled />
+              </div>
+            </div>
+
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                Sizes (xs, small, medium, large)
+              </Label>
+              <div className='flex flex-wrap items-center gap-3'>
+                <IconButton variant='filled' size='xs' icon={<Settings />} />
+                <IconButton variant='filled' size='small' icon={<Settings />} />
+                <IconButton variant='filled' size='medium' icon={<Settings />} />
+                <IconButton variant='filled' size='large' icon={<Settings />} />
+              </div>
+            </div>
+
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                Focus Ring Transition Test
+              </Label>
+              <p className='typescale-body-small mb-3 text-on-surface-variant'>
+                Use Tab to navigate to these buttons, then press Space or Enter. Watch the outline smoothly transition with the border-radius change.
+              </p>
+              <div className='flex flex-wrap items-center gap-4'>
+                <IconButton variant='filled' icon={<Heart />} />
+                <IconButton variant='tonal' icon={<Plus />} />
+                <IconButton variant='outlined' icon={<Settings />} />
+                <IconButton variant='standard' icon={<Share2 />} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* I   </Button>
             </div>
           </CardContent>
         </Card>
@@ -679,7 +785,7 @@ export default function ComponentTestPage() {
               <Label className='typescale-title-medium mb-3 block'>
                 Interactive Time Picker (Original)
               </Label>
-              <TimePickerOld value={timeOld} onChange={setTimeOld} />
+              <TimePickerOld label='Choose a time' value={timeOld} onChange={setTimeOld} />
             </div>
 
             {/* Custom Label */}
