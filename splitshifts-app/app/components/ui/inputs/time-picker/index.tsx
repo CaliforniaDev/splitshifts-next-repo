@@ -409,7 +409,6 @@ export default function TimePicker({
                   </div>
                 </div>
               }
-              className='focus-visible:rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary'
             />
 
             <div className='flex gap-2'>
