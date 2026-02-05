@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { twMerge } from 'tailwind-merge';
 import type { VariantProps } from 'class-variance-authority';
 import { Loader2 } from 'lucide-react';
-import { buttonVariants, hitAreaVariants, ACTIVE_BORDER_RADIUS, ICON_SIZE_CLASSES } from './variants';
+import { buttonVariants, ACTIVE_BORDER_RADIUS, ICON_SIZE_CLASSES } from './variants';
 import {
   useRipple,
   RippleEffect,
@@ -30,7 +30,7 @@ const isExternalLink = (href?: string): boolean => {
 
 /**
  * Icon-only button component with ripple effects
- * Supports regular buttons, Next.js links, and custom elements
+ * Modeled after regular button component for consistent behavior
  */
 export default function IconButton<T extends ElementType = 'button'>({
   as,
@@ -129,8 +129,8 @@ export default function IconButton<T extends ElementType = 'button'>({
     [rippleRef],
   );
 
-  const isDisabled = disabled || loading;
   const resolvedSize = size ?? 'small';
+  const isDisabled = disabled || loading;
 
   // Apply icon size based on button size
   const sizedIcon = React.isValidElement(icon)
@@ -148,44 +148,15 @@ export default function IconButton<T extends ElementType = 'button'>({
     sizedIcon
   );
 
-  const hitAreaClass = twMerge(
-    hitAreaVariants({
-      size: resolvedSize,
-      disabled: isDisabled,
-      className,
-    }),
-  );
-
-  const surfaceClass = twMerge(
+  const mergedClass = twMerge(
     buttonVariants({
       variant,
       size: resolvedSize,
       disabled: isDisabled,
+      className,
     }),
     // Apply active border radius when key or mouse is pressed
-    (isKeyPressed || isMousePressed)
-      ? ACTIVE_BORDER_RADIUS[resolvedSize]
-      : '',
-  );
-
-  const surfaceContent = (
-    <span ref={setRippleRef} className={surfaceClass}>
-      <span className='pointer-events-none relative z-10'>
-        {displayIcon}
-      </span>
-
-      {ripples.map(ripple => (
-        <RippleEffect
-          key={ripple.id}
-          {...ripple}
-          config={mergedConfig}
-          keyframeName='Button'
-          onComplete={() => removeRipple(ripple.id)}
-        />
-      ))}
-
-      <RippleKeyframes name='Button' config={mergedConfig} />
-    </span>
+    (isKeyPressed || isMousePressed) ? ACTIVE_BORDER_RADIUS[resolvedSize] : '',
   );
 
   // Development-only validations
@@ -205,8 +176,10 @@ export default function IconButton<T extends ElementType = 'button'>({
   if (isNextLink) {
     if (!href) {
       return (
-        <span className={hitAreaClass} role='link' aria-disabled='true' {...rest}>
-          {surfaceContent}
+        <span className={mergedClass} role='link' aria-disabled='true'>
+          <span className='pointer-events-none relative z-10'>
+            {displayIcon}
+          </span>
         </span>
       );
     }
@@ -214,18 +187,21 @@ export default function IconButton<T extends ElementType = 'button'>({
     // Disabled link renders as span
     if (isDisabled) {
       return (
-        <span className={hitAreaClass} role='link' aria-disabled='true' {...rest}>
-          {surfaceContent}
+        <span className={mergedClass} role='link' aria-disabled='true'>
+          <span className='pointer-events-none relative z-10'>
+            {displayIcon}
+          </span>
         </span>
       );
     }
 
     return (
       <Link
+        ref={setRippleRef}
         href={href}
         target={isExternal ? '_blank' : undefined}
         rel={isExternal ? 'noopener noreferrer' : undefined}
-        className={hitAreaClass}
+        className={mergedClass}
         onClick={userOnClick as any}
         onMouseDown={mergedMouseDownHandler}
         onMouseUp={mergedMouseUpHandler}
@@ -235,7 +211,21 @@ export default function IconButton<T extends ElementType = 'button'>({
         aria-busy={loading}
         {...rest}
       >
-        {surfaceContent}
+        <span className='pointer-events-none relative z-10'>
+          {displayIcon}
+        </span>
+
+        {ripples.map(ripple => (
+          <RippleEffect
+            key={ripple.id}
+            {...ripple}
+            config={mergedConfig}
+            keyframeName='Button'
+            onComplete={() => removeRipple(ripple.id)}
+          />
+        ))}
+
+        <RippleKeyframes name='Button' config={mergedConfig} />
       </Link>
     );
   }
@@ -245,7 +235,8 @@ export default function IconButton<T extends ElementType = 'button'>({
 
   return (
     <Component
-      className={hitAreaClass}
+      ref={setRippleRef}
+      className={mergedClass}
       disabled={isDisabled}
       onClick={userOnClick as any}
       onMouseDown={mergedMouseDownHandler}
@@ -258,7 +249,21 @@ export default function IconButton<T extends ElementType = 'button'>({
       aria-live={loading ? 'polite' : undefined}
       {...rest}
     >
-      {surfaceContent}
+      <span className='pointer-events-none relative z-10'>
+        {displayIcon}
+      </span>
+
+      {ripples.map(ripple => (
+        <RippleEffect
+          key={ripple.id}
+          {...ripple}
+          config={mergedConfig}
+          keyframeName='Button'
+          onComplete={() => removeRipple(ripple.id)}
+        />
+      ))}
+
+      <RippleKeyframes name='Button' config={mergedConfig} />
     </Component>
   );
 }
