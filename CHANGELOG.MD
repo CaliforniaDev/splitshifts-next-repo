@@ -162,6 +162,7 @@
 ### Fixed
 
 - Fix time picker dialog height animation and CTA positioning when toggling dial/keyboard modes
+- Fix IconButton focus outline radius to follow active pressed state with smooth outline-offset transitions
 
 ### Changed
 
