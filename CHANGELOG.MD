@@ -28,6 +28,8 @@
   - **Clock Face Integration**: Interactive SVG dial with drag support and auto-transition animations
   - **Precise Spacing**: 36px above clock, 24px below, 12px between sections, 24px separator width
   - **Focus Management**: Container focusable when not editing, input focusable during editing
+- **Date Picker Component**: Add icon-triggered calendar dropdown with month navigation, manual entry parsing, and min/max/disabled date support
+- **Date Picker Test Page**: Add a dedicated logged-in test route for visual QA (`/test-date-picker`)
 - **Input Icon Actions**: Optional clickable icon button support for Input fields with accessible labels
 - Implementation plan documentation with 5-phase MVP roadmap (`docs/IMPLEMENTATION_PLAN.md`)
   - Phase 1: Foundation & Core CRUD (Week 1-2, 60% complete)

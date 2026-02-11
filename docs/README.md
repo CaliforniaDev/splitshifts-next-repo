@@ -26,7 +26,7 @@ Welcome to the SplitShifts documentation! This directory contains comprehensive 
 
 ### UI Reference
 
-- **[UI Components](./ui/UI_COMPONENTS.md)** - Button, Input (including icon slots), Form components with React Hook Form + Radix Dialog integration patterns
+- **[UI Components](./ui/UI_COMPONENTS.md)** - Button, Input (including icon slots), Date/Time picker patterns, Form components with React Hook Form + Radix Dialog integration patterns
 - **[Dashboard Icons Guide](./ui/DASHBOARD_ICONS_GUIDE.md)** - Icon exports, variants, and navigation integration examples
 
 ### Development Guides *(Coming Soon)*
@@ -93,4 +93,4 @@ Welcome to the SplitShifts documentation! This directory contains comprehensive 
 ---
 
 **Documentation Status**: In Progress  
-**Last Updated**: November 2025
+**Last Updated**: February 2026
