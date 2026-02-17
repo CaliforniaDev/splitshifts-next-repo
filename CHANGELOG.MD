@@ -29,6 +29,7 @@
   - **Precise Spacing**: 36px above clock, 24px below, 12px between sections, 24px separator width
   - **Focus Management**: Container focusable when not editing, input focusable during editing
 - **Date Picker Component**: Add icon-triggered calendar dropdown with month navigation, manual entry parsing, and min/max/disabled date support
+- **Date Picker Format Hint**: Show a default MM/DD/YYYY format hint and allow opt-out via props
 - **Date Picker Test Page**: Add a dedicated logged-in test route for visual QA (`/test-date-picker`)
 - **Input Icon Actions**: Optional clickable icon button support for Input fields with accessible labels
 - Implementation plan documentation with 5-phase MVP roadmap (`docs/IMPLEMENTATION_PLAN.md`)
@@ -165,6 +166,8 @@
 
 - Fix time picker dialog height animation and CTA positioning when toggling dial/keyboard modes
 - Fix IconButton focus outline radius to follow active pressed state with smooth outline-offset transitions
+- Fix date picker manual input to auto-insert slashes on segment completion and preserve caret position
+- Fix date picker validation UX to show inline invalid-date errors instead of silently resetting typed values
 
 ### Changed
 
