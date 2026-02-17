@@ -147,3 +147,34 @@ export const mergeDateAndTime = (date: Date, timeSource?: Date | null): Date => 
     timeSource.getMilliseconds(),
   );
 };
+
+export const formatDateInput = (rawValue: string): { formatted: string; digits: string } => {
+  const digits = rawValue.replace(/\D/g, '').slice(0, 8);
+
+  if (digits.length <= 2) {
+    return {
+      formatted: digits.length === 2 ? `${digits}/` : digits,
+      digits,
+    };
+  }
+
+  if (digits.length <= 4) {
+    const month = digits.slice(0, 2);
+    const day = digits.slice(2);
+    return {
+      formatted: digits.length === 4 ? `${month}/${day}/` : `${month}/${day}`,
+      digits,
+    };
+  }
+
+  return {
+    formatted: `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`,
+    digits,
+  };
+};
+
+export const getDateInputCaretPosition = (digitsBeforeCaret: number): number => {
+  if (digitsBeforeCaret <= 2) return digitsBeforeCaret + (digitsBeforeCaret === 2 ? 1 : 0);
+  if (digitsBeforeCaret <= 4) return digitsBeforeCaret + (digitsBeforeCaret === 4 ? 2 : 1);
+  return digitsBeforeCaret + 2;
+};

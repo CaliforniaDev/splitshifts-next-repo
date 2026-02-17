@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
   type ChangeEvent,
-  type KeyboardEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/app/lib/utils';
@@ -24,6 +24,8 @@ import {
   endOfMonth,
   formatDate,
   formatMonthLabel,
+  formatDateInput,
+  getDateInputCaretPosition,
   isAfterDay,
   isBeforeDay,
   mergeDateAndTime,
@@ -63,11 +65,14 @@ export default function DatePicker({
   error = false,
   errorMessage = '',
   supportingText = '',
+  showFormatHint = true,
+  formatHint = 'Type 8 digits (MMDDYYYY) — slashes auto-added',
   disabled = false,
   required = false,
   className = '',
   iconPosition = 'start',
   placeholder = 'MM/DD/YYYY',
+  inputMode = 'numeric',
   locale = 'en-US',
   weekStartsOn = DEFAULT_WEEK_START,
   minDate,
@@ -85,6 +90,7 @@ export default function DatePicker({
   const [inputValue, setInputValue] = useState(() =>
     value ? formatDate(value, locale) : '',
   );
+  const [internalErrorMessage, setInternalErrorMessage] = useState('');
   const [dropdownDirection, setDropdownDirection] = useState<'down' | 'up'>(
     'down',
   );
@@ -93,7 +99,10 @@ export default function DatePicker({
 
   useEffect(() => {
     if (isEditing) return;
+    // Intentionally sync external value into the local draft when editing is inactive.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setInputValue(value ? formatDate(value, locale) : '');
+    setInternalErrorMessage('');
     if (value) {
       setVisibleMonth(startOfMonth(value));
     }
@@ -130,6 +139,7 @@ export default function DatePicker({
     const nextDate = mergeDateAndTime(date, value ?? null);
     onChange?.(nextDate);
     setInputValue(formatDate(nextDate, locale));
+    setInternalErrorMessage('');
     setVisibleMonth(startOfMonth(date));
     setIsOpen(false);
     setIsEditing(false);
@@ -142,26 +152,72 @@ export default function DatePicker({
 
   const handleInputBlur = () => {
     setIsEditing(false);
+    if (!inputValue.trim()) {
+      setInternalErrorMessage('');
+      onChange?.(null);
+      onBlur?.();
+      return;
+    }
+
     const parsed = parseDateString(inputValue);
     if (parsed && isDateAllowed(parsed)) {
       const nextDate = mergeDateAndTime(parsed, value ?? null);
       onChange?.(nextDate);
       setInputValue(formatDate(nextDate, locale));
+      setInternalErrorMessage('');
     } else {
-      setInputValue(value ? formatDate(value, locale) : '');
+      setInternalErrorMessage(
+        parsed ? 'This date is outside the allowed range.' : 'Enter a valid date (MM/DD/YYYY).',
+      );
     }
     onBlur?.();
   };
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
+    const inputElement = event.currentTarget;
+    const rawValue = inputElement.value;
+    const caretIndex = inputElement.selectionStart ?? rawValue.length;
+    const digitsBeforeCaret = rawValue.slice(0, caretIndex).replace(/\D/g, '').length;
+    const { formatted, digits } = formatDateInput(rawValue);
+
+    setInputValue(formatted);
+    if (digits.length < 8) {
+      setInternalErrorMessage('');
+    }
+
+    if (digits.length === 8) {
+      const parsed = parseDateString(formatted);
+      if (!parsed) {
+        setInternalErrorMessage('Enter a valid date (MM/DD/YYYY).');
+      } else if (!isDateAllowed(parsed)) {
+        setInternalErrorMessage('This date is outside the allowed range.');
+      } else {
+        const nextDate = mergeDateAndTime(parsed, value ?? null);
+        onChange?.(nextDate);
+        setVisibleMonth(startOfMonth(parsed));
+        setInternalErrorMessage('');
+      }
+    }
+
+    const nextCaret = Math.min(
+      getDateInputCaretPosition(digitsBeforeCaret),
+      formatted.length,
+    );
+
+    requestAnimationFrame(() => {
+      if (!inputElement.isConnected) return;
+      inputElement.setSelectionRange(nextCaret, nextCaret);
+    });
   };
 
-  const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+  const handleInputKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Escape') {
       setIsOpen(false);
     }
   };
+
+  const resolvedError = error || Boolean(internalErrorMessage);
+  const resolvedErrorMessage = error ? errorMessage : internalErrorMessage;
 
   const handlePrevMonth = () => {
     setVisibleMonth(prev => addMonths(prev, -1));
@@ -242,13 +298,17 @@ export default function DatePicker({
         onFocus={handleInputFocus}
         onBlur={handleInputBlur}
         onKeyDown={handleInputKeyDown}
-        error={error}
-        errorMessage={errorMessage}
-        supportingText={supportingText}
+        error={resolvedError}
+        errorMessage={resolvedErrorMessage}
+        supportingText={
+          showFormatHint
+            ? [supportingText, formatHint].filter(Boolean).join(' · ')
+            : supportingText
+        }
         disabled={disabled}
         required={required}
         placeholder={placeholder}
-        inputMode='numeric'
+        inputMode={inputMode}
         aria-haspopup='grid'
         aria-expanded={isOpen}
         aria-controls={dropdownId}

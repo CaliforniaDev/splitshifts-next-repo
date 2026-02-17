@@ -1,3 +1,5 @@
+import type { HTMLAttributes } from 'react';
+
 export type WeekStartsOn = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface DatePickerProps {
@@ -8,6 +10,9 @@ export interface DatePickerProps {
   error?: boolean;
   errorMessage?: string;
   supportingText?: string;
+  showFormatHint?: boolean;
+  formatHint?: string;
+  inputMode?: HTMLAttributes<HTMLInputElement>['inputMode'];
   disabled?: boolean;
   required?: boolean;
   className?: string;
