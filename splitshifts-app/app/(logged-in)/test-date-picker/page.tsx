@@ -9,8 +9,8 @@ export default function TestDatePickerPage() {
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [constrainedDate, setConstrainedDate] = useState<Date | null>(null);
 
-  const minDate = new Date(2026, 0, 1);
-  const maxDate = new Date(2026, 11, 31);
+  const minDate = new Date(2026, 1, 10);
+  const maxDate = new Date(2026, 1, 21);
   const isWeekend = (date: Date) => date.getDay() === 0 || date.getDay() === 6;
 
   const isEndBeforeStart =
@@ -30,6 +30,8 @@ export default function TestDatePickerPage() {
             <p>1. Type 8 digits (`MMDDYYYY`) and confirm slash auto-format + caret movement.</p>
             <p>2. Open calendar with icon, then test arrow keys, Home/End, PageUp/PageDown, and Enter.</p>
             <p>3. Type invalid dates (example: `03/48/1991`) and verify inline error messaging.</p>
+            <p>4. Try selecting an end date before the start date (it should be blocked).</p>
+            <p>5. For constrained date, only Feb 10-21, 2026 weekdays are allowed.</p>
           </div>
 
           <div>
@@ -47,6 +49,8 @@ export default function TestDatePickerPage() {
               value={endDate}
               onChange={setEndDate}
               supportingText='Must be same day or after start date'
+              minDate={startDate ?? undefined}
+              outOfRangeDateMessage='End date must be the same day or after start date.'
               error={isEndBeforeStart}
               errorMessage='End date cannot be before start date.'
             />
@@ -57,11 +61,11 @@ export default function TestDatePickerPage() {
               label='Constrained Date'
               value={constrainedDate}
               onChange={setConstrainedDate}
-              supportingText='Allowed window: Jan 1, 2026 - Dec 31, 2026 (weekdays only)'
+              supportingText='Allowed window: Feb 10-21, 2026 (weekdays only)'
               minDate={minDate}
               maxDate={maxDate}
               isDateDisabled={isWeekend}
-              outOfRangeDateMessage='Pick a weekday in 2026.'
+              outOfRangeDateMessage='Pick a weekday between Feb 10 and Feb 21, 2026.'
             />
           </div>
 
