@@ -12,6 +12,8 @@ export interface DatePickerProps {
   supportingText?: string;
   showFormatHint?: boolean;
   formatHint?: string;
+  invalidDateMessage?: string;
+  outOfRangeDateMessage?: string;
   inputMode?: HTMLAttributes<HTMLInputElement>['inputMode'];
   disabled?: boolean;
   required?: boolean;

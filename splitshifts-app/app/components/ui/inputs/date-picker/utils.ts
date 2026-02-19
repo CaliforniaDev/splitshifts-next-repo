@@ -28,6 +28,20 @@ export const endOfMonth = (date: Date): Date =>
 export const addMonths = (date: Date, amount: number): Date =>
   new Date(date.getFullYear(), date.getMonth() + amount, 1);
 
+export const addYears = (date: Date, amount: number): Date =>
+  new Date(date.getFullYear() + amount, date.getMonth(), date.getDate());
+
+export const addDays = (date: Date, amount: number): Date =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate() + amount);
+
+export const startOfWeek = (date: Date, weekStartsOn: WeekStartsOn): Date => {
+  const delta = (date.getDay() - weekStartsOn + 7) % 7;
+  return addDays(date, -delta);
+};
+
+export const endOfWeek = (date: Date, weekStartsOn: WeekStartsOn): Date =>
+  addDays(startOfWeek(date, weekStartsOn), 6);
+
 export const getWeekdayLabels = (weekStartsOn: WeekStartsOn): string[] => {
   if (weekStartsOn === 0) return [...WEEKDAY_LABELS];
   return [...WEEKDAY_LABELS.slice(weekStartsOn), ...WEEKDAY_LABELS.slice(0, weekStartsOn)];

@@ -4,6 +4,7 @@ import { cn } from '@/app/lib/utils';
 
 interface CalendarHeaderProps {
   label: string;
+  labelId?: string;
   onPrev: () => void;
   onNext: () => void;
   disablePrev?: boolean;
@@ -13,6 +14,7 @@ interface CalendarHeaderProps {
 
 export function CalendarHeader({
   label,
+  labelId,
   onPrev,
   onNext,
   disablePrev = false,
@@ -21,7 +23,9 @@ export function CalendarHeader({
 }: CalendarHeaderProps) {
   return (
     <div className={cn('flex items-center justify-between', className)}>
-      <p className='typescale-title-medium text-on-surface'>{label}</p>
+      <p id={labelId} className='typescale-title-medium text-on-surface'>
+        {label}
+      </p>
       <div className='flex items-center gap-1'>
         <IconButton
           variant='standard'
