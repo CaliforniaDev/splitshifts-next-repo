@@ -354,7 +354,7 @@ export default function DatePicker({
     }
 
     const nextCaret = Math.min(
-      getDateInputCaretPosition(digitsBeforeCaret),
+      getDateInputCaretPosition(formatted, digitsBeforeCaret),
       formatted.length,
     );
 

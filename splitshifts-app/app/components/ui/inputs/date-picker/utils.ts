@@ -162,33 +162,55 @@ export const mergeDateAndTime = (date: Date, timeSource?: Date | null): Date => 
   );
 };
 
-export const formatDateInput = (rawValue: string): { formatted: string; digits: string } => {
+interface FormatDateInputOptions {
+  showTrailingSeparators?: boolean;
+}
+
+export const formatDateInput = (
+  rawValue: string,
+  { showTrailingSeparators = false }: FormatDateInputOptions = {},
+): { formatted: string; digits: string } => {
   const digits = rawValue.replace(/\D/g, '').slice(0, 8);
+  const month = digits.slice(0, 2);
+  const day = digits.slice(2, 4);
+  const year = digits.slice(4);
+
+  if (!digits.length) {
+    return { formatted: '', digits };
+  }
 
   if (digits.length <= 2) {
-    return {
-      formatted: digits.length === 2 ? `${digits}/` : digits,
-      digits,
-    };
+    const formatted =
+      showTrailingSeparators && digits.length === 2 ? `${month}/` : month;
+    return { formatted, digits };
   }
 
-  if (digits.length <= 4) {
-    const month = digits.slice(0, 2);
-    const day = digits.slice(2);
-    return {
-      formatted: digits.length === 4 ? `${month}/${day}/` : `${month}/${day}`,
-      digits,
-    };
+  let formatted = `${month}/${day}`;
+
+  if (year.length > 0) {
+    formatted += `/${year}`;
+  } else if (showTrailingSeparators && digits.length >= 4) {
+    formatted += '/';
   }
 
-  return {
-    formatted: `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`,
-    digits,
-  };
+  return { formatted, digits };
 };
 
-export const getDateInputCaretPosition = (digitsBeforeCaret: number): number => {
-  if (digitsBeforeCaret <= 2) return digitsBeforeCaret + (digitsBeforeCaret === 2 ? 1 : 0);
-  if (digitsBeforeCaret <= 4) return digitsBeforeCaret + (digitsBeforeCaret === 4 ? 2 : 1);
-  return digitsBeforeCaret + 2;
+export const getDateInputCaretPosition = (
+  formattedValue: string,
+  digitsBeforeCaret: number,
+): number => {
+  if (digitsBeforeCaret <= 0) return 0;
+
+  let seenDigits = 0;
+  for (let i = 0; i < formattedValue.length; i += 1) {
+    if (/\d/.test(formattedValue[i])) {
+      seenDigits += 1;
+      if (seenDigits >= digitsBeforeCaret) {
+        return i + 1;
+      }
+    }
+  }
+
+  return formattedValue.length;
 };
