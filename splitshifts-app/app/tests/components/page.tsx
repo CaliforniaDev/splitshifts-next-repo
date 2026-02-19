@@ -18,6 +18,7 @@ import Input from '@/app/components/ui/inputs/input';
 import { Textarea, SelectMenu } from '@/app/components/ui/inputs';
 import TimePicker from '@/app/components/ui/inputs/time-picker';
 import TimePickerOld from '@/app/components/ui/inputs/time-picker-old';
+import DatePicker from '@/app/components/ui/inputs/date-picker';
 import { Label } from '@/app/components/ui/label';
 import { Settings, Trash2, Plus, X, Heart, Share2 } from 'lucide-react';
 import {
@@ -49,6 +50,9 @@ export default function ComponentTestPage() {
     date.setHours(9, 0, 0, 0);
     return date;
   });
+  const [shiftStartDate, setShiftStartDate] = useState<Date | null>(new Date());
+  const [shiftEndDate, setShiftEndDate] = useState<Date | null>(null);
+  const [availabilityDate, setAvailabilityDate] = useState<Date | null>(null);
   const [showError, setShowError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -84,6 +88,28 @@ export default function ComponentTestPage() {
     const displayMinutes = minutes.toString().padStart(2, '0');
     return `${displayHours}:${displayMinutes} ${period}`;
   };
+
+  const formatDateDisplay = (date: Date | null) => {
+    if (!date) return 'Not set';
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(date);
+  };
+
+  const today = new Date();
+  const availabilityWindowMinDate = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    1,
+  );
+  const availabilityWindowMaxDate = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    21,
+  );
+  const isWeekend = (date: Date) => date.getDay() === 0 || date.getDay() === 6;
 
   const handleLoadingTest = () => {
     setIsLoading(true);
@@ -137,6 +163,12 @@ export default function ComponentTestPage() {
                 </Button>
                 <Button
                   variant='tonal'
+                  onClick={() => scrollToSection('date-picker')}
+                >
+                  Date Picker
+                </Button>
+                <Button
+                  variant='tonal'
                   onClick={() => scrollToSection('cards')}
                 >
                   Cards
@@ -187,6 +219,12 @@ export default function ComponentTestPage() {
                   onClick={() => scrollToSection('time-picker')}
                 >
                   Time Picker
+                </Button>
+                <Button
+                  variant='tonal'
+                  onClick={() => scrollToSection('date-picker')}
+                >
+                  Date Picker
                 </Button>
                 <Button
                   variant='tonal'
@@ -766,6 +804,78 @@ export default function ComponentTestPage() {
         </Card>
       </section>
 
+      {/* DATE PICKER SECTION */}
+      <section id='date-picker' className='scroll-mt-8'>
+        <div className='mb-6 border-b-2 border-primary pb-4'>
+          <h2 className='typescale-headline-medium mb-2 text-primary'>
+            DatePicker Component
+          </h2>
+          <p className='typescale-body-medium text-on-surface-variant'>
+            Manual entry with auto-formatting, calendar selection, and constraint rules
+          </p>
+        </div>
+
+        <Card className='border-none shadow-elevation-2'>
+          <CardContent className='space-y-8 pt-6'>
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                Interactive Date Picker
+              </Label>
+              <DatePicker
+                label='Shift Date *'
+                value={shiftStartDate}
+                onChange={setShiftStartDate}
+                supportingText='Type MMDDYYYY or use the calendar icon'
+              />
+            </div>
+
+            <div className='grid gap-4 md:grid-cols-2'>
+              <DatePicker
+                label='Shift Start Date'
+                value={shiftStartDate}
+                onChange={setShiftStartDate}
+              />
+              <DatePicker
+                label='Shift End Date'
+                value={shiftEndDate}
+                onChange={setShiftEndDate}
+                minDate={shiftStartDate ?? undefined}
+                supportingText='End date cannot be before start date'
+                outOfRangeDateMessage='End date must be on or after the start date.'
+              />
+            </div>
+
+            <div>
+              <Label className='typescale-title-medium mb-3 block'>
+                Weekday Constraint Example
+              </Label>
+              <DatePicker
+                label='Available Work Day'
+                value={availabilityDate}
+                onChange={setAvailabilityDate}
+                minDate={availabilityWindowMinDate}
+                maxDate={availabilityWindowMaxDate}
+                isDateDisabled={isWeekend}
+                supportingText='Only weekdays are allowed in the first 21 days of this month'
+                outOfRangeDateMessage='Pick a weekday within the allowed window.'
+              />
+            </div>
+
+            <div className='rounded-lg bg-tertiary-container p-4'>
+              <p className='text-sm text-on-tertiary-container'>
+                <strong>Shift Start:</strong> {formatDateDisplay(shiftStartDate)}
+              </p>
+              <p className='mt-2 text-sm text-on-tertiary-container'>
+                <strong>Shift End:</strong> {formatDateDisplay(shiftEndDate)}
+              </p>
+              <p className='mt-2 text-sm text-on-tertiary-container'>
+                <strong>Available Work Day:</strong> {formatDateDisplay(availabilityDate)}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
       {/* TIME PICKER COMPARISON SECTION */}
       <section id='time-picker-comparison' className='scroll-mt-8'>
         <div className='mb-6 border-b-2 border-tertiary pb-4'>
@@ -1156,6 +1266,8 @@ export default function ComponentTestPage() {
               <li>□ Textarea resizes correctly</li>
               <li>□ Textarea WITH/WITHOUT placeholder works</li>
               <li>□ Select dropdown opens and closes smoothly</li>
+              <li>□ Date picker manual input auto-formats as MM/DD/YYYY</li>
+              <li>□ Date picker constraints block out-of-range and disabled dates</li>
               <li>□ Form validation errors trigger properly</li>
               <li>□ FormErrorDisplay shows with icon</li>
               <li>□ Cards have appropriate elevation shadows</li>
