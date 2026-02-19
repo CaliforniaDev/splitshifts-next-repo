@@ -29,8 +29,10 @@
   - **Precise Spacing**: 36px above clock, 24px below, 12px between sections, 24px separator width
   - **Focus Management**: Container focusable when not editing, input focusable during editing
 - **Date Picker Component**: Add icon-triggered calendar dropdown with month navigation, manual entry parsing, and min/max/disabled date support
+- **Date Picker Accessibility Upgrade**: Add keyboard-first calendar navigation (Arrow keys, Home/End, PageUp/PageDown, Enter/Escape) with roving focus and live month announcements
 - **Date Picker Format Hint**: Show a default MM/DD/YYYY format hint and allow opt-out via props
 - **Date Picker Test Page**: Add a dedicated logged-in test route for visual QA (`/test-date-picker`)
+- **Date Picker Test Scenarios**: Expand `/test-date-picker` with constrained range, weekday-only selection, and cross-field validation examples
 - **Input Icon Actions**: Optional clickable icon button support for Input fields with accessible labels
 - Implementation plan documentation with 5-phase MVP roadmap (`docs/IMPLEMENTATION_PLAN.md`)
   - Phase 1: Foundation & Core CRUD (Week 1-2, 60% complete)
@@ -168,10 +170,12 @@
 - Fix IconButton focus outline radius to follow active pressed state with smooth outline-offset transitions
 - Fix date picker manual input to auto-insert slashes on segment completion and preserve caret position
 - Fix date picker validation UX to show inline invalid-date errors instead of silently resetting typed values
+- Fix date picker focus lifecycle when transitioning between input and calendar grid to prevent unstable focus state
 
 ### Changed
 
 - Animate dialog max-height on mode toggle and keep dial fade/scale synced inside the collapse
+- Improve date picker validation pipeline with customizable invalid/range messages and deduplicated `onChange` emissions between typed completion and blur
     - **Consistent Implementation**: All forms use `requestAnimationFrame` for proper DOM timing and TypeScript-safe ref handling
   - **Form Error Handling**: Improved error state management with proper boolean/string typing for Input components
   - **Visual Design Consistency**: Centered success states and animations across all verification flows

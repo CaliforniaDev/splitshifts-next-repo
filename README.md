@@ -51,7 +51,7 @@ SplitShifts is a web application designed to streamline the scheduling process f
   - **OTP Input Component**: Specialized 6-digit OTP input with accessibility features
   - **Authentication Cards**: Consistent card-based design for all auth flows
   - **Time Picker Manual Entry**: Type hours → minutes with auto-advance, use A/P for AM/PM, Enter confirms, icon opens the dial
-  - **Date Picker Component**: Icon-triggered calendar dropdown with month navigation, manual entry parsing, and disabled date support
+  - **Date Picker Component**: Icon-triggered calendar dropdown with keyboard grid navigation (arrows/Home/End/PageUp/PageDown), auto-formatted manual entry, inline invalid/range validation, and disabled date support
   - **Component Modernization**: Unified form interface using standardized Input component across all authentication forms
   - **AuthLayout System**: Professional responsive layout for authentication pages
     - **Three Layout Variants**: Default (50/50), Wide (60/40), and Compact (66/33) split layouts
